@@ -4,3 +4,4 @@
 .project
 .classpath
 build
+gradle.properties
