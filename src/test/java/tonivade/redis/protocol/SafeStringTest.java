@@ -2,13 +2,13 @@
  * Copyright (c) 2015, Antonio Gabriel Muñoz Conejo <antoniogmc at gmail dot com>
  * Distributed under the terms of the MIT License
  */
-package tonivade.server.protocol;
+package tonivade.redis.protocol;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static tonivade.redis.protocol.HexUtil.toHexString;
 import static tonivade.redis.protocol.SafeString.safeAsList;
 import static tonivade.redis.protocol.SafeString.safeString;
-import static tonivade.server.protocol.HexUtil.toHexString;
 
 import java.util.Iterator;
 import java.util.List;

@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License
  */
 
-package tonivade.server.command;
+package tonivade.redis.command;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;

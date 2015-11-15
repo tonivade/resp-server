@@ -7,6 +7,17 @@ package tonivade.redis;
 import static java.util.Objects.requireNonNull;
 import static tonivade.redis.protocol.SafeString.safeAsList;
 import static tonivade.redis.protocol.SafeString.safeString;
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.PooledByteBufAllocator;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
 
 import java.net.InetSocketAddress;
 import java.util.HashMap;
@@ -29,18 +40,6 @@ import tonivade.redis.protocol.RedisToken;
 import tonivade.redis.protocol.RedisTokenType;
 import tonivade.redis.protocol.RequestDecoder;
 import tonivade.redis.protocol.SafeString;
-
-import io.netty.bootstrap.ServerBootstrap;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.PooledByteBufAllocator;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
 
 public class RedisServer implements IRedis, IServerContext {
 
@@ -69,9 +68,16 @@ public class RedisServer implements IRedis, IServerContext {
     protected final CommandSuite commands;
 
     public RedisServer(String host, int port, CommandSuite commands) {
-        this.host = host;
-        this.port = port;
+        this.host = requireNonNull(host);
+        this.port = requireRange(port, 1024, 65535);
         this.commands = requireNonNull(commands);
+    }
+
+    private int requireRange(int value, int min, int max) {
+        if (value <= min || value > max) {
+            throw new IllegalArgumentException(min + " <= " + value + " < " + max);
+        }
+        return value;
     }
 
     public void start() {

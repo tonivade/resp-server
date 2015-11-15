@@ -5,12 +5,6 @@
 package tonivade.redis;
 
 import static java.util.Objects.requireNonNull;
-
-import java.util.logging.Logger;
-
-import tonivade.redis.protocol.RedisToken;
-import tonivade.redis.protocol.RequestDecoder;
-
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelFuture;
@@ -22,6 +16,11 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.util.CharsetUtil;
+
+import java.util.logging.Logger;
+
+import tonivade.redis.protocol.RedisToken;
+import tonivade.redis.protocol.RequestDecoder;
 
 public class RedisClient implements IRedis {
 
@@ -38,16 +37,23 @@ public class RedisClient implements IRedis {
 
     private ChannelFuture future;
 
-    private ChannelHandlerContext ctx;
+    private ChannelHandlerContext context;
     private RedisInitializerHandler initHandler;
     private RedisConnectionHandler connectionHandler;
 
     private final IRedisCallback callback;
 
     public RedisClient(String host, int port, IRedisCallback callback) {
-        this.host = host;
-        this.port = port;
+        this.host = requireNonNull(host);
+        this.port = requireRange(port, 1024, 65535);
         this.callback = requireNonNull(callback);
+    }
+
+    private int requireRange(int value, int min, int max) {
+        if (value <= min || value > max) {
+            throw new IllegalArgumentException(min + " <= " + value + " < " + max);
+        }
+        return value;
     }
 
     public void start() {
@@ -102,7 +108,7 @@ public class RedisClient implements IRedis {
     public void connected(ChannelHandlerContext ctx) {
         LOGGER.info(() -> "channel active");
 
-        this.ctx = ctx;
+        this.context = ctx;
 
         callback.onConnect();
     }
@@ -111,16 +117,16 @@ public class RedisClient implements IRedis {
     public void disconnected(ChannelHandlerContext ctx) {
         LOGGER.info(() -> "client disconected from server: " + host + ":" + port);
 
-        if (this.ctx != null) {
+        if (this.context != null) {
             callback.onDisconnect();
 
-            this.ctx = null;
+            this.context = null;
         }
     }
 
     public void send(String message) {
-        if (ctx != null) {
-            ctx.writeAndFlush(message);
+        if (context != null) {
+            context.writeAndFlush(message);
         }
     }
 
