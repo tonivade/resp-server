@@ -54,7 +54,6 @@ public class CommandSuite {
     }
 
     public ICommand getCommand(String name) {
-        ICommand command = commands.get(name.toLowerCase());
-        return command != null ? command : nullCommand;
+        return commands.getOrDefault(name.toLowerCase(), nullCommand);
     }
 }
