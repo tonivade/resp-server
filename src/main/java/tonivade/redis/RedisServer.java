@@ -207,16 +207,11 @@ public class RedisServer implements IRedis, IServerContext {
         LOGGER.fine(() -> "received command: " + request);
 
         IResponse response = new Response();
-        ISession session = request.getSession();
         ICommand command = commands.getCommand(request.getCommand());
-        if (command != null) {
-            try {
-                executeCommand(command, request, response);
-            } catch (RuntimeException e) {
-                LOGGER.log(Level.SEVERE, "error executing command: " + request, e);
-            }
-        } else {
-            writeResponse(session, response.addError("ERR unknown command '" + request.getCommand() + "'"));
+        try {
+            executeCommand(command, request, response);
+        } catch (RuntimeException e) {
+            LOGGER.log(Level.SEVERE, "error executing command: " + request, e);
         }
     }
 

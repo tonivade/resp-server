@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 
 import tonivade.redis.annotation.Command;
 import tonivade.redis.command.server.EchoCommand;
+import tonivade.redis.command.server.NullCommand;
 import tonivade.redis.command.server.PingCommand;
 import tonivade.redis.command.server.QuitCommand;
 import tonivade.redis.command.server.TimeCommand;
@@ -20,6 +21,8 @@ public class CommandSuite {
     private static final Logger LOGGER = Logger.getLogger(CommandSuite.class.getName());
 
     private final Map<String, ICommand> commands = new HashMap<>();
+
+    private final NullCommand nullCommand = new NullCommand();
 
     public CommandSuite() {
         addCommand(PingCommand.class);
@@ -51,6 +54,7 @@ public class CommandSuite {
     }
 
     public ICommand getCommand(String name) {
-        return commands.get(name.toLowerCase());
+        ICommand command = commands.get(name.toLowerCase());
+        return command != null ? command : nullCommand;
     }
 }
