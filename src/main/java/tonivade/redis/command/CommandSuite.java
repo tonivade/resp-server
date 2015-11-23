@@ -11,7 +11,6 @@ import java.util.logging.Logger;
 
 import tonivade.redis.annotation.Command;
 import tonivade.redis.command.server.EchoCommand;
-import tonivade.redis.command.server.NullCommand;
 import tonivade.redis.command.server.PingCommand;
 import tonivade.redis.command.server.QuitCommand;
 import tonivade.redis.command.server.TimeCommand;

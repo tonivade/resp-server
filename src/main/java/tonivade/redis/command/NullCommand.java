@@ -1,8 +1,8 @@
-package tonivade.redis.command.server;
-
-import tonivade.redis.command.ICommand;
-import tonivade.redis.command.IRequest;
-import tonivade.redis.command.IResponse;
+/*
+ * Copyright (c) 2015, Antonio Gabriel Muñoz Conejo <antoniogmc at gmail dot com>
+ * Distributed under the terms of the MIT License
+ */
+package tonivade.redis.command;
 
 public class NullCommand implements ICommand {
 
