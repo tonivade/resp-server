@@ -2,7 +2,6 @@
  * Copyright (c) 2015, Antonio Gabriel Muñoz Conejo <antoniogmc at gmail dot com>
  * Distributed under the terms of the MIT License
  */
-
 package tonivade.redis.command;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -11,8 +10,6 @@ import static tonivade.redis.protocol.SafeString.safeString;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import tonivade.redis.command.Response;
 
 public class ResponseTest {
 

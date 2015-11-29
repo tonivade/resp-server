@@ -18,4 +18,6 @@ public interface ISession {
 
     void putValue(String key, Object value);
 
+    <T> T removeValue(String key);
+
 }

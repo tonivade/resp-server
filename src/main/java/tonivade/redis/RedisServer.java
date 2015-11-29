@@ -263,6 +263,12 @@ public class RedisServer implements IRedis, IServerContext {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public <T> T removeValue(String key) {
+        return (T) state.remove(key);
+    }
+
+    @Override
     public void putValue(String key, Object value) {
         state.put(key, value);
     }

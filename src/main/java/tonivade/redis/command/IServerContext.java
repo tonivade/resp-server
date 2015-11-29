@@ -16,4 +16,6 @@ public interface IServerContext {
 
     void putValue(String key, Object value);
 
+    <T> T removeValue(String key);
+
 }

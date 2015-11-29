@@ -4,10 +4,10 @@
  */
 package tonivade.redis.command;
 
+import io.netty.channel.ChannelHandlerContext;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import io.netty.channel.ChannelHandlerContext;
 
 public class Session implements ISession {
 
@@ -42,6 +42,12 @@ public class Session implements ISession {
     @SuppressWarnings("unchecked")
     public <T> T getValue(String key) {
         return (T) state.get(key);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> T removeValue(String key) {
+        return (T) state.remove(key);
     }
 
     @Override
