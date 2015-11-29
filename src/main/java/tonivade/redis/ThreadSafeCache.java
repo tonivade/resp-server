@@ -22,6 +22,21 @@ public class ThreadSafeCache<K, V> {
     private Map<K, FutureTask<V>> values = new HashMap<>();
     private ExecutorService executor = Executors.newSingleThreadExecutor();
 
+    public V get(K key) {
+        try {
+            return getValue(key).get();
+        } catch (InterruptedException e) {
+            log.log(Level.WARNING, "interrupted", e);
+        } catch (ExecutionException e) {
+            log.log(Level.SEVERE, "error", e);
+        }
+        return null;
+    }
+
+    private FutureTask<V> getValue(K key) {
+        return values.getOrDefault(key, new FutureTask<>(() -> null));
+    }
+
     public V get(K key, Function<K, V> objectCreator, Consumer<V> creationCallback) {
         try {
             FutureTask<V> task = getOrCreateTask(key, objectCreator, creationCallback);
@@ -35,7 +50,8 @@ public class ThreadSafeCache<K, V> {
         return null;
     }
 
-    private FutureTask<V> getOrCreateTask(K key, Function<K, V> objectCreator, Consumer<V> creationCallback) {
+    private FutureTask<V> getOrCreateTask(K key,
+            Function<K, V> objectCreator, Consumer<V> creationCallback) {
         FutureTask<V> task;
         synchronized (values) {
             task = values.get(key);
@@ -48,11 +64,13 @@ public class ThreadSafeCache<K, V> {
         return task;
     }
 
-    private FutureTask<V> createTask(K key, Function<K, V> objectCreator, Consumer<V> creationCallback) {
+    private FutureTask<V> createTask(K key,
+            Function<K, V> objectCreator, Consumer<V> creationCallback) {
         return new FutureTask<>(() -> createObject(key, objectCreator, creationCallback));
     }
 
-    private V createObject(K key, Function<K, V> objectCreator, Consumer<V> creationCallback) {
+    private V createObject(K key,
+            Function<K, V> objectCreator, Consumer<V> creationCallback) {
         log.log(Level.INFO, "creating object from cache `{0}`", key);
         V createdObject = objectCreator.apply(key);
         if (createdObject != null) {

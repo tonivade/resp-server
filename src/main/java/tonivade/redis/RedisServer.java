@@ -61,11 +61,11 @@ public class RedisServer implements IRedis, IServerContext {
 
     private ChannelFuture future;
 
-    protected final Map<String, Object> state = new HashMap<>();
+    private final Map<String, Object> state = new HashMap<>();
 
-    protected final ThreadSafeCache<String, ISession> clients = new ThreadSafeCache<>();
+    private final ThreadSafeCache<String, ISession> clients = new ThreadSafeCache<>();
 
-    protected final CommandSuite commands;
+    private final CommandSuite commands;
 
     public RedisServer(String host, int port, CommandSuite commands) {
         this.host = requireNonNull(host);
@@ -265,5 +265,9 @@ public class RedisServer implements IRedis, IServerContext {
     @Override
     public void putValue(String key, Object value) {
         state.put(key, value);
+    }
+
+    public ISession getSession(String key) {
+        return clients.get(key);
     }
 }
