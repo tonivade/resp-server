@@ -63,14 +63,7 @@ public class RedisServer implements IRedis, IServerContext {
 
     protected final Map<String, Object> state = new HashMap<>();
 
-    protected final ThreadSafeCache<String, ISession> clients = new ThreadSafeCache<String, ISession>() {
-        @Override
-        protected ISession createValue(String key, Object ... params) {
-            Session session = new Session(key, (ChannelHandlerContext) params[0]);
-            createSession(session);
-            return session;
-        }
-    };
+    protected final ThreadSafeCache<String, ISession> clients = new ThreadSafeCache<>();
 
     protected final CommandSuite commands;
 
@@ -172,7 +165,7 @@ public class RedisServer implements IRedis, IServerContext {
     }
 
     private ISession getSession(String sourceKey, ChannelHandlerContext ctx) {
-        return clients.get(sourceKey, ctx);
+        return clients.get(sourceKey, (key) -> new Session(key, ctx), this::createSession);
     }
 
     protected void createSession(ISession session) {

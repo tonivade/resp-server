@@ -6,38 +6,25 @@ package tonivade.redis;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public abstract class ThreadSafeCache<K, V> {
+public class ThreadSafeCache<K, V> {
 
     private static Logger log = Logger.getLogger(ThreadSafeCache.class.getName());
 
     private Map<K, FutureTask<V>> values = new HashMap<>();
     private ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    public V get(K key, Object ... params) {
+    public V get(K key, Function<K, V> objectCreator, Consumer<V> creationCallback) {
         try {
-            FutureTask<V> task;
-            synchronized (values) {
-                task = values.get(key);
-                if (task == null) {
-                    task = new FutureTask<>(new Callable<V>() {
-                        @Override
-                        public V call() throws Exception {
-                            log.log(Level.INFO, "creating object from cache `{0}`", key);
-                            return createValue(key, params);
-                        }
-                    });
-                    executor.execute(task);
-                    values.put(key, task);
-                }
-            }
+            FutureTask<V> task = getOrCreateTask(key, objectCreator, creationCallback);
             log.log(Level.FINE, "getting object from cache `{0}`", key);
             return task.get();
         } catch (InterruptedException e) {
@@ -48,7 +35,31 @@ public abstract class ThreadSafeCache<K, V> {
         return null;
     }
 
-    protected abstract V createValue(K key, Object ... params);
+    private FutureTask<V> getOrCreateTask(K key, Function<K, V> objectCreator, Consumer<V> creationCallback) {
+        FutureTask<V> task;
+        synchronized (values) {
+            task = values.get(key);
+            if (task == null) {
+                task = createTask(key, objectCreator, creationCallback);
+                executor.execute(task);
+                values.put(key, task);
+            }
+        }
+        return task;
+    }
+
+    private FutureTask<V> createTask(K key, Function<K, V> objectCreator, Consumer<V> creationCallback) {
+        return new FutureTask<>(() -> createObject(key, objectCreator, creationCallback));
+    }
+
+    private V createObject(K key, Function<K, V> objectCreator, Consumer<V> creationCallback) {
+        log.log(Level.INFO, "creating object from cache `{0}`", key);
+        V createdObject = objectCreator.apply(key);
+        if (createdObject != null) {
+            creationCallback.accept(createdObject);
+        }
+        return createdObject;
+    }
 
     public V remove(K key) {
         try {
@@ -66,7 +77,9 @@ public abstract class ThreadSafeCache<K, V> {
     }
 
     public int size() {
-        return values.size();
+        synchronized (values) {
+            return values.size();
+        }
     }
 
     public void clear() {
