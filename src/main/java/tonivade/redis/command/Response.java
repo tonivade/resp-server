@@ -90,6 +90,8 @@ public class Response implements IResponse {
                     addBulkStr((SafeString) value);
                 } else if (value instanceof String) {
                     addSimpleStr((String) value);
+                } else if (value instanceof byte[]) {
+                    builder.append((byte[]) value);
                 }
             }
         } else {
@@ -164,8 +166,13 @@ public class Response implements IResponse {
 
         private void ensureCapacity(int len) {
             if (buffer.remaining() < len) {
-                buffer = ByteBuffer.allocate(buffer.capacity() + Math.max(len, INITIAL_CAPACITY)).put(build());
+                growBuffer(len);
             }
+        }
+
+        private void growBuffer(int len) {
+            int capacity = buffer.capacity() + Math.max(len, INITIAL_CAPACITY);
+            buffer = ByteBuffer.allocate(capacity).put(build());
         }
 
         public byte[] build() {
