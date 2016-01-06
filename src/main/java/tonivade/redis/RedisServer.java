@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,6 +28,9 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import rx.Observable;
+import rx.Scheduler;
+import rx.schedulers.Schedulers;
 import tonivade.redis.command.CommandSuite;
 import tonivade.redis.command.ICommand;
 import tonivade.redis.command.IRequest;
@@ -66,6 +70,8 @@ public class RedisServer implements IRedis, IServerContext {
     private final ThreadSafeCache<String, ISession> clients = new ThreadSafeCache<>();
 
     private final CommandSuite commands;
+
+    private final Scheduler scheduler = Schedulers.from(Executors.newSingleThreadExecutor());
 
     public RedisServer(String host, int port, CommandSuite commands) {
         this.host = requireNonNull(host);
@@ -203,26 +209,33 @@ public class RedisServer implements IRedis, IServerContext {
     protected void processCommand(IRequest request) {
         LOGGER.fine(() -> "received command: " + request);
 
+        ISession session = request.getSession();
         IResponse response = new Response();
         ICommand command = commands.getCommand(request.getCommand());
         try {
-            executeCommand(command, request, response);
+            execute(command, request, response).observeOn(scheduler).subscribe(buffer -> {
+                session.getContext().writeAndFlush(buffer);
+                if (response.isExit()) {
+                    session.getContext().close();
+                }
+            });
         } catch (RuntimeException e) {
             LOGGER.log(Level.SEVERE, "error executing command: " + request, e);
         }
     }
 
-    protected void executeCommand(ICommand command, IRequest request, IResponse response) {
-        ISession session = request.getSession();
-        command.execute(request, response);
-        writeResponse(session, response);
-        if (response.isExit()) {
-            session.getContext().close();
-        }
+    private Observable<ByteBuf> execute(ICommand command, IRequest request, IResponse response) {
+        return Observable.create(observer -> {
+            executeCommand(command, request, response);
+
+            observer.onNext(responseToBuffer(request.getSession(), response));
+
+            observer.onCompleted();
+        });
     }
 
-    protected void writeResponse(ISession session, IResponse response) {
-        session.getContext().writeAndFlush(responseToBuffer(session, response));
+    protected void executeCommand(ICommand command, IRequest request, IResponse response) {
+
     }
 
     private ByteBuf responseToBuffer(ISession session, IResponse response) {
