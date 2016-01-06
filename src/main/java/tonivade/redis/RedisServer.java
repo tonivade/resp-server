@@ -7,6 +7,15 @@ package tonivade.redis;
 import static java.util.Objects.requireNonNull;
 import static tonivade.redis.protocol.SafeString.safeAsList;
 import static tonivade.redis.protocol.SafeString.safeString;
+
+import java.net.InetSocketAddress;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -18,15 +27,6 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-
-import java.net.InetSocketAddress;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import tonivade.redis.command.CommandSuite;
 import tonivade.redis.command.ICommand;
 import tonivade.redis.command.IRequest;
@@ -275,5 +275,9 @@ public class RedisServer implements IRedis, IServerContext {
 
     public ISession getSession(String key) {
         return clients.get(key);
+    }
+
+    public CommandSuite getCommands() {
+        return commands;
     }
 }
