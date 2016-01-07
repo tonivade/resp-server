@@ -235,7 +235,7 @@ public class RedisServer implements IRedis, IServerContext {
     }
 
     protected void executeCommand(ICommand command, IRequest request, IResponse response) {
-
+        command.execute(request, response);
     }
 
     private ByteBuf responseToBuffer(ISession session, IResponse response) {
