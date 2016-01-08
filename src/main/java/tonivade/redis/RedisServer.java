@@ -129,6 +129,7 @@ public class RedisServer implements IRedis, IServerContext {
     public void channel(SocketChannel channel) {
         LOGGER.fine(() -> "new channel: " + sourceKey(channel));
 
+        channel.pipeline().addLast("redisEncoder", new RedisTokenEncoder());
         channel.pipeline().addLast("linDelimiter", new RequestDecoder(MAX_FRAME_SIZE));
         channel.pipeline().addLast(connectionHandler);
     }

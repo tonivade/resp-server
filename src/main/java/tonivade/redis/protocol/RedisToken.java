@@ -6,8 +6,10 @@ package tonivade.redis.protocol;
 
 import static java.util.Collections.unmodifiableList;
 import static java.util.Objects.requireNonNull;
+import static tonivade.equalizer.Equalizer.equalizer;
 
 import java.util.List;
+import java.util.Objects;
 
 public abstract class RedisToken {
 
@@ -29,6 +31,16 @@ public abstract class RedisToken {
     @SuppressWarnings("unchecked")
     public <T> T getValue() {
         return (T) value;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(value);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return equalizer(this).append((one, other) -> Objects.equals(one.value, other.value)).applyTo(obj);
     }
 
     @Override
