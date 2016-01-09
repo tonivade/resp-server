@@ -4,7 +4,8 @@
  */
 package tonivade.redis.command;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
@@ -17,6 +18,6 @@ public class CommandSuiteTest {
     public void getCommandNull() {
         ICommand command =  commandSuite.getCommand("notExists");
 
-        assertThat(command, is(NullCommand.class));
+        assertThat(command, is(instanceOf(NullCommand.class)));
     }
 }

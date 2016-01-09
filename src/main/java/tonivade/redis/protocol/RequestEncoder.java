@@ -1,4 +1,6 @@
-package tonivade.redis;
+package tonivade.redis.protocol;
+
+import static java.util.stream.Collectors.toList;
 
 import java.util.List;
 
@@ -6,10 +8,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import tonivade.redis.command.Response;
-import tonivade.redis.protocol.RedisToken;
-import tonivade.redis.protocol.SafeString;
 
-public class RedisTokenEncoder extends MessageToByteEncoder<RedisToken> {
+public class RequestEncoder extends MessageToByteEncoder<RedisToken> {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, RedisToken msg, ByteBuf out) throws Exception {
@@ -28,12 +28,16 @@ public class RedisTokenEncoder extends MessageToByteEncoder<RedisToken> {
             response.addError(msg.<String>getValue());
             break;
         case ARRAY:
-            response.addArray(msg.<List<RedisToken>>getValue());
+            response.addArray(collectValues(msg));
             break;
         case UNKNOWN:
             break;
         }
         out.writeBytes(response.getBytes());
+    }
+
+    private List<?> collectValues(RedisToken msg) {
+        return msg.<List<RedisToken>>getValue().stream().map(RedisToken::getValue).collect(toList());
     }
 
 }
