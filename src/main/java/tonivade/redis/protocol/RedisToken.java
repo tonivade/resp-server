@@ -10,6 +10,8 @@ import static java.util.Objects.requireNonNull;
 import static tonivade.equalizer.Equalizer.equalizer;
 import static tonivade.redis.protocol.SafeString.safeString;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -50,6 +52,35 @@ public abstract class RedisToken {
         return type + SEPARATOR + value;
     }
 
+
+    public static RedisToken string(SafeString str) {
+        return new StringRedisToken(str);
+    }
+
+    public static RedisToken string(String str) {
+        return new StringRedisToken(safeString(str));
+    }
+
+    public static RedisToken status(String str) {
+        return new StatusRedisToken(str);
+    }
+
+    public static RedisToken integer(int i) {
+        return new IntegerRedisToken(i);
+    }
+
+    public static RedisToken error(String str) {
+        return new ErrorRedisToken(str);
+    }
+
+    public static RedisToken array(RedisToken ...redisTokens) {
+        return new ArrayRedisToken(asList(redisTokens));
+    }
+
+    public static RedisToken array(Collection<RedisToken> redisTokens) {
+        return new ArrayRedisToken(redisTokens);
+    }
+
     static class UnknownRedisToken extends RedisToken {
         public UnknownRedisToken(String value) {
             super(RedisTokenType.UNKNOWN, value);
@@ -81,41 +112,12 @@ public abstract class RedisToken {
     }
 
     static class ArrayRedisToken extends RedisToken {
-        public ArrayRedisToken(List<RedisToken> value) {
-            super(RedisTokenType.ARRAY, unmodifiableList(value));
+        public ArrayRedisToken(Collection<RedisToken> value) {
+            super(RedisTokenType.ARRAY, unmodifiableList(new ArrayList<>(value)));
         }
 
         public int size() {
             return this.<List<RedisToken>>getValue().size();
         }
     }
-
-    public static RedisToken string(SafeString str) {
-        return new StringRedisToken(str);
-    }
-
-    public static RedisToken string(String str) {
-        return new StringRedisToken(safeString(str));
-    }
-
-    public static RedisToken status(String str) {
-        return new StatusRedisToken(str);
-    }
-
-    public static RedisToken integer(int i) {
-        return new IntegerRedisToken(i);
-    }
-
-    public static RedisToken error(String str) {
-        return new ErrorRedisToken(str);
-    }
-
-    public static RedisToken array(RedisToken ...redisTokens) {
-        return new ArrayRedisToken(asList(redisTokens));
-    }
-
-    public static RedisToken array(List<RedisToken> redisTokens) {
-        return new ArrayRedisToken(redisTokens);
-    }
-
 }

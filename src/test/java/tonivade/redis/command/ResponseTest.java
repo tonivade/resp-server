@@ -6,6 +6,11 @@ package tonivade.redis.command;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static tonivade.redis.protocol.RedisToken.array;
+import static tonivade.redis.protocol.RedisToken.error;
+import static tonivade.redis.protocol.RedisToken.integer;
+import static tonivade.redis.protocol.RedisToken.status;
+import static tonivade.redis.protocol.RedisToken.string;
 import static tonivade.redis.protocol.SafeString.safeString;
 
 import org.junit.Before;
@@ -22,47 +27,38 @@ public class ResponseTest {
 
     @Test
     public void testAddBulkStr() {
-        assertThat(response.addBulkStr(safeString("test")).toString(), is("$4\r\ntest\r\n"));
+        assertThat(response.addBulkStr(safeString("test")).build(), is(string("test")));
     }
 
     @Test
     public void testAddSimpleStr() {
-        assertThat(response.addSimpleStr("test").toString(), is("+test\r\n"));
-    }
-
-    @Test
-    public void testAddIntString() {
-        assertThat(response.addInt(safeString("1")).toString(), is(":1\r\n"));
+        assertThat(response.addSimpleStr("test").build(), is(status("test")));
     }
 
     @Test
     public void testAddIntInt() {
-        assertThat(response.addInt(1).toString(), is(":1\r\n"));
-    }
-
-    @Test
-    public void testAddIntLong() {
-        assertThat(response.addInt(1L).toString(), is(":1\r\n"));
+        assertThat(response.addInt(1).build(), is(integer(1)));
     }
 
     @Test
     public void testAddIntBooleanTrue() {
-        assertThat(response.addInt(true).toString(), is(":1\r\n"));
+        assertThat(response.addInt(true).build(), is(integer(1)));
     }
 
     @Test
     public void testAddIntBooleanFalse() {
-        assertThat(response.addInt(false).toString(), is(":0\r\n"));
+        assertThat(response.addInt(false).build(), is(integer(0)));
     }
 
     @Test
     public void testAddError() {
-        assertThat(response.addError("ERROR").toString(), is("-ERROR\r\n"));
+        assertThat(response.addError("ERROR").build(), is(error("ERROR")));
     }
 
     @Test
     public void testAddArrayNull() {
-        assertThat(response.addArray(null).toString(), is("*0\r\n"));
+        assertThat(array(), is(array()));
+        assertThat(response.addArray(null).build(), is(array()));
     }
 
 }

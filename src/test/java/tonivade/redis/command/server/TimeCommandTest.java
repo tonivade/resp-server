@@ -14,6 +14,7 @@ import org.mockito.Captor;
 
 import tonivade.redis.command.CommandRule;
 import tonivade.redis.command.CommandUnderTest;
+import tonivade.redis.protocol.RedisToken;
 
 @CommandUnderTest(TimeCommand.class)
 public class TimeCommandTest {
@@ -22,17 +23,17 @@ public class TimeCommandTest {
     public final CommandRule rule = new CommandRule(this);
 
     @Captor
-    private ArgumentCaptor<Collection<String>> captor;
+    private ArgumentCaptor<Collection<RedisToken>> captor;
 
     @Test
     public void testExecute() {
         rule.execute().verify().addArray(captor.capture());
 
-        Collection<String> value = captor.getValue();
+        Collection<RedisToken> value = captor.getValue();
 
-        Iterator<String> iterator = value.iterator();
-        String secs = iterator.next();
-        String mics = iterator.next();
+        Iterator<RedisToken> iterator = value.iterator();
+        RedisToken secs = iterator.next();
+        RedisToken mics = iterator.next();
 
         System.out.println(secs);
         System.out.println(mics);

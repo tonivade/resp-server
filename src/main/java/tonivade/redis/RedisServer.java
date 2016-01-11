@@ -18,7 +18,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -41,9 +40,9 @@ import tonivade.redis.command.Request;
 import tonivade.redis.command.Response;
 import tonivade.redis.command.Session;
 import tonivade.redis.protocol.RedisToken;
-import tonivade.redis.protocol.RequestEncoder;
 import tonivade.redis.protocol.RedisTokenType;
 import tonivade.redis.protocol.RequestDecoder;
+import tonivade.redis.protocol.RequestEncoder;
 import tonivade.redis.protocol.SafeString;
 
 public class RedisServer implements IRedis, IServerContext {
@@ -215,8 +214,8 @@ public class RedisServer implements IRedis, IServerContext {
         IResponse response = new Response();
         ICommand command = commands.getCommand(request.getCommand());
         try {
-            execute(command, request, response).observeOn(scheduler).subscribe(buffer -> {
-                session.getContext().writeAndFlush(buffer);
+            execute(command, request, response).observeOn(scheduler).subscribe(token -> {
+                session.getContext().writeAndFlush(token);
                 if (response.isExit()) {
                     session.getContext().close();
                 }
@@ -226,11 +225,11 @@ public class RedisServer implements IRedis, IServerContext {
         }
     }
 
-    private Observable<ByteBuf> execute(ICommand command, IRequest request, IResponse response) {
+    private Observable<RedisToken> execute(ICommand command, IRequest request, IResponse response) {
         return Observable.create(observer -> {
             executeCommand(command, request, response);
 
-            observer.onNext(responseToBuffer(request.getSession(), response));
+            observer.onNext(response.build());
 
             observer.onCompleted();
         });
@@ -238,17 +237,6 @@ public class RedisServer implements IRedis, IServerContext {
 
     protected void executeCommand(ICommand command, IRequest request, IResponse response) {
         command.execute(request, response);
-    }
-
-    private ByteBuf responseToBuffer(ISession session, IResponse response) {
-        byte[] array = ((Response) response).getBytes();
-        return bytesToBuffer(session, array);
-    }
-
-    private ByteBuf bytesToBuffer(ISession session, byte[] array) {
-        ByteBuf buffer = session.getContext().alloc().buffer(array.length);
-        buffer.writeBytes(array);
-        return buffer;
     }
 
     private String sourceKey(Channel channel) {

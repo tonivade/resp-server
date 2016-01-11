@@ -4,16 +4,17 @@
  */
 package tonivade.redis.command.server;
 
-import static java.util.stream.Collectors.toList;
+import static java.util.Arrays.asList;
+import static tonivade.redis.protocol.RedisToken.string;
 
 import java.time.Clock;
 import java.util.List;
-import java.util.stream.Stream;
 
 import tonivade.redis.annotation.Command;
 import tonivade.redis.command.ICommand;
 import tonivade.redis.command.IRequest;
 import tonivade.redis.command.IResponse;
+import tonivade.redis.protocol.RedisToken;
 
 @Command("time")
 public class TimeCommand implements ICommand {
@@ -23,8 +24,7 @@ public class TimeCommand implements ICommand {
     @Override
     public void execute(IRequest request, IResponse response) {
         long currentTimeMillis = Clock.systemDefaultZone().millis();
-        List<String> result = Stream.of(
-                seconds(currentTimeMillis), microseconds(currentTimeMillis)).collect(toList());
+        List<RedisToken> result = asList(string(seconds(currentTimeMillis)), string(microseconds(currentTimeMillis)));
         response.addArray(result);
     }
 
