@@ -20,8 +20,8 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.util.CharsetUtil;
 import tonivade.redis.protocol.RedisToken;
-import tonivade.redis.protocol.RequestDecoder;
-import tonivade.redis.protocol.RequestEncoder;
+import tonivade.redis.protocol.RedisDecoder;
+import tonivade.redis.protocol.RedisEncoder;
 
 public class RedisClient implements IRedis {
 
@@ -102,9 +102,9 @@ public class RedisClient implements IRedis {
     public void channel(SocketChannel channel) {
         LOGGER.info(() -> "connected to server: " + host + ":" + port);
 
-        channel.pipeline().addLast("redisEncoder", new RequestEncoder());
+        channel.pipeline().addLast("redisEncoder", new RedisEncoder());
         channel.pipeline().addLast("stringEncoder", new StringEncoder(CharsetUtil.UTF_8));
-        channel.pipeline().addLast("linDelimiter", new RequestDecoder(MAX_FRAME_SIZE));
+        channel.pipeline().addLast("linDelimiter", new RedisDecoder(MAX_FRAME_SIZE));
         channel.pipeline().addLast(connectionHandler);
     }
 

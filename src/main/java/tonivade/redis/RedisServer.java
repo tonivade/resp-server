@@ -41,8 +41,8 @@ import tonivade.redis.command.Response;
 import tonivade.redis.command.Session;
 import tonivade.redis.protocol.RedisToken;
 import tonivade.redis.protocol.RedisTokenType;
-import tonivade.redis.protocol.RequestDecoder;
-import tonivade.redis.protocol.RequestEncoder;
+import tonivade.redis.protocol.RedisDecoder;
+import tonivade.redis.protocol.RedisEncoder;
 import tonivade.redis.protocol.SafeString;
 
 public class RedisServer implements IRedis, IServerContext {
@@ -129,8 +129,8 @@ public class RedisServer implements IRedis, IServerContext {
     public void channel(SocketChannel channel) {
         LOGGER.fine(() -> "new channel: " + sourceKey(channel));
 
-        channel.pipeline().addLast("redisEncoder", new RequestEncoder());
-        channel.pipeline().addLast("linDelimiter", new RequestDecoder(MAX_FRAME_SIZE));
+        channel.pipeline().addLast("redisEncoder", new RedisEncoder());
+        channel.pipeline().addLast("linDelimiter", new RedisDecoder(MAX_FRAME_SIZE));
         channel.pipeline().addLast(connectionHandler);
     }
 

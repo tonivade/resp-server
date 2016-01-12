@@ -25,7 +25,7 @@ public abstract class RedisToken {
 
     private RedisToken(RedisTokenType type, Object value) {
         this.type = requireNonNull(type);
-        this.value = requireNonNull(value);
+        this.value = value;
     }
 
     public RedisTokenType getType() {

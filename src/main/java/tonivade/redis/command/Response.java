@@ -4,7 +4,9 @@
  */
 package tonivade.redis.command;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 import tonivade.redis.protocol.RedisToken;
@@ -47,11 +49,26 @@ public class Response implements IResponse {
     }
 
     @Override
-    public IResponse addArray(Collection<RedisToken> array) {
+    public IResponse addArray(Collection<?> array) {
         if (array == null) {
             token = RedisToken.array();
         } else {
-            token = RedisToken.array(array);
+            List<RedisToken> tokens = new ArrayList<>(array.size());
+            for (Object value : array) {
+                if (value instanceof Integer) {
+                    tokens.add(RedisToken.integer((Integer) value));
+                } else if (value instanceof Boolean) {
+                    Boolean b = (Boolean) value;
+                    tokens.add(RedisToken.integer(b ? 1 : 0));
+                } else if (value instanceof String) {
+                    tokens.add(RedisToken.string((String) value));
+                } else if (value instanceof SafeString) {
+                    tokens.add(RedisToken.string((SafeString) value));
+                } else if (value instanceof RedisToken) {
+                    tokens.add((RedisToken) value);
+                }
+            }
+            token = RedisToken.array(tokens);
         }
         return this;
     }

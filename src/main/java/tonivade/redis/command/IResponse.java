@@ -14,7 +14,7 @@ public interface IResponse {
     String RESULT_OK = "OK";
     String RESULT_ERROR = "ERR";
 
-    IResponse addArray(Collection<RedisToken> array);
+    IResponse addArray(Collection<?> array);
 
     IResponse addBulkStr(SafeString str);
 
