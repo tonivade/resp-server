@@ -24,6 +24,7 @@ public class RequestEncoderTest {
     private RedisToken pongString = RedisToken.status("pong");
     private RedisToken errorString = RedisToken.error("ERR");
     private RedisToken arrayToken = RedisToken.array(intToken, abcString);
+    private RedisToken arrayOfArraysToken = RedisToken.array(arrayToken, arrayToken);
 
     private ByteBuf out = mock(ByteBuf.class);
     private ChannelHandlerContext ctx = mock(ChannelHandlerContext.class);
@@ -74,6 +75,15 @@ public class RequestEncoderTest {
         verify(out).writeBytes(captor.capture());
 
         assertThat(captor.getValue(), equalTo("*2\r\n:1\r\n$3\r\nabc\r\n".getBytes(utf8)));
+    }
+
+    @Test
+    public void encodeArrayOfArrays() throws Exception {
+        encoder.encode(ctx, arrayOfArraysToken, out);
+
+        verify(out).writeBytes(captor.capture());
+
+        assertThat(captor.getValue(), equalTo("*2\r\n*2\r\n:1\r\n$3\r\nabc\r\n*2\r\n:1\r\n$3\r\nabc\r\n".getBytes(utf8)));
     }
 
 }
