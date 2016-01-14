@@ -1,5 +1,7 @@
 apply plugin: 'java'
 apply plugin: 'eclipse'
+apply plugin: 'jacoco'
+apply plugin: 'com.github.kt3k.coveralls'
 apply plugin: 'com.bmuschko.nexus'
 
 group = 'tonivade'
@@ -7,10 +9,20 @@ version = '0.2.0-SNAPSHOT'
 
 buildscript {
     repositories {
+        mavenCentral()
         jcenter()
     }
+
     dependencies {
+        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.0.1'
         classpath 'com.bmuschko:gradle-nexus-plugin:2.3.1'
+    }
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled = true // coveralls plugin depends on xml format report
+        html.enabled = true
     }
 }
 
@@ -37,6 +49,9 @@ repositories {
     mavenCentral()
     maven {
         url = 'http://garagemarket.com.es/nexus/content/repositories/releases/'
+    }
+    maven {
+        url = 'http://garagemarket.com.es/nexus/content/repositories/snapshots/'
     }
 }
 
