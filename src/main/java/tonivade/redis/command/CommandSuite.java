@@ -32,6 +32,14 @@ public class CommandSuite {
         addCommand(TimeCommand.class);
     }
 
+    public ICommand getCommand(String name) {
+        return commands.getOrDefault(name.toLowerCase(), nullCommand);
+    }
+
+    public boolean isPresent(String name, Class<? extends Annotation> annotationClass) {
+        return getMetadata(name).isAnnotationPresent(annotationClass);
+    }
+
     protected void addCommand(Class<?> clazz) {
         try {
             Object command = clazz.newInstance();
@@ -53,14 +61,6 @@ public class CommandSuite {
             return new CommandWrapper((ICommand) command);
         }
         throw new RuntimeException();
-    }
-
-    public ICommand getCommand(String name) {
-        return commands.getOrDefault(name.toLowerCase(), nullCommand);
-    }
-
-    public boolean isPresent(String name, Class<? extends Annotation> annotationClass) {
-        return getMetadata(name).isAnnotationPresent(annotationClass);
     }
 
     private Class<?> getMetadata(String name) {

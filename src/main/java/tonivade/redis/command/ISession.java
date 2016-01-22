@@ -4,13 +4,15 @@
  */
 package tonivade.redis.command;
 
-import io.netty.channel.ChannelHandlerContext;
+import tonivade.redis.protocol.RedisToken;
 
 public interface ISession {
 
     String getId();
 
-    ChannelHandlerContext getContext();
+    void publish(RedisToken msg);
+    
+    void close();
 
     void destroy();
 

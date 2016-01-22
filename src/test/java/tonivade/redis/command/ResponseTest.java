@@ -4,6 +4,7 @@
  */
 package tonivade.redis.command;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static tonivade.redis.protocol.RedisToken.array;
@@ -57,8 +58,32 @@ public class ResponseTest {
 
     @Test
     public void testAddArrayNull() {
-        assertThat(array(), is(array()));
         assertThat(response.addArray(null).build(), is(array()));
+    }
+    
+    @Test
+    public void testAddArraySafeString() {
+        assertThat(response.addArray(asList(safeString("hola"))).build(), is(array(string(safeString("hola")))));
+    }
+    
+    @Test
+    public void testAddArrayString() {
+        assertThat(response.addArray(asList("hola")).build(), is(array(string(safeString("hola")))));
+    }
+    
+    @Test
+    public void testAddArrayInteger() {
+        assertThat(response.addArray(asList(1)).build(), is(array(integer(1))));
+    }
+    
+    @Test
+    public void testAddArrayBoolean() {
+        assertThat(response.addArray(asList(true)).build(), is(array(integer(1))));
+    }
+    
+    @Test
+    public void testAddArrayRedisToken() {
+      assertThat(response.addArray(asList(string(safeString("hola")))).build(), is(array(string(safeString("hola")))));
     }
 
 }

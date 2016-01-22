@@ -79,13 +79,6 @@ public class RedisServer implements IRedis, IServerContext {
         this.commands = requireNonNull(commands);
     }
 
-    private int requireRange(int value, int min, int max) {
-        if (value <= min || value > max) {
-            throw new IllegalArgumentException(min + " <= " + value + " < " + max);
-        }
-        return value;
-    }
-
     public void start() {
         bossGroup = new NioEventLoopGroup();
         workerGroup = new NioEventLoopGroup(Runtime.getRuntime().availableProcessors() * 2);
@@ -102,9 +95,8 @@ public class RedisServer implements IRedis, IServerContext {
             .childOption(ChannelOption.SO_KEEPALIVE, true)
             .childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);
 
-        // Bind and start to accept incoming connections.
         future = bootstrap.bind(host, port);
-
+        // Bind and start to accept incoming connections.
         future.syncUninterruptibly();
 
         LOGGER.info(() -> "server started: " + host + ":" + port);
@@ -155,10 +147,6 @@ public class RedisServer implements IRedis, IServerContext {
         }
     }
 
-    protected void cleanSession(ISession session) {
-
-    }
-
     @Override
     public void receive(ChannelHandlerContext ctx, RedisToken message) {
         String sourceKey = sourceKey(ctx.channel());
@@ -169,79 +157,6 @@ public class RedisServer implements IRedis, IServerContext {
         if (request != null) {
             processCommand(request);
         }
-    }
-
-    private ISession getSession(String sourceKey, ChannelHandlerContext ctx) {
-        return clients.get(sourceKey, (key) -> new Session(key, ctx), this::createSession);
-    }
-
-    protected void createSession(ISession session) {
-
-    }
-
-    private IRequest parseMessage(String sourceKey, RedisToken message, ISession session) {
-        IRequest request = null;
-        if (message.getType() == RedisTokenType.ARRAY) {
-            request = parseArray(sourceKey, message, session);
-        } else if (message.getType() == RedisTokenType.UNKNOWN) {
-            request = parseLine(sourceKey, message, session);
-        }
-        return request;
-    }
-
-    private Request parseLine(String sourceKey, RedisToken message, ISession session) {
-        String command = message.getValue();
-        String[] params = command.split(" ");
-        String[] array = new String[params.length - 1];
-        System.arraycopy(params, 1, array, 0, array.length);
-        return new Request(this, session, safeString(params[0]), safeAsList(array));
-    }
-
-    private Request parseArray(String sourceKey, RedisToken message, ISession session) {
-        List<SafeString> params = new LinkedList<>();
-        for (RedisToken token : message.<List<RedisToken>>getValue()) {
-            if (token.getType() == RedisTokenType.STRING) {
-                params.add(token.getValue());
-            }
-        }
-        return new Request(this, session, params.remove(0), params);
-    }
-
-    protected void processCommand(IRequest request) {
-        LOGGER.fine(() -> "received command: " + request);
-
-        ISession session = request.getSession();
-        IResponse response = new Response();
-        ICommand command = commands.getCommand(request.getCommand());
-        try {
-            execute(command, request, response).observeOn(scheduler).subscribe(token -> {
-                session.getContext().writeAndFlush(token);
-                if (response.isExit()) {
-                    session.getContext().close();
-                }
-            });
-        } catch (RuntimeException e) {
-            LOGGER.log(Level.SEVERE, "error executing command: " + request, e);
-        }
-    }
-
-    private Observable<RedisToken> execute(ICommand command, IRequest request, IResponse response) {
-        return Observable.create(observer -> {
-            executeCommand(command, request, response);
-
-            observer.onNext(response.build());
-
-            observer.onCompleted();
-        });
-    }
-
-    protected void executeCommand(ICommand command, IRequest request, IResponse response) {
-        command.execute(request, response);
-    }
-
-    private String sourceKey(Channel channel) {
-        InetSocketAddress remoteAddress = (InetSocketAddress) channel.remoteAddress();
-        return remoteAddress.getHostName() + ":" + remoteAddress.getPort();
     }
 
     @Override
@@ -282,5 +197,89 @@ public class RedisServer implements IRedis, IServerContext {
 
     public CommandSuite getCommands() {
         return commands;
+    }
+
+    protected void executeCommand(ICommand command, IRequest request, IResponse response) {
+        command.execute(request, response);
+    }
+
+    protected void cleanSession(ISession session) {
+
+    }
+
+    protected void createSession(ISession session) {
+
+    }
+
+    private ISession getSession(String sourceKey, ChannelHandlerContext ctx) {
+        return clients.get(sourceKey, (key) -> new Session(key, ctx), this::createSession);
+    }
+
+    private IRequest parseMessage(String sourceKey, RedisToken message, ISession session) {
+        IRequest request = null;
+        if (message.getType() == RedisTokenType.ARRAY) {
+            request = parseArray(sourceKey, message, session);
+        } else if (message.getType() == RedisTokenType.UNKNOWN) {
+            request = parseLine(sourceKey, message, session);
+        }
+        return request;
+    }
+
+    private Request parseLine(String sourceKey, RedisToken message, ISession session) {
+        String command = message.getValue();
+        String[] params = command.split(" ");
+        String[] array = new String[params.length - 1];
+        System.arraycopy(params, 1, array, 0, array.length);
+        return new Request(this, session, safeString(params[0]), safeAsList(array));
+    }
+
+    private Request parseArray(String sourceKey, RedisToken message, ISession session) {
+        List<SafeString> params = new LinkedList<>();
+        for (RedisToken token : message.<List<RedisToken>>getValue()) {
+            if (token.getType() == RedisTokenType.STRING) {
+                params.add(token.getValue());
+            }
+        }
+        return new Request(this, session, params.remove(0), params);
+    }
+
+    private void processCommand(IRequest request) {
+        LOGGER.fine(() -> "received command: " + request);
+
+        ISession session = request.getSession();
+        IResponse response = new Response();
+        ICommand command = commands.getCommand(request.getCommand());
+        try {
+            execute(command, request, response).observeOn(scheduler).subscribe(token -> {
+                session.publish(token);
+                if (response.isExit()) {
+                    session.close();
+                }
+            });
+        } catch (RuntimeException e) {
+            LOGGER.log(Level.SEVERE, "error executing command: " + request, e);
+        }
+    }
+
+    private Observable<RedisToken> execute(ICommand command, IRequest request, IResponse response) {
+        return Observable.create(observer -> {
+            executeCommand(command, request, response);
+
+            observer.onNext(response.build());
+
+            observer.onCompleted();
+        });
+    }
+
+    private String sourceKey(Channel channel) {
+        InetSocketAddress remoteAddress = (InetSocketAddress) channel.remoteAddress();
+        return remoteAddress.getHostName() + ":" + remoteAddress.getPort();
+    }
+
+    private int requireRange(int value, int min, int max) {
+        if (value <= min || value > max) {
+            throw new IllegalArgumentException(min + " <= " + value + " < " + max);
+        }
+        return value;
     }
 }

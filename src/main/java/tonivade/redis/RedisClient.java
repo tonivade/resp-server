@@ -25,9 +25,9 @@ import tonivade.redis.protocol.RedisEncoder;
 
 public class RedisClient implements IRedis {
 
-    private static final String DELIMITER = "\r\n";
-
     private static final Logger LOGGER = Logger.getLogger(RedisClient.class.getName());
+
+    private static final String DELIMITER = "\r\n";
 
     private static final int BUFFER_SIZE = 1024 * 1024;
     private static final int MAX_FRAME_SIZE = BUFFER_SIZE * 100;
@@ -50,13 +50,6 @@ public class RedisClient implements IRedis {
         this.host = requireNonNull(host);
         this.port = requireRange(port, 1024, 65535);
         this.callback = requireNonNull(callback);
-    }
-
-    private int requireRange(int value, int min, int max) {
-        if (value <= min || value > max) {
-            throw new IllegalArgumentException(min + " <= " + value + " < " + max);
-        }
-        return value;
     }
 
     public void start() {
@@ -88,14 +81,6 @@ public class RedisClient implements IRedis {
         } finally {
             workerGroup.shutdownGracefully();
         }
-    }
-
-    private void connect() {
-        LOGGER.info(() -> "trying to connect");
-
-        future = bootstrap.connect(host, port);
-
-        future.syncUninterruptibly();
     }
 
     @Override
@@ -136,15 +121,29 @@ public class RedisClient implements IRedis {
         writeAndFlush(message);
     }
 
+    @Override
+    public void receive(ChannelHandlerContext ctx, RedisToken message) {
+        callback.onMessage(message);
+    }
+
+    private void connect() {
+        LOGGER.info(() -> "trying to connect");
+
+        future = bootstrap.connect(host, port);
+
+        future.syncUninterruptibly();
+    }
+
     private void writeAndFlush(Object message) {
         if (context != null) {
             context.writeAndFlush(message);
         }
     }
 
-    @Override
-    public void receive(ChannelHandlerContext ctx, RedisToken message) {
-        callback.onMessage(message);
+    private int requireRange(int value, int min, int max) {
+        if (value <= min || value > max) {
+            throw new IllegalArgumentException(min + " <= " + value + " < " + max);
+        }
+        return value;
     }
-
 }

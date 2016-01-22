@@ -44,14 +44,15 @@ public abstract class RedisToken {
 
     @Override
     public boolean equals(Object obj) {
-        return equalizer(this).append((one, other) -> Objects.equals(one.value, other.value)).applyTo(obj);
+        return equalizer(this)
+            .append((one, other) -> Objects.equals(one.value, other.value))
+                .applyTo(obj);
     }
 
     @Override
     public String toString() {
         return type + SEPARATOR + value;
     }
-
 
     public static RedisToken string(SafeString str) {
         return new StringRedisToken(str);
