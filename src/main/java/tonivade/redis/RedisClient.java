@@ -5,6 +5,9 @@
 package tonivade.redis;
 
 import static java.util.Objects.requireNonNull;
+
+import java.util.logging.Logger;
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelFuture;
@@ -16,15 +19,15 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.util.CharsetUtil;
-
-import java.util.logging.Logger;
-
 import tonivade.redis.protocol.RedisToken;
-import tonivade.redis.protocol.RequestDecoder;
+import tonivade.redis.protocol.RedisDecoder;
+import tonivade.redis.protocol.RedisEncoder;
 
 public class RedisClient implements IRedis {
 
     private static final Logger LOGGER = Logger.getLogger(RedisClient.class.getName());
+
+    private static final String DELIMITER = "\r\n";
 
     private static final int BUFFER_SIZE = 1024 * 1024;
     private static final int MAX_FRAME_SIZE = BUFFER_SIZE * 100;
@@ -47,13 +50,6 @@ public class RedisClient implements IRedis {
         this.host = requireNonNull(host);
         this.port = requireRange(port, 1024, 65535);
         this.callback = requireNonNull(callback);
-    }
-
-    private int requireRange(int value, int min, int max) {
-        if (value <= min || value > max) {
-            throw new IllegalArgumentException(min + " <= " + value + " < " + max);
-        }
-        return value;
     }
 
     public void start() {
@@ -87,20 +83,13 @@ public class RedisClient implements IRedis {
         }
     }
 
-    private void connect() {
-        LOGGER.info(() -> "trying to connect");
-
-        future = bootstrap.connect(host, port);
-
-        future.syncUninterruptibly();
-    }
-
     @Override
     public void channel(SocketChannel channel) {
         LOGGER.info(() -> "connected to server: " + host + ":" + port);
 
+        channel.pipeline().addLast("redisEncoder", new RedisEncoder());
         channel.pipeline().addLast("stringEncoder", new StringEncoder(CharsetUtil.UTF_8));
-        channel.pipeline().addLast("linDelimiter", new RequestDecoder(MAX_FRAME_SIZE));
+        channel.pipeline().addLast("linDelimiter", new RedisDecoder(MAX_FRAME_SIZE));
         channel.pipeline().addLast(connectionHandler);
     }
 
@@ -125,9 +114,11 @@ public class RedisClient implements IRedis {
     }
 
     public void send(String message) {
-        if (context != null) {
-            context.writeAndFlush(message);
-        }
+        writeAndFlush(message + DELIMITER);
+    }
+
+    public void send(RedisToken message) {
+        writeAndFlush(message);
     }
 
     @Override
@@ -135,4 +126,24 @@ public class RedisClient implements IRedis {
         callback.onMessage(message);
     }
 
+    private void connect() {
+        LOGGER.info(() -> "trying to connect");
+
+        future = bootstrap.connect(host, port);
+
+        future.syncUninterruptibly();
+    }
+
+    private void writeAndFlush(Object message) {
+        if (context != null) {
+            context.writeAndFlush(message);
+        }
+    }
+
+    private int requireRange(int value, int min, int max) {
+        if (value <= min || value > max) {
+            throw new IllegalArgumentException(min + " <= " + value + " < " + max);
+        }
+        return value;
+    }
 }

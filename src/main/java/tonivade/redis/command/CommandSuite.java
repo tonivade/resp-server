@@ -4,6 +4,7 @@
  */
 package tonivade.redis.command;
 
+import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -19,6 +20,7 @@ public class CommandSuite {
 
     private static final Logger LOGGER = Logger.getLogger(CommandSuite.class.getName());
 
+    private final Map<String, Class<?>> metadata = new HashMap<>();
     private final Map<String, ICommand> commands = new HashMap<>();
 
     private final NullCommand nullCommand = new NullCommand();
@@ -30,6 +32,14 @@ public class CommandSuite {
         addCommand(TimeCommand.class);
     }
 
+    public ICommand getCommand(String name) {
+        return commands.getOrDefault(name.toLowerCase(), nullCommand);
+    }
+
+    public boolean isPresent(String name, Class<? extends Annotation> annotationClass) {
+        return getMetadata(name).isAnnotationPresent(annotationClass);
+    }
+
     protected void addCommand(Class<?> clazz) {
         try {
             Object command = clazz.newInstance();
@@ -37,6 +47,7 @@ public class CommandSuite {
             Command annotation = clazz.getAnnotation(Command.class);
             if (annotation != null) {
                 commands.put(annotation.value(), wrap(command));
+                metadata.put(annotation.value(), clazz);
             } else {
                 LOGGER.warning(() -> "annotation not present at " + clazz.getName());
             }
@@ -52,7 +63,7 @@ public class CommandSuite {
         throw new RuntimeException();
     }
 
-    public ICommand getCommand(String name) {
-        return commands.getOrDefault(name.toLowerCase(), nullCommand);
+    private Class<?> getMetadata(String name) {
+        return metadata.getOrDefault(name.toLowerCase(), Void.class);
     }
 }

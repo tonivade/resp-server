@@ -6,6 +6,7 @@ package tonivade.redis.command;
 
 import java.util.Collection;
 
+import tonivade.redis.protocol.RedisToken;
 import tonivade.redis.protocol.SafeString;
 
 public interface IResponse {
@@ -19,15 +20,13 @@ public interface IResponse {
 
     IResponse addSimpleStr(String str);
 
-    IResponse addInt(SafeString str);
-
     IResponse addInt(int value);
-
-    IResponse addInt(long value);
 
     IResponse addInt(boolean value);
 
     IResponse addError(String str);
+
+    RedisToken build();
 
     void exit();
 

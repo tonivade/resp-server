@@ -12,13 +12,13 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.LineBasedFrameDecoder;
 
-public class RequestDecoder extends LineBasedFrameDecoder {
+public class RedisDecoder extends LineBasedFrameDecoder {
 
     private static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
     private final int maxLength;
 
-    public RequestDecoder(int maxLength) {
+    public RedisDecoder(int maxLength) {
         super(maxLength);
         this.maxLength = maxLength;
     }
@@ -54,12 +54,12 @@ public class RequestDecoder extends LineBasedFrameDecoder {
         RedisParser parser = new RedisParser(maxLength, new RedisSource() {
             @Override
             public ByteBuffer readBytes(int size) {
-                return RequestDecoder.this.readBytes(buffer, size);
+                return RedisDecoder.this.readBytes(buffer, size);
             }
 
             @Override
             public String readLine() {
-                return RequestDecoder.this.readLine(ctx, buffer);
+                return RedisDecoder.this.readLine(ctx, buffer);
             }
         });
 

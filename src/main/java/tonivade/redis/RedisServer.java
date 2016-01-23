@@ -7,8 +7,17 @@ package tonivade.redis;
 import static java.util.Objects.requireNonNull;
 import static tonivade.redis.protocol.SafeString.safeAsList;
 import static tonivade.redis.protocol.SafeString.safeString;
+
+import java.net.InetSocketAddress;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -18,15 +27,9 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-
-import java.net.InetSocketAddress;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import rx.Observable;
+import rx.Scheduler;
+import rx.schedulers.Schedulers;
 import tonivade.redis.command.CommandSuite;
 import tonivade.redis.command.ICommand;
 import tonivade.redis.command.IRequest;
@@ -38,7 +41,8 @@ import tonivade.redis.command.Response;
 import tonivade.redis.command.Session;
 import tonivade.redis.protocol.RedisToken;
 import tonivade.redis.protocol.RedisTokenType;
-import tonivade.redis.protocol.RequestDecoder;
+import tonivade.redis.protocol.RedisDecoder;
+import tonivade.redis.protocol.RedisEncoder;
 import tonivade.redis.protocol.SafeString;
 
 public class RedisServer implements IRedis, IServerContext {
@@ -67,17 +71,12 @@ public class RedisServer implements IRedis, IServerContext {
 
     private final CommandSuite commands;
 
+    private final Scheduler scheduler = Schedulers.from(Executors.newSingleThreadExecutor());
+
     public RedisServer(String host, int port, CommandSuite commands) {
         this.host = requireNonNull(host);
         this.port = requireRange(port, 1024, 65535);
         this.commands = requireNonNull(commands);
-    }
-
-    private int requireRange(int value, int min, int max) {
-        if (value <= min || value > max) {
-            throw new IllegalArgumentException(min + " <= " + value + " < " + max);
-        }
-        return value;
     }
 
     public void start() {
@@ -96,9 +95,8 @@ public class RedisServer implements IRedis, IServerContext {
             .childOption(ChannelOption.SO_KEEPALIVE, true)
             .childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);
 
-        // Bind and start to accept incoming connections.
         future = bootstrap.bind(host, port);
-
+        // Bind and start to accept incoming connections.
         future.syncUninterruptibly();
 
         LOGGER.info(() -> "server started: " + host + ":" + port);
@@ -123,7 +121,8 @@ public class RedisServer implements IRedis, IServerContext {
     public void channel(SocketChannel channel) {
         LOGGER.fine(() -> "new channel: " + sourceKey(channel));
 
-        channel.pipeline().addLast("linDelimiter", new RequestDecoder(MAX_FRAME_SIZE));
+        channel.pipeline().addLast("redisEncoder", new RedisEncoder());
+        channel.pipeline().addLast("linDelimiter", new RedisDecoder(MAX_FRAME_SIZE));
         channel.pipeline().addLast(connectionHandler);
     }
 
@@ -148,10 +147,6 @@ public class RedisServer implements IRedis, IServerContext {
         }
     }
 
-    protected void cleanSession(ISession session) {
-
-    }
-
     @Override
     public void receive(ChannelHandlerContext ctx, RedisToken message) {
         String sourceKey = sourceKey(ctx.channel());
@@ -162,83 +157,6 @@ public class RedisServer implements IRedis, IServerContext {
         if (request != null) {
             processCommand(request);
         }
-    }
-
-    private ISession getSession(String sourceKey, ChannelHandlerContext ctx) {
-        return clients.get(sourceKey, (key) -> new Session(key, ctx), this::createSession);
-    }
-
-    protected void createSession(ISession session) {
-
-    }
-
-    private IRequest parseMessage(String sourceKey, RedisToken message, ISession session) {
-        IRequest request = null;
-        if (message.getType() == RedisTokenType.ARRAY) {
-            request = parseArray(sourceKey, message, session);
-        } else if (message.getType() == RedisTokenType.UNKNOWN) {
-            request = parseLine(sourceKey, message, session);
-        }
-        return request;
-    }
-
-    private Request parseLine(String sourceKey, RedisToken message, ISession session) {
-        String command = message.getValue();
-        String[] params = command.split(" ");
-        String[] array = new String[params.length - 1];
-        System.arraycopy(params, 1, array, 0, array.length);
-        return new Request(this, session, safeString(params[0]), safeAsList(array));
-    }
-
-    private Request parseArray(String sourceKey, RedisToken message, ISession session) {
-        List<SafeString> params = new LinkedList<>();
-        for (RedisToken token : message.<List<RedisToken>>getValue()) {
-            if (token.getType() == RedisTokenType.STRING) {
-                params.add(token.getValue());
-            }
-        }
-        return new Request(this, session, params.remove(0), params);
-    }
-
-    protected void processCommand(IRequest request) {
-        LOGGER.fine(() -> "received command: " + request);
-
-        IResponse response = new Response();
-        ICommand command = commands.getCommand(request.getCommand());
-        try {
-            executeCommand(command, request, response);
-        } catch (RuntimeException e) {
-            LOGGER.log(Level.SEVERE, "error executing command: " + request, e);
-        }
-    }
-
-    protected void executeCommand(ICommand command, IRequest request, IResponse response) {
-        ISession session = request.getSession();
-        command.execute(request, response);
-        writeResponse(session, response);
-        if (response.isExit()) {
-            session.getContext().close();
-        }
-    }
-
-    protected void writeResponse(ISession session, IResponse response) {
-        session.getContext().writeAndFlush(responseToBuffer(session, response));
-    }
-
-    private ByteBuf responseToBuffer(ISession session, IResponse response) {
-        byte[] array = ((Response) response).getBytes();
-        return bytesToBuffer(session, array);
-    }
-
-    private ByteBuf bytesToBuffer(ISession session, byte[] array) {
-        ByteBuf buffer = session.getContext().alloc().buffer(array.length);
-        buffer.writeBytes(array);
-        return buffer;
-    }
-
-    private String sourceKey(Channel channel) {
-        InetSocketAddress remoteAddress = (InetSocketAddress) channel.remoteAddress();
-        return remoteAddress.getHostName() + ":" + remoteAddress.getPort();
     }
 
     @Override
@@ -275,5 +193,93 @@ public class RedisServer implements IRedis, IServerContext {
 
     public ISession getSession(String key) {
         return clients.get(key);
+    }
+
+    public CommandSuite getCommands() {
+        return commands;
+    }
+
+    protected void executeCommand(ICommand command, IRequest request, IResponse response) {
+        command.execute(request, response);
+    }
+
+    protected void cleanSession(ISession session) {
+
+    }
+
+    protected void createSession(ISession session) {
+
+    }
+
+    private ISession getSession(String sourceKey, ChannelHandlerContext ctx) {
+        return clients.get(sourceKey, (key) -> new Session(key, ctx), this::createSession);
+    }
+
+    private IRequest parseMessage(String sourceKey, RedisToken message, ISession session) {
+        IRequest request = null;
+        if (message.getType() == RedisTokenType.ARRAY) {
+            request = parseArray(sourceKey, message, session);
+        } else if (message.getType() == RedisTokenType.UNKNOWN) {
+            request = parseLine(sourceKey, message, session);
+        }
+        return request;
+    }
+
+    private Request parseLine(String sourceKey, RedisToken message, ISession session) {
+        String command = message.getValue();
+        String[] params = command.split(" ");
+        String[] array = new String[params.length - 1];
+        System.arraycopy(params, 1, array, 0, array.length);
+        return new Request(this, session, safeString(params[0]), safeAsList(array));
+    }
+
+    private Request parseArray(String sourceKey, RedisToken message, ISession session) {
+        List<SafeString> params = new LinkedList<>();
+        for (RedisToken token : message.<List<RedisToken>>getValue()) {
+            if (token.getType() == RedisTokenType.STRING) {
+                params.add(token.getValue());
+            }
+        }
+        return new Request(this, session, params.remove(0), params);
+    }
+
+    private void processCommand(IRequest request) {
+        LOGGER.fine(() -> "received command: " + request);
+
+        ISession session = request.getSession();
+        IResponse response = new Response();
+        ICommand command = commands.getCommand(request.getCommand());
+        try {
+            execute(command, request, response).observeOn(scheduler).subscribe(token -> {
+                session.publish(token);
+                if (response.isExit()) {
+                    session.close();
+                }
+            });
+        } catch (RuntimeException e) {
+            LOGGER.log(Level.SEVERE, "error executing command: " + request, e);
+        }
+    }
+
+    private Observable<RedisToken> execute(ICommand command, IRequest request, IResponse response) {
+        return Observable.create(observer -> {
+            executeCommand(command, request, response);
+
+            observer.onNext(response.build());
+
+            observer.onCompleted();
+        });
+    }
+
+    private String sourceKey(Channel channel) {
+        InetSocketAddress remoteAddress = (InetSocketAddress) channel.remoteAddress();
+        return remoteAddress.getHostName() + ":" + remoteAddress.getPort();
+    }
+
+    private int requireRange(int value, int min, int max) {
+        if (value <= min || value > max) {
+            throw new IllegalArgumentException(min + " <= " + value + " < " + max);
+        }
+        return value;
     }
 }

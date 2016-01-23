@@ -4,10 +4,11 @@
  */
 package tonivade.redis.command;
 
-import io.netty.channel.ChannelHandlerContext;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import io.netty.channel.ChannelHandlerContext;
+import tonivade.redis.protocol.RedisToken;
 
 public class Session implements ISession {
 
@@ -29,10 +30,15 @@ public class Session implements ISession {
     }
 
     @Override
-    public ChannelHandlerContext getContext() {
-        return ctx;
+    public void publish(RedisToken msg) {
+        ctx.writeAndFlush(msg);
     }
-
+    
+    @Override
+    public void close() {
+        ctx.close();
+    }
+    
     @Override
     public void destroy() {
 

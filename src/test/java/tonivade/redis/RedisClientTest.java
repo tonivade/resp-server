@@ -9,6 +9,8 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
+import static tonivade.redis.protocol.RedisToken.array;
+import static tonivade.redis.protocol.RedisToken.string;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -48,7 +50,7 @@ public class RedisClientTest {
         redisClient.start();
         verify(callback, timeout(TIMEOUT)).onConnect();
 
-        redisClient.send("PING\r\n");
+        redisClient.send(array(string("PING")));
 
         ArgumentCaptor<RedisToken> captor = ArgumentCaptor.forClass(RedisToken.class);
 
