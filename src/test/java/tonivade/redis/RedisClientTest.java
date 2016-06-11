@@ -11,6 +11,7 @@ import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static tonivade.redis.protocol.RedisToken.array;
 import static tonivade.redis.protocol.RedisToken.string;
+import static tonivade.redis.protocol.SafeString.safeString;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -19,6 +20,7 @@ import org.mockito.ArgumentCaptor;
 
 import tonivade.redis.protocol.RedisToken;
 import tonivade.redis.protocol.RedisTokenType;
+import tonivade.redis.protocol.SafeString;
 
 public class RedisClientTest {
 
@@ -58,7 +60,7 @@ public class RedisClientTest {
 
         RedisToken token = captor.getValue();
         assertThat(token.getType(), equalTo(RedisTokenType.STATUS));
-        assertThat(token.<String>getValue(), equalTo("PONG"));
+        assertThat(token.<SafeString>getValue(), equalTo(safeString("PONG")));
     }
 
     @Test

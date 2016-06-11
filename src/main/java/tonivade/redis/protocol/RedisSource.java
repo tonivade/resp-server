@@ -4,12 +4,10 @@
  */
 package tonivade.redis.protocol;
 
-import java.nio.ByteBuffer;
-
 public interface RedisSource {
 
-    public String readLine();
+    public SafeString readLine();
 
-    public ByteBuffer readBytes(int size);
+    public SafeString readString(int length);
 
 }

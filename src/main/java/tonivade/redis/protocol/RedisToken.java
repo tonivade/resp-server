@@ -63,7 +63,7 @@ public abstract class RedisToken {
     }
 
     public static RedisToken status(String str) {
-        return new StatusRedisToken(str);
+        return new StatusRedisToken(safeString(str));
     }
 
     public static RedisToken integer(int i) {
@@ -71,7 +71,7 @@ public abstract class RedisToken {
     }
 
     public static RedisToken error(String str) {
-        return new ErrorRedisToken(str);
+        return new ErrorRedisToken(safeString(str));
     }
 
     public static RedisToken array(RedisToken ...redisTokens) {
@@ -83,7 +83,7 @@ public abstract class RedisToken {
     }
 
     static class UnknownRedisToken extends RedisToken {
-        public UnknownRedisToken(String value) {
+        public UnknownRedisToken(SafeString value) {
             super(RedisTokenType.UNKNOWN, value);
         }
     }
@@ -95,13 +95,13 @@ public abstract class RedisToken {
     }
 
     static class StatusRedisToken extends RedisToken {
-        public StatusRedisToken(String value) {
+        public StatusRedisToken(SafeString value) {
             super(RedisTokenType.STATUS, value);
         }
     }
 
     static class ErrorRedisToken extends RedisToken {
-        public ErrorRedisToken(String value) {
+        public ErrorRedisToken(SafeString value) {
             super(RedisTokenType.ERROR, value);
         }
     }

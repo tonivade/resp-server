@@ -27,13 +27,13 @@ public class RedisSerializer {
             addBulkStr(msg.<SafeString> getValue());
             break;
         case STATUS:
-            addSimpleStr(msg.<String> getValue());
+            addSimpleStr(msg.<SafeString> getValue());
             break;
         case INTEGER:
             addInt(msg.<Integer> getValue());
             break;
         case ERROR:
-            addError(msg.<String> getValue());
+            addError(msg.<SafeString> getValue());
             break;
         case ARRAY:
             addArray(msg.<List<RedisToken>> getValue());
@@ -53,16 +53,16 @@ public class RedisSerializer {
         builder.append(DELIMITER);
     }
 
-    private void addSimpleStr(String str) {
-        builder.append(SIMPLE_STRING).append(str.getBytes(DEFAULT_CHARSET)).append(DELIMITER);
+    private void addSimpleStr(SafeString str) {
+        builder.append(SIMPLE_STRING).append(str.getBytes()).append(DELIMITER);
     }
 
     private void addInt(int value) {
         builder.append(INTEGER).append(value).append(DELIMITER);
     }
 
-    private void addError(String str) {
-        builder.append(ERROR).append(str).append(DELIMITER);
+    private void addError(SafeString str) {
+        builder.append(ERROR).append(str.getBytes()).append(DELIMITER);
     }
 
     private void addArray(Collection<RedisToken> array) {
