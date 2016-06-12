@@ -64,6 +64,29 @@ public class RedisClientTest {
     }
 
     @Test
+    public void onBigMessage() {
+        redisClient.start();
+        verify(callback, timeout(TIMEOUT)).onConnect();
+
+        redisClient.send(array(string("PING"), string(readBigFile())));
+
+        ArgumentCaptor<RedisToken> captor = ArgumentCaptor.forClass(RedisToken.class);
+
+        verify(callback, timeout(TIMEOUT)).onMessage(captor.capture());
+
+        RedisToken token = captor.getValue();
+        assertThat(token.getType(), equalTo(RedisTokenType.STRING));
+    }
+
+    private String readBigFile() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 10000; i++) {
+           sb.append("lkjsdfkjaskjflskjf");
+        }
+        return sb.toString();
+    }
+
+    @Test
     public void onClientDisconnect() {
         redisClient.start();
         verify(callback, timeout(TIMEOUT)).onConnect();

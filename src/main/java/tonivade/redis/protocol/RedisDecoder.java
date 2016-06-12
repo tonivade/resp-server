@@ -7,6 +7,7 @@ package tonivade.redis.protocol;
 import java.util.List;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufProcessor;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ReplayingDecoder;
 
@@ -24,22 +25,34 @@ public class RedisDecoder extends ReplayingDecoder<Void> {
     }
 
     private SafeString readLine(ChannelHandlerContext ctx, ByteBuf buffer) {
-        int size = buffer.bytesBefore((byte) '\r');
-        return readBytes(buffer, size);
+        int eol = findEndOfLine(buffer);
+        int size = eol - buffer.readerIndex();
+        return readString(buffer, size);
     }
 
-    private SafeString readBytes(ByteBuf buffer, int size) {
-        SafeString safeString = new SafeString(buffer.readBytes(size).nioBuffer());
+    private SafeString readString(ByteBuf buffer, int size) {
+        SafeString safeString = readBytes(buffer, size);
         buffer.skipBytes(2);
-        checkpoint();
         return safeString;
     }
 
-    private RedisToken parseResponse(ChannelHandlerContext ctx, ByteBuf buffer) throws Exception {
+    private SafeString readBytes(ByteBuf buffer, int size) {
+        return new SafeString(buffer.readBytes(size).nioBuffer());
+    }
+
+    private static int findEndOfLine(final ByteBuf buffer) {
+        int i = buffer.forEachByte(ByteBufProcessor.FIND_LF);
+        if (i > 0 && buffer.getByte(i - 1) == '\r') {
+            i--;
+        }
+        return i;
+    }
+
+    private RedisToken parseResponse(ChannelHandlerContext ctx, ByteBuf buffer) {
         RedisParser parser = new RedisParser(maxLength, new RedisSource() {
             @Override
             public SafeString readString(int size) {
-                return RedisDecoder.this.readBytes(buffer, size);
+                return RedisDecoder.this.readString(buffer, size);
             }
 
             @Override
@@ -48,7 +61,8 @@ public class RedisDecoder extends ReplayingDecoder<Void> {
             }
         });
 
-        return parser.parse();
+        RedisToken token = parser.parse();
+        checkpoint();
+        return token;
     }
-
 }

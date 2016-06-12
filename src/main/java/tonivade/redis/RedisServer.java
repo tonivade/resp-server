@@ -152,6 +152,7 @@ public class RedisServer implements IRedis, IServerContext {
         String sourceKey = sourceKey(ctx.channel());
 
         LOGGER.finest(() -> "message received: " + sourceKey);
+        LOGGER.info(() -> "message: " + message);
 
         IRequest request = parseMessage(sourceKey, message, getSession(sourceKey, ctx));
         if (request != null) {
@@ -212,7 +213,7 @@ public class RedisServer implements IRedis, IServerContext {
     }
 
     private ISession getSession(String sourceKey, ChannelHandlerContext ctx) {
-        return clients.get(sourceKey, (key) -> new Session(key, ctx), this::createSession);
+        return clients.get(sourceKey, key -> new Session(key, ctx), this::createSession);
     }
 
     private IRequest parseMessage(String sourceKey, RedisToken message, ISession session) {

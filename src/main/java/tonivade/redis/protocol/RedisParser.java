@@ -36,7 +36,7 @@ public class RedisParser {
     }
 
     private RedisToken parseToken(SafeString line) {
-        RedisToken token = new UnknownRedisToken(line);
+        RedisToken token = new UnknownRedisToken(SafeString.EMPTY_STRING);
         if (line != null && !line.isEmpty()) {
             if (line.startsWith(ARRAY_PREFIX)) {
                 int size = Integer.parseInt(line.substring(1));
@@ -49,6 +49,8 @@ public class RedisParser {
                 token = parseIntegerToken(line);
             } else if (line.startsWith(STRING_PREFIX)) {
                 token = parseStringToken(line);
+            } else {
+                token = new UnknownRedisToken(line);
             }
         }
         return token;
