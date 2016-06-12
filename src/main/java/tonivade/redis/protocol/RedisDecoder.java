@@ -31,6 +31,7 @@ public class RedisDecoder extends ReplayingDecoder<Void> {
     private SafeString readBytes(ByteBuf buffer, int size) {
         SafeString safeString = new SafeString(buffer.readBytes(size).nioBuffer());
         buffer.skipBytes(2);
+        checkpoint();
         return safeString;
     }
 
