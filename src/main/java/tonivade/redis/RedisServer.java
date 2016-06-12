@@ -152,7 +152,6 @@ public class RedisServer implements IRedis, IServerContext {
         String sourceKey = sourceKey(ctx.channel());
 
         LOGGER.finest(() -> "message received: " + sourceKey);
-        LOGGER.info(() -> "message: " + message);
 
         IRequest request = parseMessage(sourceKey, message, getSession(sourceKey, ctx));
         if (request != null) {
