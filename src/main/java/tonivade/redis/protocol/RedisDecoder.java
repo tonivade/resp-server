@@ -37,7 +37,7 @@ public class RedisDecoder extends ReplayingDecoder<Void> {
     }
 
     private SafeString readBytes(ByteBuf buffer, int size) {
-        return new SafeString(buffer.readBytes(size).nioBuffer());
+        return new SafeString(buffer.readSlice(size).nioBuffer());
     }
 
     private static int findEndOfLine(final ByteBuf buffer) {
