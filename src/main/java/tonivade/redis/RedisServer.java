@@ -39,10 +39,10 @@ import tonivade.redis.command.ISession;
 import tonivade.redis.command.Request;
 import tonivade.redis.command.Response;
 import tonivade.redis.command.Session;
-import tonivade.redis.protocol.RedisToken;
-import tonivade.redis.protocol.RedisTokenType;
 import tonivade.redis.protocol.RedisDecoder;
 import tonivade.redis.protocol.RedisEncoder;
+import tonivade.redis.protocol.RedisToken;
+import tonivade.redis.protocol.RedisTokenType;
 import tonivade.redis.protocol.SafeString;
 
 public class RedisServer implements IRedis, IServerContext {
@@ -212,7 +212,7 @@ public class RedisServer implements IRedis, IServerContext {
     }
 
     private ISession getSession(String sourceKey, ChannelHandlerContext ctx) {
-        return clients.get(sourceKey, (key) -> new Session(key, ctx), this::createSession);
+        return clients.get(sourceKey, key -> new Session(key, ctx), this::createSession);
     }
 
     private IRequest parseMessage(String sourceKey, RedisToken message, ISession session) {
@@ -226,8 +226,8 @@ public class RedisServer implements IRedis, IServerContext {
     }
 
     private Request parseLine(String sourceKey, RedisToken message, ISession session) {
-        String command = message.getValue();
-        String[] params = command.split(" ");
+        SafeString command = message.getValue();
+        String[] params = command.toString().split(" ");
         String[] array = new String[params.length - 1];
         System.arraycopy(params, 1, array, 0, array.length);
         return new Request(this, session, safeString(params[0]), safeAsList(array));

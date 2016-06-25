@@ -95,4 +95,17 @@ public class SafeString implements Comparable<SafeString> {
         return left.length - right.length;
     }
 
+    public boolean isEmpty() {
+        return length() == 0;
+    }
+
+    public boolean startsWith(byte b) {
+        byte first = buffer.get(0);
+        return first == b;
+    }
+
+    public String substring(int i) {
+        return toString().substring(i);
+    }
+
 }
