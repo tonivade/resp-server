@@ -4,9 +4,9 @@ apply plugin: 'jacoco'
 apply plugin: 'com.github.kt3k.coveralls'
 apply plugin: 'com.bmuschko.nexus'
 
-group = 'tonivade'
+group = 'com.github.tonivade'
 archivesBaseName = 'resp-server'
-version = '0.3.2'
+version = '0.4.0'
 
 buildscript {
     repositories {
@@ -47,18 +47,16 @@ sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
 repositories {
+    mavenLocal()
     mavenCentral()
     maven {
-        url = 'http://garagemarket.com.es/nexus/content/repositories/releases/'
-    }
-    maven {
-        url = 'http://garagemarket.com.es/nexus/content/repositories/snapshots/'
+        url = 'https://oss.sonatype.org/content/repositories/snapshots'
     }
 }
 
 dependencies {
     compile 'io.netty:netty-all:4.0.37.Final'
-    compile 'tonivade:equalizer:0.1.2'
+    compile 'com.github.tonivade:equalizer:0.2.0'
     compile 'io.reactivex:rxjava:1.1.5'
     testCompile 'junit:junit:4.12'
     testCompile 'org.hamcrest:hamcrest-library:1.3'
@@ -99,11 +97,11 @@ modifyPom {
 extraArchive {
     sources = true
     tests = false
-    javadoc = false
+    javadoc = true
 }
 
 nexus {
-    sign = false
-    repositoryUrl = 'http://garagemarket.com.es/nexus/content/repositories/releases/'
-    snapshotRepositoryUrl = 'http://garagemarket.com.es/nexus/content/repositories/snapshots/'
+    sign = true
+    repositoryUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2'
+    snapshotRepositoryUrl = 'https://oss.sonatype.org/content/repositories/snapshots'
 }
