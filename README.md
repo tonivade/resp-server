@@ -131,6 +131,18 @@ the number of the parameter accepted for this command
 If the number of parameters is less than the especified value, the command
 is rejected with an error.
 
+## Maven
+
+    <dependency>
+        <groupId>com.github.tonivade</groupId>
+        <artifactId>resp-server</artifactId>
+        <version>0.4.0</version>
+    </dependency>
+    
+## Gradle
+
+    compile 'com.github.tonivade:resp-server:0.4.0'
+
 ## Continuous Integration
 
 [![Build Status](https://drone.io/github.com/tonivade/resp-server/status.png)](https://drone.io/github.com/tonivade/resp-server/latest)
