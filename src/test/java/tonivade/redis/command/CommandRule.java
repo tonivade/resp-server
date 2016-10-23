@@ -56,9 +56,12 @@ public class CommandRule implements TestRule {
             public void evaluate() throws Throwable {
                 server = mock(IServerContext.class);
                 request = mock(IRequest.class);
-                response = mock(IResponse.class, new Answer<IResponse>() {
+                response = mock(IResponse.class, new Answer<Object>() {
                     @Override
-                    public IResponse answer(InvocationOnMock invocation) throws Throwable {
+                    public Object answer(InvocationOnMock invocation) throws Throwable {
+                    	if (invocation.getMethod().getName().equals("exit")) {
+                    		return (Void) null;
+                    	}
                         return (IResponse) invocation.getMock();
                     }
                 });
