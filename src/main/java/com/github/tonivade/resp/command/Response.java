@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Objects;
 
 import com.github.tonivade.resp.protocol.RedisToken;
+import com.github.tonivade.resp.protocol.RespSerializer;
 import com.github.tonivade.resp.protocol.SafeString;
 
 public class Response implements IResponse {
@@ -17,6 +18,8 @@ public class Response implements IResponse {
     private boolean exit;
 
     private RedisToken token;
+    
+    private RespSerializer serializer;
 
     @Override
     public IResponse addBulkStr(SafeString str) {
@@ -71,6 +74,12 @@ public class Response implements IResponse {
             token = RedisToken.array(tokens);
         }
         return this;
+    }
+    
+    @Override
+    public IResponse addObject(Object object) {
+      token = serializer.getValue(object);
+      return this;
     }
 
     @Override

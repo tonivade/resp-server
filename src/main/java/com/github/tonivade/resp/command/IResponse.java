@@ -25,6 +25,8 @@ public interface IResponse {
     IResponse addInt(boolean value);
 
     IResponse addError(String str);
+    
+    IResponse addObject(Object object);
 
     RedisToken build();
 
