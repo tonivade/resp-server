@@ -19,7 +19,7 @@ public class Response implements IResponse {
 
     private RedisToken token;
     
-    private RespSerializer serializer;
+    private RespSerializer serializer = new RespSerializer();
 
     @Override
     public IResponse addBulkStr(SafeString str) {
