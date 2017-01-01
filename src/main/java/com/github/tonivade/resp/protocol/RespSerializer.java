@@ -4,7 +4,6 @@
  */
 package com.github.tonivade.resp.protocol;
 
-import static java.lang.String.valueOf;
 import static javaslang.API.$;
 import static javaslang.API.Case;
 import static javaslang.API.Match;
@@ -28,28 +27,6 @@ public class RespSerializer {
                 Case(instanceOf(Collection.class), this::getCollectionValue),
                 Case(instanceOf(Map.class), this::getMapValue),
                 Case($(), this::getObjectValue));
-    }
-
-    public RedisToken getValueOld(Object object) {
-        if (object.getClass().isPrimitive()) {
-            return RedisToken.string(valueOf(object));
-        }
-        if (String.class.isInstance(object)) {
-            return RedisToken.string(valueOf(object));
-        }
-        if (Number.class.isInstance(object)) {
-            return RedisToken.string(valueOf(object));
-        }
-        if (object.getClass().isArray()) {
-            return getArrayValue(Object[].class.cast(object));
-        }
-        if (Collection.class.isInstance(object)) {
-            return getCollectionValue(Collection.class.cast(object));
-        }
-        if (Map.class.isInstance(object)) {
-            return getMapValue(Map.class.cast(object));
-        }
-        return getObjectValue(object);
     }
 
     private RedisToken getMapValue(Map<?, ?> map) {
