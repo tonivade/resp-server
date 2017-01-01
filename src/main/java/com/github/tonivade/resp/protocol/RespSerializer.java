@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
+import javaslang.control.Try;
+
 public class RespSerializer {
 
     public RedisToken getValue(Object object) {
@@ -58,16 +60,15 @@ public class RespSerializer {
         List<RedisToken> tokens = new ArrayList<>();
         Field[] fields = object.getClass().getDeclaredFields();
         for (Field field : fields) {
-            try {
-                tokens.add(RedisToken.string(field.getName()));
-                field.setAccessible(true);
-                tokens.add(getValue(field.get(object)));
-            } catch (IllegalArgumentException | IllegalAccessException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+            tokens.add(RedisToken.string(field.getName()));
+            tokens.add(getValue(Try.of(() -> getFieldValue(object, field)).get()));
         }
         return RedisToken.array(tokens);
+    }
+
+    private Object getFieldValue(Object object, Field field) throws IllegalArgumentException, IllegalAccessException {
+        field.setAccessible(true);
+        return field.get(object);
     }
 
     private RedisToken getStringValue(Object value) {
@@ -75,6 +76,6 @@ public class RespSerializer {
     }
 
     private Predicate<? super Object> isPrimitive() {
-        return o -> o.getClass().isPrimitive();
+        return object -> object.getClass().isPrimitive();
     }
 }
