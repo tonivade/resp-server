@@ -16,9 +16,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-
-import com.github.tonivade.resp.ThreadSafeCache;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ThreadSafeCacheTest {
@@ -56,5 +54,4 @@ public class ThreadSafeCacheTest {
 
         verify(consumer, times(1)).accept(KEY);
     }
-
 }
