@@ -41,14 +41,14 @@ public class RedisConnectionHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        LOGGER.log(Level.SEVERE, "channel inactive");
+        LOGGER.log(Level.FINE, "channel inactive");
         impl.disconnected(ctx);
         ctx.close();
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        LOGGER.log(Level.SEVERE, "uncaught exception", cause);
+        LOGGER.log(Level.FINE, "uncaught exception", cause);
         impl.disconnected(ctx);
         ctx.close();
     }
