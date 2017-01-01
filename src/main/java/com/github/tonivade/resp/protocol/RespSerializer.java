@@ -5,17 +5,32 @@
 package com.github.tonivade.resp.protocol;
 
 import static java.lang.String.valueOf;
+import static javaslang.API.$;
+import static javaslang.API.Case;
+import static javaslang.API.Match;
+import static javaslang.Predicates.instanceOf;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
-import com.github.tonivade.resp.protocol.RedisToken;
+import java.util.function.Predicate;
 
 public class RespSerializer {
+
     public RedisToken getValue(Object object) {
+        return Match(object).of(
+                Case(isPrimitive(), this::getStringValue),
+                Case(instanceOf(Object[].class), this::getArrayValue),
+                Case(instanceOf(Number.class), this::getStringValue),
+                Case(instanceOf(String.class), this::getStringValue),
+                Case(instanceOf(Collection.class), this::getCollectionValue),
+                Case(instanceOf(Map.class), this::getMapValue),
+                Case($(), this::getObjectValue));
+    }
+
+    public RedisToken getValueOld(Object object) {
         if (object.getClass().isPrimitive()) {
             return RedisToken.string(valueOf(object));
         }
@@ -78,4 +93,11 @@ public class RespSerializer {
         return RedisToken.array(tokens);
     }
 
+    private RedisToken getStringValue(Object value) {
+        return RedisToken.string(String.valueOf(value));
+    }
+
+    private Predicate<? super Object> isPrimitive() {
+        return o -> o.getClass().isPrimitive();
+    }
 }
