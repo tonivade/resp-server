@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -68,7 +69,7 @@ public class RedisServer implements IRedis, IServerContext {
 
     private final Map<String, Object> state = new HashMap<>();
 
-    private final ThreadSafeCache<String, ISession> clients = new ThreadSafeCache<>();
+    private final ConcurrentHashMap<String, ISession> clients = new ConcurrentHashMap<>();
 
     private final CommandSuite commands;
 
@@ -213,7 +214,13 @@ public class RedisServer implements IRedis, IServerContext {
     }
 
     private ISession getSession(String sourceKey, ChannelHandlerContext ctx) {
-        return clients.get(sourceKey, key -> new Session(key, ctx), this::createSession);
+        return clients.computeIfAbsent(sourceKey, key -> newSession(ctx, key));
+    }
+
+    private ISession newSession(ChannelHandlerContext ctx, String key) {
+        Session session = new Session(key, ctx);
+        createSession(session);
+        return session;
     }
 
     private IRequest parseMessage(String sourceKey, RedisToken message, ISession session) {
