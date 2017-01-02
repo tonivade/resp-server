@@ -4,37 +4,31 @@
  */
 package com.github.tonivade.resp.protocol;
 
-import static java.lang.String.valueOf;
+import static javaslang.API.$;
+import static javaslang.API.Case;
+import static javaslang.API.Match;
+import static javaslang.Predicates.instanceOf;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
-import com.github.tonivade.resp.protocol.RedisToken;
+import javaslang.control.Try;
 
 public class RespSerializer {
+
     public RedisToken getValue(Object object) {
-        if (object.getClass().isPrimitive()) {
-            return RedisToken.string(valueOf(object));
-        }
-        if (String.class.isInstance(object)) {
-            return RedisToken.string(valueOf(object));
-        }
-        if (Number.class.isInstance(object)) {
-            return RedisToken.string(valueOf(object));
-        }
-        if (object.getClass().isArray()) {
-            return getArrayValue(Object[].class.cast(object));
-        }
-        if (Collection.class.isInstance(object)) {
-            return getCollectionValue(Collection.class.cast(object));
-        }
-        if (Map.class.isInstance(object)) {
-            return getMapValue(Map.class.cast(object));
-        }
-        return getObjectValue(object);
+        return Match(object).of(
+                Case(isPrimitive(), this::getStringValue),
+                Case(instanceOf(Object[].class), this::getArrayValue),
+                Case(instanceOf(Number.class), this::getStringValue),
+                Case(instanceOf(String.class), this::getStringValue),
+                Case(instanceOf(Collection.class), this::getCollectionValue),
+                Case(instanceOf(Map.class), this::getMapValue),
+                Case($(), this::getObjectValue));
     }
 
     private RedisToken getMapValue(Map<?, ?> map) {
@@ -66,16 +60,22 @@ public class RespSerializer {
         List<RedisToken> tokens = new ArrayList<>();
         Field[] fields = object.getClass().getDeclaredFields();
         for (Field field : fields) {
-            try {
-                tokens.add(RedisToken.string(field.getName()));
-                field.setAccessible(true);
-                tokens.add(getValue(field.get(object)));
-            } catch (IllegalArgumentException | IllegalAccessException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+            tokens.add(RedisToken.string(field.getName()));
+            tokens.add(getValue(Try.of(() -> getFieldValue(object, field)).get()));
         }
         return RedisToken.array(tokens);
     }
 
+    private Object getFieldValue(Object object, Field field) throws IllegalArgumentException, IllegalAccessException {
+        field.setAccessible(true);
+        return field.get(object);
+    }
+
+    private RedisToken getStringValue(Object value) {
+        return RedisToken.string(String.valueOf(value));
+    }
+
+    private Predicate<? super Object> isPrimitive() {
+        return object -> object.getClass().isPrimitive();
+    }
 }
