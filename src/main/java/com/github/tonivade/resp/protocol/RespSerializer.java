@@ -60,8 +60,10 @@ public class RespSerializer {
         List<RedisToken> tokens = new ArrayList<>();
         Field[] fields = object.getClass().getDeclaredFields();
         for (Field field : fields) {
-            tokens.add(RedisToken.string(field.getName()));
-            tokens.add(getValue(Try.of(() -> getFieldValue(object, field)).get()));
+            if (!field.getName().startsWith("$")) {
+                tokens.add(RedisToken.string(field.getName()));
+                tokens.add(getValue(Try.of(() -> getFieldValue(object, field)).get()));
+            }
         }
         return RedisToken.array(tokens);
     }
