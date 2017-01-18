@@ -55,9 +55,9 @@ repositories {
 }
 
 dependencies {
-    compile 'io.netty:netty-all:4.0.42.Final'
+    compile 'io.netty:netty-all:4.0.43.Final'
     compile 'com.github.tonivade:equalizer:0.2.0'
-    compile 'io.reactivex:rxjava:1.2.4'
+    compile 'io.reactivex:rxjava:1.2.5'
     compile 'io.javaslang:javaslang:2.0.5'
     testCompile 'junit:junit:4.12'
     testCompile 'org.hamcrest:hamcrest-library:1.3'
