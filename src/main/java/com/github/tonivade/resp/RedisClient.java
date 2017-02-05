@@ -26,125 +26,114 @@ import io.netty.util.CharsetUtil;
 
 public class RedisClient implements IRedis {
 
-    private static final Logger LOGGER = Logger.getLogger(RedisClient.class.getName());
+  private static final Logger LOGGER = Logger.getLogger(RedisClient.class.getName());
 
-    private static final String DELIMITER = "\r\n";
+  private static final String DELIMITER = "\r\n";
 
-    private static final int BUFFER_SIZE = 1024 * 1024;
-    private static final int MAX_FRAME_SIZE = BUFFER_SIZE * 100;
+  private static final int BUFFER_SIZE = 1024 * 1024;
+  private static final int MAX_FRAME_SIZE = BUFFER_SIZE * 100;
 
-    private final int port;
-    private final String host;
+  private final int port;
+  private final String host;
 
-    private EventLoopGroup workerGroup;
-    private Bootstrap bootstrap;
+  private EventLoopGroup workerGroup;
+  private Bootstrap bootstrap;
 
-    private ChannelFuture future;
+  private ChannelFuture future;
 
-    private ChannelHandlerContext context;
-    private RedisInitializerHandler initHandler;
-    private RedisConnectionHandler connectionHandler;
+  private ChannelHandlerContext context;
+  private RedisInitializerHandler initHandler;
+  private RedisConnectionHandler connectionHandler;
 
-    private final IRedisCallback callback;
+  private final IRedisCallback callback;
 
-    public RedisClient(String host, int port, IRedisCallback callback) {
-        this.host = requireNonNull(host);
-        this.port = requireRange(port, 1024, 65535);
-        this.callback = requireNonNull(callback);
+  public RedisClient(String host, int port, IRedisCallback callback) {
+    this.host = requireNonNull(host);
+    this.port = requireRange(port, 1024, 65535);
+    this.callback = requireNonNull(callback);
+  }
+
+  public void start() {
+    workerGroup = new NioEventLoopGroup(Runtime.getRuntime().availableProcessors());
+    initHandler = new RedisInitializerHandler(this);
+    connectionHandler = new RedisConnectionHandler(this);
+
+    bootstrap = new Bootstrap().group(workerGroup)
+        .channel(NioSocketChannel.class)
+        .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+        .option(ChannelOption.SO_RCVBUF, BUFFER_SIZE)
+        .option(ChannelOption.SO_SNDBUF, BUFFER_SIZE)
+        .option(ChannelOption.SO_KEEPALIVE, true)
+        .handler(initHandler);
+
+    future = connect();
+  }
+
+  public void stop() {
+    try {
+      if (future != null) {
+        future.channel().close();
+      }
+    } finally {
+      workerGroup.shutdownGracefully();
     }
+  }
 
-    public void start() {
-        workerGroup = new NioEventLoopGroup(Runtime.getRuntime().availableProcessors());
-        initHandler = new RedisInitializerHandler(this);
-        connectionHandler = new RedisConnectionHandler(this);
+  @Override
+  public void channel(SocketChannel channel) {
+    LOGGER.info(() -> "connected to server: " + host + ":" + port);
+    channel.pipeline().addLast("redisEncoder", new RedisEncoder());
+    channel.pipeline().addLast("stringEncoder", new StringEncoder(CharsetUtil.UTF_8));
+    channel.pipeline().addLast("linDelimiter", new RedisDecoder(MAX_FRAME_SIZE));
+    channel.pipeline().addLast(connectionHandler);
+  }
 
-        bootstrap = new Bootstrap()
-          .group(workerGroup)
-          .channel(NioSocketChannel.class)
-          .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
-          .option(ChannelOption.SO_RCVBUF, BUFFER_SIZE)
-          .option(ChannelOption.SO_SNDBUF, BUFFER_SIZE)
-          .option(ChannelOption.SO_KEEPALIVE, true)
-          .handler(initHandler);
+  @Override
+  public void connected(ChannelHandlerContext ctx) {
+    LOGGER.info(() -> "channel active");
+    this.context = ctx;
+    callback.onConnect();
+  }
 
-        try {
-            connect();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+  @Override
+  public void disconnected(ChannelHandlerContext ctx) {
+    LOGGER.info(() -> "client disconected from server: " + host + ":" + port);
+    if (this.context != null) {
+      callback.onDisconnect();
+      this.context = null;
     }
+  }
 
-    public void stop() {
-        try {
-            if (future != null) {
-                future.channel().close();
-            }
-        } finally {
-            workerGroup.shutdownGracefully();
-        }
+  public void send(String message) {
+    writeAndFlush(message + DELIMITER);
+  }
+
+  public void send(RedisToken message) {
+    writeAndFlush(message);
+  }
+
+  @Override
+  public void receive(ChannelHandlerContext ctx, RedisToken message) {
+    callback.onMessage(message);
+  }
+
+  private ChannelFuture connect() {
+    LOGGER.info(() -> "trying to connect");
+    ChannelFuture future = bootstrap.connect(host, port);
+    future.syncUninterruptibly();
+    return future;
+  }
+
+  private void writeAndFlush(Object message) {
+    if (context != null) {
+      context.writeAndFlush(message);
     }
+  }
 
-    @Override
-    public void channel(SocketChannel channel) {
-        LOGGER.info(() -> "connected to server: " + host + ":" + port);
-
-        channel.pipeline().addLast("redisEncoder", new RedisEncoder());
-        channel.pipeline().addLast("stringEncoder", new StringEncoder(CharsetUtil.UTF_8));
-        channel.pipeline().addLast("linDelimiter", new RedisDecoder(MAX_FRAME_SIZE));
-        channel.pipeline().addLast(connectionHandler);
+  private int requireRange(int value, int min, int max) {
+    if (value <= min || value > max) {
+      throw new IllegalArgumentException(min + " <= " + value + " < " + max);
     }
-
-    @Override
-    public void connected(ChannelHandlerContext ctx) {
-        LOGGER.info(() -> "channel active");
-
-        this.context = ctx;
-
-        callback.onConnect();
-    }
-
-    @Override
-    public void disconnected(ChannelHandlerContext ctx) {
-        LOGGER.info(() -> "client disconected from server: " + host + ":" + port);
-
-        if (this.context != null) {
-            callback.onDisconnect();
-
-            this.context = null;
-        }
-    }
-
-    public void send(String message) {
-        writeAndFlush(message + DELIMITER);
-    }
-
-    public void send(RedisToken message) {
-        writeAndFlush(message);
-    }
-
-    @Override
-    public void receive(ChannelHandlerContext ctx, RedisToken message) {
-        callback.onMessage(message);
-    }
-
-    private void connect() {
-        LOGGER.info(() -> "trying to connect");
-
-        future = bootstrap.connect(host, port);
-
-        future.syncUninterruptibly();
-    }
-
-    private void writeAndFlush(Object message) {
-        if (context != null) {
-            context.writeAndFlush(message);
-        }
-    }
-
-    private int requireRange(int value, int min, int max) {
-        if (value <= min || value > max) {
-            throw new IllegalArgumentException(min + " <= " + value + " < " + max);
-        }
-        return value;
-    }
+    return value;
+  }
 }

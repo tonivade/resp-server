@@ -17,108 +17,110 @@ import java.util.Objects;
 
 public abstract class RedisToken {
 
-    private static final String SEPARATOR = "=>";
+  private static final String SEPARATOR = "=>";
 
-    private final RedisTokenType type;
+  private final RedisTokenType type;
 
-    private final Object value;
+  private final Object value;
 
-    private RedisToken(RedisTokenType type, Object value) {
-        this.type = requireNonNull(type);
-        this.value = value;
+  private RedisToken(RedisTokenType type, Object value) {
+    this.type = requireNonNull(type);
+    this.value = value;
+  }
+
+  public RedisTokenType getType() {
+    return type;
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T> T getValue() {
+    return (T) value;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(value);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return equalizer(this).append((one, other) -> Objects.equals(one.value, other.value)).applyTo(obj);
+  }
+
+  @Override
+  public String toString() {
+    return type + SEPARATOR + value;
+  }
+
+  public static RedisToken string(SafeString str) {
+    return new StringRedisToken(str);
+  }
+
+  public static RedisToken string(String str) {
+    return new StringRedisToken(safeString(str));
+  }
+
+  public static RedisToken status(String str) {
+    return new StatusRedisToken(safeString(str));
+  }
+
+  public static RedisToken integer(boolean b) {
+    return new IntegerRedisToken(b ? 1 : 0);
+  }
+
+  public static RedisToken integer(int i) {
+    return new IntegerRedisToken(i);
+  }
+
+  public static RedisToken error(String str) {
+    return new ErrorRedisToken(safeString(str));
+  }
+
+  public static RedisToken array(RedisToken... redisTokens) {
+    return new ArrayRedisToken(asList(redisTokens));
+  }
+
+  public static RedisToken array(Collection<RedisToken> redisTokens) {
+    return new ArrayRedisToken(redisTokens);
+  }
+
+  static class UnknownRedisToken extends RedisToken {
+    public UnknownRedisToken(SafeString value) {
+      super(RedisTokenType.UNKNOWN, value);
+    }
+  }
+
+  static class StringRedisToken extends RedisToken {
+    public StringRedisToken(SafeString value) {
+      super(RedisTokenType.STRING, value);
+    }
+  }
+
+  static class StatusRedisToken extends RedisToken {
+    public StatusRedisToken(SafeString value) {
+      super(RedisTokenType.STATUS, value);
+    }
+  }
+
+  static class ErrorRedisToken extends RedisToken {
+    public ErrorRedisToken(SafeString value) {
+      super(RedisTokenType.ERROR, value);
+    }
+  }
+
+  static class IntegerRedisToken extends RedisToken {
+    public IntegerRedisToken(Integer value) {
+      super(RedisTokenType.INTEGER, value);
+    }
+  }
+
+  static class ArrayRedisToken extends RedisToken {
+    public ArrayRedisToken(Collection<RedisToken> value) {
+      super(RedisTokenType.ARRAY, unmodifiableList(new ArrayList<>(value)));
     }
 
-    public RedisTokenType getType() {
-        return type;
+    public int size() {
+      return this.<List<RedisToken>>getValue().size();
     }
-
-    @SuppressWarnings("unchecked")
-    public <T> T getValue() {
-        return (T) value;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(value);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return equalizer(this)
-            .append((one, other) -> Objects.equals(one.value, other.value))
-                .applyTo(obj);
-    }
-
-    @Override
-    public String toString() {
-        return type + SEPARATOR + value;
-    }
-
-    public static RedisToken string(SafeString str) {
-        return new StringRedisToken(str);
-    }
-
-    public static RedisToken string(String str) {
-        return new StringRedisToken(safeString(str));
-    }
-
-    public static RedisToken status(String str) {
-        return new StatusRedisToken(safeString(str));
-    }
-
-    public static RedisToken integer(int i) {
-        return new IntegerRedisToken(i);
-    }
-
-    public static RedisToken error(String str) {
-        return new ErrorRedisToken(safeString(str));
-    }
-
-    public static RedisToken array(RedisToken ...redisTokens) {
-        return new ArrayRedisToken(asList(redisTokens));
-    }
-
-    public static RedisToken array(Collection<RedisToken> redisTokens) {
-        return new ArrayRedisToken(redisTokens);
-    }
-
-    static class UnknownRedisToken extends RedisToken {
-        public UnknownRedisToken(SafeString value) {
-            super(RedisTokenType.UNKNOWN, value);
-        }
-    }
-
-    static class StringRedisToken extends RedisToken {
-        public StringRedisToken(SafeString value) {
-            super(RedisTokenType.STRING, value);
-        }
-    }
-
-    static class StatusRedisToken extends RedisToken {
-        public StatusRedisToken(SafeString value) {
-            super(RedisTokenType.STATUS, value);
-        }
-    }
-
-    static class ErrorRedisToken extends RedisToken {
-        public ErrorRedisToken(SafeString value) {
-            super(RedisTokenType.ERROR, value);
-        }
-    }
-
-    static class IntegerRedisToken extends RedisToken {
-        public IntegerRedisToken(Integer value) {
-            super(RedisTokenType.INTEGER, value);
-        }
-    }
-
-    static class ArrayRedisToken extends RedisToken {
-        public ArrayRedisToken(Collection<RedisToken> value) {
-            super(RedisTokenType.ARRAY, unmodifiableList(new ArrayList<>(value)));
-        }
-
-        public int size() {
-            return this.<List<RedisToken>>getValue().size();
-        }
-    }
+  }
 }

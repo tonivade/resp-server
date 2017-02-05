@@ -14,15 +14,13 @@ import com.github.tonivade.resp.command.CommandUnderTest;
 
 @CommandUnderTest(EchoCommand.class)
 public class EchoCommandTest {
+  @Rule
+  public final CommandRule rule = new CommandRule(this);
 
-    @Rule
-    public final CommandRule rule = new CommandRule(this);
-
-    @Test
-    public void testExecute() {
-        rule.withParams("test")
-            .execute()
-            .verify().addBulkStr(safeString("test"));
-    }
-
+  @Test
+  public void testExecute() {
+    rule.withParams("test")
+        .execute()
+        .verify().addBulkStr(safeString("test"));
+  }
 }

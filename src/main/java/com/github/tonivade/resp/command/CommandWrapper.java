@@ -8,25 +8,25 @@ import com.github.tonivade.resp.annotation.ParamLength;
 
 public class CommandWrapper implements ICommand {
 
-    private int params;
+  private int params;
 
-    private final ICommand command;
+  private final ICommand command;
 
-    public CommandWrapper(ICommand command) {
-        this.command = command;
-        ParamLength length = command.getClass().getAnnotation(ParamLength.class);
-        if (length != null) {
-            this.params = length.value();
-        }
+  public CommandWrapper(ICommand command) {
+    this.command = command;
+    ParamLength length = command.getClass().getAnnotation(ParamLength.class);
+    if (length != null) {
+      this.params = length.value();
     }
+  }
 
-    @Override
-    public void execute(IRequest request, IResponse response) {
-        if (request.getLength() < params) {
-            response.addError("ERR wrong number of arguments for '" + request.getCommand() + "' command");
-        } else {
-            command.execute(request, response);
-        }
+  @Override
+  public void execute(IRequest request, IResponse response) {
+    if (request.getLength() < params) {
+      response.addError("ERR wrong number of arguments for '" + request.getCommand() + "' command");
+    } else {
+      command.execute(request, response);
     }
+  }
 
 }

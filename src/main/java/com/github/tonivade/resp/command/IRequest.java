@@ -10,19 +10,11 @@ import java.util.Optional;
 import com.github.tonivade.resp.protocol.SafeString;
 
 public interface IRequest {
-
-    String getCommand();
-
-    List<SafeString> getParams();
-
-    SafeString getParam(int i);
-
-    Optional<SafeString> getOptionalParam(int i);
-
-    int getLength();
-
-    ISession getSession();
-
-    IServerContext getServerContext();
-
+  String getCommand();
+  List<SafeString> getParams();
+  SafeString getParam(int i);
+  Optional<SafeString> getOptionalParam(int i);
+  int getLength();
+  ISession getSession();
+  IServerContext getServerContext();
 }

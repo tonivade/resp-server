@@ -14,21 +14,19 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class NullCommandTest {
+  @Mock
+  private IRequest request;
 
-    @Mock
-    private IRequest request;
+  @Mock
+  private IResponse response;
 
-    @Mock
-    private IResponse response;
+  @Test
+  public void execute() {
+    NullCommand nullCommand = new NullCommand();
+    when(request.getCommand()).thenReturn("notExists");
 
-    @Test
-    public void execute() {
-        NullCommand nullCommand = new NullCommand();
+    nullCommand.execute(request, response);
 
-        when(request.getCommand()).thenReturn("notExists");
-
-        nullCommand.execute(request, response);
-
-        verify(response).addError("ERR unknown command 'notExists'");
-    }
+    verify(response).addError("ERR unknown command 'notExists'");
+  }
 }

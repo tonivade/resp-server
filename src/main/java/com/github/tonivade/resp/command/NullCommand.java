@@ -5,10 +5,8 @@
 package com.github.tonivade.resp.command;
 
 public class NullCommand implements ICommand {
-
-    @Override
-    public void execute(IRequest request, IResponse response) {
-        response.addError("ERR unknown command '" + request.getCommand() + "'");
-    }
-
+  @Override
+  public void execute(IRequest request, IResponse response) {
+    response.addError("ERR unknown command '" + request.getCommand() + "'");
+  }
 }

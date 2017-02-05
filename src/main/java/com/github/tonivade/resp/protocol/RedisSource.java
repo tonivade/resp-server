@@ -5,9 +5,6 @@
 package com.github.tonivade.resp.protocol;
 
 public interface RedisSource {
-
-    public SafeString readLine();
-
-    public SafeString readString(int length);
-
+  SafeString readLine();
+  SafeString readString(int length);
 }

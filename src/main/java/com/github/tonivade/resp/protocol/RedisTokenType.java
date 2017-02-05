@@ -6,20 +6,20 @@ package com.github.tonivade.resp.protocol;
 
 public enum RedisTokenType {
 
-    STATUS(false),
-    INTEGER(false),
-    STRING(false),
-    ARRAY(false),
-    ERROR(true),
-    UNKNOWN(true);
+  STATUS(false),
+  INTEGER(false),
+  STRING(false),
+  ARRAY(false),
+  ERROR(true),
+  UNKNOWN(true);
 
-    private boolean error;
+  private boolean error;
 
-    private RedisTokenType(boolean error) {
-        this.error = error;
-    }
+  private RedisTokenType(boolean error) {
+    this.error = error;
+  }
 
-    public boolean isError() {
-        return error;
-    }
+  public boolean isError() {
+    return error;
+  }
 }

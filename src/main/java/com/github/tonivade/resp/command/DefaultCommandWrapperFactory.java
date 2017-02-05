@@ -5,11 +5,12 @@
 package com.github.tonivade.resp.command;
 
 public class DefaultCommandWrapperFactory implements CommandWrapperFactory {
-    @Override
-    public ICommand wrap(Object command) {
-        if (command instanceof ICommand) {
-            return new CommandWrapper((ICommand) command);
-        }
-        throw new IllegalArgumentException("must implements command interface");
+  @Override
+  public ICommand wrap(Object command) {
+
+    if (command instanceof ICommand) {
+      return new CommandWrapper((ICommand) command);
     }
+    throw new IllegalArgumentException("must implements command interface");
+  }
 }

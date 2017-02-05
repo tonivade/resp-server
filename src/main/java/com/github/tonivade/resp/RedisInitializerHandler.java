@@ -10,20 +10,19 @@ import io.netty.channel.socket.SocketChannel;
 
 public class RedisInitializerHandler extends ChannelInitializer<SocketChannel> {
 
-    private final IRedis impl;
+  private final IRedis impl;
 
-    public RedisInitializerHandler(IRedis impl) {
-        this.impl = impl;
-    }
+  public RedisInitializerHandler(IRedis impl) {
+    this.impl = impl;
+  }
 
-    @Override
-    protected void initChannel(SocketChannel channel) throws Exception {
-        impl.channel(channel);
-    }
+  @Override
+  protected void initChannel(SocketChannel channel) throws Exception {
+    impl.channel(channel);
+  }
 
-    @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        impl.disconnected(ctx);
-    }
-
+  @Override
+  public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+    impl.disconnected(ctx);
+  }
 }

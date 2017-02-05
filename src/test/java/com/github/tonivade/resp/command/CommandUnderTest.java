@@ -9,12 +9,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import com.github.tonivade.resp.command.ICommand;
-
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface CommandUnderTest {
-
-    Class<? extends ICommand> value();
-
+  Class<? extends ICommand> value();
 }

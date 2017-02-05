@@ -4,8 +4,7 @@
  */
 package com.github.tonivade.resp.command;
 
+@FunctionalInterface
 public interface ICommand {
-
-    void execute(IRequest request, IResponse response);
-
+  void execute(IRequest request, IResponse response);
 }

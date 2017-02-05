@@ -12,15 +12,13 @@ import com.github.tonivade.resp.command.CommandUnderTest;
 
 @CommandUnderTest(QuitCommand.class)
 public class QuitCommandTest {
+  @Rule
+  public final CommandRule rule = new CommandRule(this);
 
-    @Rule
-    public final CommandRule rule = new CommandRule(this);
-
-    @Test
-    public void testExecute() throws Exception {
-        rule.withParams()
-            .execute()
-            .verify().exit();
-    }
-
+  @Test
+  public void testExecute() throws Exception {
+    rule.withParams()
+        .execute()
+        .verify().exit();
+  }
 }

@@ -24,94 +24,94 @@ import com.github.tonivade.resp.protocol.SafeString;
 
 public class RedisClientTest {
 
-    private static final String HOST = "localhost";
-    private static final int PORT = 12345;
-    private static final int TIMEOUT = 2000;
+  private static final String HOST = "localhost";
+  private static final int PORT = 12345;
+  private static final int TIMEOUT = 2000;
 
-    @Rule
-    public RedisServerRule redisServerRule = new RedisServerRule(HOST, PORT);
+  @Rule
+  public RedisServerRule redisServerRule = new RedisServerRule(HOST, PORT);
 
-    private RedisClient redisClient;
+  private RedisClient redisClient;
 
-    private IRedisCallback callback = mock(IRedisCallback.class);
+  private IRedisCallback callback = mock(IRedisCallback.class);
 
-    @Before
-    public void setUp() {
-        redisClient = new RedisClient(HOST, PORT, callback);
+  @Before
+  public void setUp() {
+    redisClient = new RedisClient(HOST, PORT, callback);
+  }
+
+  @Test
+  public void onConnect() {
+    redisClient.start();
+
+    verify(callback, timeout(1000)).onConnect();
+  }
+
+  @Test
+  public void onMessage() {
+    redisClient.start();
+    verify(callback, timeout(TIMEOUT)).onConnect();
+
+    redisClient.send(array(string("PING")));
+
+    ArgumentCaptor<RedisToken> captor = ArgumentCaptor.forClass(RedisToken.class);
+
+    verify(callback, timeout(TIMEOUT)).onMessage(captor.capture());
+
+    RedisToken token = captor.getValue();
+    assertThat(token.getType(), equalTo(RedisTokenType.STATUS));
+    assertThat(token.<SafeString>getValue(), equalTo(safeString("PONG")));
+  }
+
+  @Test
+  public void onBigMessage() {
+    redisClient.start();
+    verify(callback, timeout(TIMEOUT)).onConnect();
+
+    redisClient.send(array(string("PING"), string(readBigFile())));
+
+    ArgumentCaptor<RedisToken> captor = ArgumentCaptor.forClass(RedisToken.class);
+
+    verify(callback, timeout(TIMEOUT)).onMessage(captor.capture());
+
+    RedisToken token = captor.getValue();
+    assertThat(token.getType(), equalTo(RedisTokenType.STRING));
+  }
+
+  private String readBigFile() {
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < 10000; i++) {
+      sb.append("lkjsdfkjaskjflskjf");
     }
+    return sb.toString();
+  }
 
-    @Test
-    public void onConnect() {
-        redisClient.start();
+  @Test
+  public void onClientDisconnect() {
+    redisClient.start();
+    verify(callback, timeout(TIMEOUT)).onConnect();
 
-        verify(callback, timeout(1000)).onConnect();
-    }
+    redisClient.stop();
+    verify(callback, timeout(TIMEOUT)).onDisconnect();
+  }
 
-    @Test
-    public void onMessage() {
-        redisClient.start();
-        verify(callback, timeout(TIMEOUT)).onConnect();
+  @Test(expected = NullPointerException.class)
+  public void requireHost() {
+    new RedisClient(null, 0, callback);
+  }
 
-        redisClient.send(array(string("PING")));
+  @Test(expected = IllegalArgumentException.class)
+  public void requirePortLowerThan1024() {
+    new RedisClient("localshot", 0, callback);
+  }
 
-        ArgumentCaptor<RedisToken> captor = ArgumentCaptor.forClass(RedisToken.class);
+  @Test(expected = IllegalArgumentException.class)
+  public void requirePortGreaterThan65535() {
+    new RedisClient("localshot", 987654321, callback);
+  }
 
-        verify(callback, timeout(TIMEOUT)).onMessage(captor.capture());
-
-        RedisToken token = captor.getValue();
-        assertThat(token.getType(), equalTo(RedisTokenType.STATUS));
-        assertThat(token.<SafeString>getValue(), equalTo(safeString("PONG")));
-    }
-
-    @Test
-    public void onBigMessage() {
-        redisClient.start();
-        verify(callback, timeout(TIMEOUT)).onConnect();
-
-        redisClient.send(array(string("PING"), string(readBigFile())));
-
-        ArgumentCaptor<RedisToken> captor = ArgumentCaptor.forClass(RedisToken.class);
-
-        verify(callback, timeout(TIMEOUT)).onMessage(captor.capture());
-
-        RedisToken token = captor.getValue();
-        assertThat(token.getType(), equalTo(RedisTokenType.STRING));
-    }
-
-    private String readBigFile() {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < 10000; i++) {
-           sb.append("lkjsdfkjaskjflskjf");
-        }
-        return sb.toString();
-    }
-
-    @Test
-    public void onClientDisconnect() {
-        redisClient.start();
-        verify(callback, timeout(TIMEOUT)).onConnect();
-
-        redisClient.stop();
-        verify(callback, timeout(TIMEOUT)).onDisconnect();
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void requireHost() {
-        new RedisClient(null, 0, callback);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void requirePortLowerThan1024() {
-        new RedisClient("localshot", 0, callback);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void requirePortGreaterThan65535() {
-        new RedisClient("localshot", 987654321, callback);
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void requireCallback() {
-        new RedisClient("localhost", 12345, null);
-    }
+  @Test(expected = NullPointerException.class)
+  public void requireCallback() {
+    new RedisClient("localhost", 12345, null);
+  }
 }

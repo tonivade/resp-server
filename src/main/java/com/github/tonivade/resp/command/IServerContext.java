@@ -4,18 +4,13 @@
  */
 package com.github.tonivade.resp.command;
 
+import java.util.Optional;
+
 public interface IServerContext {
-
-    int getPort();
-
-    int getClients();
-
-    ICommand getCommand(String name);
-
-    <T> T getValue(String key);
-
-    void putValue(String key, Object value);
-
-    <T> T removeValue(String key);
-
+  int getPort();
+  int getClients();
+  ICommand getCommand(String name);
+  <T> Optional<T> getValue(String key);
+  void putValue(String key, Object value);
+  <T> Optional<T> removeValue(String key);
 }

@@ -11,13 +11,12 @@ import static org.junit.Assert.assertThat;
 import org.junit.Test;
 
 public class CommandSuiteTest {
+  private CommandSuite commandSuite = new CommandSuite();
 
-    private CommandSuite commandSuite = new CommandSuite();
+  @Test
+  public void getCommandNull() {
+    ICommand command = commandSuite.getCommand("notExists");
 
-    @Test
-    public void getCommandNull() {
-        ICommand command =  commandSuite.getCommand("notExists");
-
-        assertThat(command, is(instanceOf(NullCommand.class)));
-    }
+    assertThat(command, is(instanceOf(NullCommand.class)));
+  }
 }

@@ -6,6 +6,7 @@ package com.github.tonivade.resp.command;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import com.github.tonivade.resp.protocol.RedisToken;
 
@@ -20,7 +21,6 @@ public class Session implements ISession {
     private final Map<String, Object> state = new HashMap<>();
 
     public Session(String id, ChannelHandlerContext ctx) {
-        super();
         this.id = id;
         this.ctx = ctx;
     }
@@ -34,12 +34,12 @@ public class Session implements ISession {
     public void publish(RedisToken msg) {
         ctx.writeAndFlush(msg);
     }
-    
+
     @Override
     public void close() {
         ctx.close();
     }
-    
+
     @Override
     public void destroy() {
 
@@ -47,14 +47,14 @@ public class Session implements ISession {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T> T getValue(String key) {
-        return (T) state.get(key);
+    public <T> Optional<T> getValue(String key) {
+        return (Optional<T>) Optional.ofNullable(state.get(key));
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T> T removeValue(String key) {
-        return (T) state.remove(key);
+    public <T> Optional<T> removeValue(String key) {
+        return (Optional<T>) Optional.ofNullable(state.remove(key));
     }
 
     @Override

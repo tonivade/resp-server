@@ -7,11 +7,7 @@ package com.github.tonivade.resp;
 import com.github.tonivade.resp.protocol.RedisToken;
 
 public interface IRedisCallback {
-
-    void onConnect();
-
-    void onDisconnect();
-
-    void onMessage(RedisToken token);
-
+  void onConnect();
+  void onDisconnect();
+  void onMessage(RedisToken token);
 }

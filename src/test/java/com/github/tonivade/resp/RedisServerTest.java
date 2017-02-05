@@ -25,90 +25,90 @@ import com.github.tonivade.resp.protocol.SafeString;
 
 public class RedisServerTest {
 
-    private static final String HOST = "localhost";
-    private static final int PORT = 12345;
-    private static final int TIMEOUT = 1000;
+  private static final String HOST = "localhost";
+  private static final int PORT = 12345;
+  private static final int TIMEOUT = 1000;
 
-    private RedisServer redisServer;
+  private RedisServer redisServer;
 
-    private CommandSuite commands = new CommandSuite();
+  private CommandSuite commands = new CommandSuite();
 
-    private IRedisCallback callback = mock(IRedisCallback.class);
+  private IRedisCallback callback = mock(IRedisCallback.class);
 
-    @Before
-    public void setUp() {
-        redisServer = new RedisServer(HOST, PORT, commands);
-        redisServer.start();
-    }
+  @Before
+  public void setUp() {
+    redisServer = new RedisServer(HOST, PORT, commands);
+    redisServer.start();
+  }
 
-    @After
-    public void tearDown() {
-        redisServer.stop();
-    }
+  @After
+  public void tearDown() {
+    redisServer.stop();
+  }
 
-    @Test
-    public void serverRespond() {
-        RedisClient redisClient = createClient();
+  @Test
+  public void serverRespond() {
+    RedisClient redisClient = createClient();
 
-        redisClient.send(array(string("PING")));
+    redisClient.send(array(string("PING")));
 
-        verifyResponse("PONG");
-    }
+    verifyResponse("PONG");
+  }
 
-    @Test
-    public void clientDisconects() {
-        RedisClient redisClient = createClient();
+  @Test
+  public void clientDisconects() {
+    RedisClient redisClient = createClient();
 
-        redisClient.stop();
+    redisClient.stop();
 
-        verify(callback, timeout(TIMEOUT)).onDisconnect();
-    }
+    verify(callback, timeout(TIMEOUT)).onDisconnect();
+  }
 
-    @Test
-    public void serverDisconects() {
-        RedisClient redisClient = createClient();
+  @Test
+  public void serverDisconects() {
+    RedisClient redisClient = createClient();
 
-        redisServer.stop();
+    redisServer.stop();
 
-        verify(callback, timeout(TIMEOUT)).onDisconnect();
+    verify(callback, timeout(TIMEOUT)).onDisconnect();
 
-        redisClient.stop();
-    }
+    redisClient.stop();
+  }
 
-    @Test(expected = NullPointerException.class)
-    public void requireHost() {
-        new RedisServer(null, 0, commands);
-    }
+  @Test(expected = NullPointerException.class)
+  public void requireHost() {
+    new RedisServer(null, 0, commands);
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void requirePortLowerThan1024() {
-        new RedisServer(HOST, 0, commands);
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void requirePortLowerThan1024() {
+    new RedisServer(HOST, 0, commands);
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void requirePortGreaterThan65535() {
-        new RedisServer(HOST, 987654321, commands);
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void requirePortGreaterThan65535() {
+    new RedisServer(HOST, 987654321, commands);
+  }
 
-    @Test(expected = NullPointerException.class)
-    public void requireCallback() {
-        new RedisServer(HOST, PORT, null);
-    }
+  @Test(expected = NullPointerException.class)
+  public void requireCallback() {
+    new RedisServer(HOST, PORT, null);
+  }
 
-    private RedisClient createClient() {
-        RedisClient redisClient = new RedisClient(HOST, PORT, callback);
-        redisClient.start();
-        verify(callback, timeout(TIMEOUT)).onConnect();
-        return redisClient;
-    }
+  private RedisClient createClient() {
+    RedisClient redisClient = new RedisClient(HOST, PORT, callback);
+    redisClient.start();
+    verify(callback, timeout(TIMEOUT)).onConnect();
+    return redisClient;
+  }
 
-    private void verifyResponse(String response) {
-        ArgumentCaptor<RedisToken> captor = ArgumentCaptor.forClass(RedisToken.class);
+  private void verifyResponse(String response) {
+    ArgumentCaptor<RedisToken> captor = ArgumentCaptor.forClass(RedisToken.class);
 
-        verify(callback, timeout(TIMEOUT)).onMessage(captor.capture());
+    verify(callback, timeout(TIMEOUT)).onMessage(captor.capture());
 
-        RedisToken token = captor.getValue();
-        assertThat(token.getType(), equalTo(RedisTokenType.STATUS));
-        assertThat(token.<SafeString>getValue(), equalTo(safeString(response)));
-    }
+    RedisToken token = captor.getValue();
+    assertThat(token.getType(), equalTo(RedisTokenType.STATUS));
+    assertThat(token.<SafeString>getValue(), equalTo(safeString(response)));
+  }
 }
