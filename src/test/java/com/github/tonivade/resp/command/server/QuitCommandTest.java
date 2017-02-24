@@ -16,7 +16,7 @@ public class QuitCommandTest {
   public final CommandRule rule = new CommandRule(this);
 
   @Test
-  public void testExecute() throws Exception {
+  public void testExecute() {
     rule.withParams()
         .execute()
         .verify().exit();

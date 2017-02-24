@@ -20,7 +20,7 @@ import org.junit.Test;
 
 public class SafeStringTest {
   @Test
-  public void testBytes() throws Exception {
+  public void testBytes() {
     SafeString str = safeString("Hola Mundo!");
 
     assertThat(new SafeString(str.getBuffer()), is(str));
@@ -30,7 +30,7 @@ public class SafeStringTest {
   }
 
   @Test
-  public void testList() throws Exception {
+  public void testList() {
     List<SafeString> list = safeAsList("1", "2", "3");
 
     assertThat(list.size(), is(3));
@@ -40,7 +40,7 @@ public class SafeStringTest {
   }
 
   @Test
-  public void testSet() throws Exception {
+  public void testSet() {
     NavigableSet<SafeString> set = new TreeSet<>(safeAsList("1", "2", "3"));
 
     SortedSet<SafeString> result = set.subSet(safeString("2"), safeString("4"));

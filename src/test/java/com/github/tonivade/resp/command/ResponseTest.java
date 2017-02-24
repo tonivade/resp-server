@@ -22,7 +22,7 @@ public class ResponseTest {
   private Response response;
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     response = new Response();
   }
 

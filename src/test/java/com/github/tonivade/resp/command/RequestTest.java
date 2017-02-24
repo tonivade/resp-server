@@ -14,7 +14,7 @@ import org.junit.Test;
 
 public class RequestTest {
   @Test
-  public void testRequest() throws Exception {
+  public void testRequest() {
     Request request = new Request(null, null, safeString("a"), safeAsList("1", "2", "3"));
 
     assertThat(request.getCommand(), is("a"));

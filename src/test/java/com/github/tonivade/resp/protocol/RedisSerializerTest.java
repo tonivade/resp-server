@@ -50,7 +50,7 @@ public class RedisSerializerTest {
   }
 
   @Test
-  public void encodeArrayOfArrays() throws Exception {
+  public void encodeArrayOfArrays() {
     assertThat(encoder.encodeToken(arrayOfArraysToken),
         equalTo("*2\r\n*2\r\n:1\r\n$3\r\nabc\r\n*2\r\n:1\r\n$3\r\nabc\r\n".getBytes(utf8)));
   }
