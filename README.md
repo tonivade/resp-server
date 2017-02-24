@@ -23,11 +23,11 @@ It's nice because:
 
 RESP can serialize some data types
 
-- simple strings: `+PONG`
-- errors: `-ERROR`
-- integers: `:1`
-- bulk strings (binary-safe): `$4\r\nPING`
-- arrays: `*3\r\n:1\r\n:2\r\n:3`
+- simple strings: `+PONG\r\n`
+- errors: `-ERROR\r\n`
+- integers: `:1\r\n`
+- bulk strings (binary-safe): `$4\r\nPING\r\n`
+- arrays: `*3\r\n:1\r\n:2\r\n:3\r\n`
 
 What binary safe means? It means that can be what ever you want, a UTF-8 String
 or compressed data, a picture, etc...
@@ -136,19 +136,18 @@ is rejected with an error.
     <dependency>
         <groupId>com.github.tonivade</groupId>
         <artifactId>resp-server</artifactId>
-        <version>0.4.0</version>
+        <version>0.5.0</version>
     </dependency>
-    
+
 ## Gradle
 
-    compile 'com.github.tonivade:resp-server:0.4.0'
+    compile 'com.github.tonivade:resp-server:0.5.0'
 
 ## Continuous Integration
 
 [![Build Status](https://api.travis-ci.org/tonivade/resp-server.svg?branch=develop)](https://travis-ci.org/tonivade/resp-server)
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/47b2b3213b7248eca911e4783ed6d031)](https://www.codacy.com/app/tonivade/resp-server?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tonivade/resp-server&amp;utm_campaign=Badge_Grade)
-
 [![Codacy Coverage](https://api.codacy.com/project/badge/Coverage/47b2b3213b7248eca911e4783ed6d031)](https://www.codacy.com/app/tonivade/resp-server?utm_source=github.com&utm_medium=referral&utm_content=tonivade/resp-server&utm_campaign=Badge_Coverage)
 
 ## LICENSE
