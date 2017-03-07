@@ -44,9 +44,9 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import rx.Observable;
-import rx.Scheduler;
-import rx.schedulers.Schedulers;
+import io.reactivex.Observable;
+import io.reactivex.Scheduler;
+import io.reactivex.schedulers.Schedulers;
 
 public class RedisServer implements IRedis, IServerContext {
 
@@ -272,7 +272,7 @@ public class RedisServer implements IRedis, IServerContext {
     return Observable.create(observer -> {
       executeCommand(command, request, response);
       observer.onNext(response.build());
-      observer.onCompleted();
+      observer.onComplete();
     });
   }
 
