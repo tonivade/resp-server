@@ -14,52 +14,52 @@ import io.netty.channel.ChannelHandlerContext;
 
 public class Session implements ISession {
 
-    private final String id;
+  private final String id;
 
-    private final ChannelHandlerContext ctx;
+  private final ChannelHandlerContext ctx;
 
-    private final Map<String, Object> state = new HashMap<>();
+  private final Map<String, Object> state = new HashMap<>();
 
-    public Session(String id, ChannelHandlerContext ctx) {
-        this.id = id;
-        this.ctx = ctx;
-    }
+  public Session(String id, ChannelHandlerContext ctx) {
+    this.id = id;
+    this.ctx = ctx;
+  }
 
-    @Override
-    public String getId() {
-        return id;
-    }
+  @Override
+  public String getId() {
+    return id;
+  }
 
-    @Override
-    public void publish(RedisToken msg) {
-        ctx.writeAndFlush(msg);
-    }
+  @Override
+  public void publish(RedisToken msg) {
+    ctx.writeAndFlush(msg);
+  }
 
-    @Override
-    public void close() {
-        ctx.close();
-    }
+  @Override
+  public void close() {
+    ctx.close();
+  }
 
-    @Override
-    public void destroy() {
+  @Override
+  public void destroy() {
 
-    }
+  }
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T> Optional<T> getValue(String key) {
-        return (Optional<T>) Optional.ofNullable(state.get(key));
-    }
+  @Override
+  @SuppressWarnings("unchecked")
+  public <T> Optional<T> getValue(String key) {
+    return (Optional<T>) Optional.ofNullable(state.get(key));
+  }
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T> Optional<T> removeValue(String key) {
-        return (Optional<T>) Optional.ofNullable(state.remove(key));
-    }
+  @Override
+  @SuppressWarnings("unchecked")
+  public <T> Optional<T> removeValue(String key) {
+    return (Optional<T>) Optional.ofNullable(state.remove(key));
+  }
 
-    @Override
-    public void putValue(String key, Object value) {
-        state.put(key, value);
-    }
+  @Override
+  public void putValue(String key, Object value) {
+    state.put(key, value);
+  }
 
 }

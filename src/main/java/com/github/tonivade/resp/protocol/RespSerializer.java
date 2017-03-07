@@ -34,7 +34,8 @@ public class RespSerializer {
 
   private RedisToken getMapValue(Map<?, ?> map) {
     return RedisToken.array(map.entrySet().stream()
-        .flatMap(entry -> Stream.of(getValue(entry.getKey()), getValue(entry.getValue()))).collect(toList()));
+        .flatMap(entry -> Stream.of(getValue(entry.getKey()), getValue(entry.getValue())))
+        .collect(toList()));
   }
 
   private RedisToken getCollectionValue(Collection<?> collection) {
