@@ -50,7 +50,7 @@ public class CommandSuite {
   }
 
   protected void addCommand(Class<?> clazz) {
-    Try.of(() -> clazz.newInstance())
+    Try.of(clazz::newInstance)
        .onSuccess(this::processCommand)
        .onFailure(e -> LOGGER.log(Level.SEVERE, "error loading command: " + clazz.getName(), e));
   }

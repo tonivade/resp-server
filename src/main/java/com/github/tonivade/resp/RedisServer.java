@@ -154,10 +154,7 @@ public class RedisServer implements IRedis, IServerContext {
 
     LOGGER.finest(() -> "message received: " + sourceKey);
 
-    IRequest request = parseMessage(sourceKey, message, getSession(sourceKey, ctx));
-    if (request != null) {
-      processCommand(request);
-    }
+    parseMessage(sourceKey, message, getSession(sourceKey, ctx)).ifPresent(this::processCommand);
   }
 
   @Override
@@ -222,14 +219,14 @@ public class RedisServer implements IRedis, IServerContext {
     return session;
   }
 
-  private IRequest parseMessage(String sourceKey, RedisToken message, ISession session) {
+  private Optional<IRequest> parseMessage(String sourceKey, RedisToken message, ISession session) {
     IRequest request = null;
     if (message.getType() == RedisTokenType.ARRAY) {
       request = parseArray(sourceKey, message, session);
     } else if (message.getType() == RedisTokenType.UNKNOWN) {
       request = parseLine(sourceKey, message, session);
     }
-    return request;
+    return Optional.ofNullable(request);
   }
 
   private Request parseLine(String sourceKey, RedisToken message, ISession session) {
