@@ -24,6 +24,11 @@ public class Response implements IResponse {
   private RedisToken token;
 
   private RespSerializer serializer = new RespSerializer();
+  
+  public IResponse add(RedisToken token) {
+    this.token = token;
+    return this;
+  }
 
   @Override
   public IResponse addBulkStr(SafeString str) {
