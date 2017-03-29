@@ -4,11 +4,14 @@
  */
 package com.github.tonivade.resp.command.server;
 
+import static com.github.tonivade.resp.protocol.RedisToken.status;
+
 import org.junit.Rule;
 import org.junit.Test;
 
 import com.github.tonivade.resp.command.CommandRule;
 import com.github.tonivade.resp.command.CommandUnderTest;
+import com.github.tonivade.resp.command.IResponse;
 
 @CommandUnderTest(QuitCommand.class)
 public class QuitCommandTest {
@@ -19,6 +22,6 @@ public class QuitCommandTest {
   public void testExecute() {
     rule.withParams()
         .execute()
-        .verify().exit();
+        .then(status(IResponse.RESULT_OK));
   }
 }

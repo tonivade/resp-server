@@ -6,12 +6,14 @@ package com.github.tonivade.resp.command;
 
 import static com.github.tonivade.resp.protocol.SafeString.safeAsList;
 import static com.github.tonivade.resp.protocol.SafeString.safeString;
+import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 
+import org.junit.Assert;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
@@ -20,13 +22,12 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
+import com.github.tonivade.resp.protocol.RedisToken;
 import com.github.tonivade.resp.protocol.SafeString;
 
 public class CommandRule implements TestRule {
 
   private IRequest request;
-
-  private IResponse response;
 
   private IServerContext server;
 
@@ -36,6 +37,8 @@ public class CommandRule implements TestRule {
 
   private ICommand command;
 
+  private RedisToken response;
+
   public CommandRule(Object target) {
     this.target = target;
   }
@@ -43,8 +46,8 @@ public class CommandRule implements TestRule {
   public IRequest getRequest() {
     return request;
   }
-
-  public IResponse getResponse() {
+  
+  public RedisToken getResponse() {
     return response;
   }
 
@@ -55,15 +58,6 @@ public class CommandRule implements TestRule {
       public void evaluate() throws Throwable {
         server = mock(IServerContext.class);
         request = mock(IRequest.class);
-        response = mock(IResponse.class, new Answer<Object>() {
-          @Override
-          public Object answer(InvocationOnMock invocation) throws Throwable {
-            if (invocation.getMethod().getName().equals("exit")) {
-              return null;
-            }
-            return invocation.getMock();
-          }
-        });
         session = mock(ISession.class);
 
         when(request.getServerContext()).thenReturn(server);
@@ -80,8 +74,7 @@ public class CommandRule implements TestRule {
   }
 
   public CommandRule execute() {
-    Mockito.reset(response);
-    new CommandWrapper(command).execute(request, response);
+    response = new CommandWrapper(command).execute(request);
     return this;
   }
 
@@ -107,8 +100,8 @@ public class CommandRule implements TestRule {
     return this;
   }
 
-  public IResponse verify() {
-    return Mockito.verify(response);
+  public void then(RedisToken token) {
+    Assert.assertThat(response, equalTo(token));
   }
 
   @SuppressWarnings("unchecked")
@@ -118,7 +111,7 @@ public class CommandRule implements TestRule {
     } else if (type.equals(ISession.class)) {
       return (T) Mockito.verify(session);
     }
-    return (T) verify();
+    throw new IllegalArgumentException();
   }
 
 }

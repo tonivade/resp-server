@@ -8,13 +8,15 @@ import com.github.tonivade.resp.annotation.Command;
 import com.github.tonivade.resp.command.ICommand;
 import com.github.tonivade.resp.command.IRequest;
 import com.github.tonivade.resp.command.IResponse;
+import com.github.tonivade.resp.protocol.RedisToken;
 
 @Command("quit")
 public class QuitCommand implements ICommand {
 
-    @Override
-    public void execute(IRequest request, IResponse response) {
-        response.addSimpleStr(IResponse.RESULT_OK).exit();
-    }
+  // FIXME: solve exit problems
+  @Override
+  public RedisToken execute(IRequest request) {
+    return RedisToken.status(IResponse.RESULT_OK);
+  }
 
 }

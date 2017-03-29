@@ -4,7 +4,9 @@
  */
 package com.github.tonivade.resp.command;
 
+import com.github.tonivade.resp.protocol.RedisToken;
+
 @FunctionalInterface
 public interface ICommand {
-  void execute(IRequest request, IResponse response);
+  RedisToken execute(IRequest request);
 }
