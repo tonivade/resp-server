@@ -54,6 +54,11 @@ public class Request implements IRequest {
   public int getLength() {
     return params.size();
   }
+  
+  @Override
+  public boolean isEmpty() {
+    return params.size() == 0;
+  }
 
   @Override
   public ISession getSession() {
