@@ -198,7 +198,7 @@ public class RedisServer implements IRedis, IServerContext {
   }
 
   protected void executeCommand(ICommand command, IRequest request, IResponse response) {
-    command.execute(request, response);
+    response.add(command.execute(request));
   }
 
   protected void cleanSession(ISession session) {

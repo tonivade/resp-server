@@ -15,6 +15,7 @@ public interface IRequest {
   SafeString getParam(int i);
   Optional<SafeString> getOptionalParam(int i);
   int getLength();
+  boolean isEmpty();
   ISession getSession();
   IServerContext getServerContext();
 }

@@ -4,7 +4,10 @@
  */
 package com.github.tonivade.resp.command;
 
+import static com.github.tonivade.resp.protocol.RedisToken.error;
+
 import com.github.tonivade.resp.annotation.ParamLength;
+import com.github.tonivade.resp.protocol.RedisToken;
 
 public class CommandWrapper implements ICommand {
 
@@ -21,12 +24,11 @@ public class CommandWrapper implements ICommand {
   }
 
   @Override
-  public void execute(IRequest request, IResponse response) {
+  public RedisToken execute(IRequest request) {
     if (request.getLength() < params) {
-      response.addError("ERR wrong number of arguments for '" + request.getCommand() + "' command");
-    } else {
-      command.execute(request, response);
+      return error("ERR wrong number of arguments for '" + request.getCommand() + "' command");
     }
+    return command.execute(request);
   }
 
 }

@@ -7,20 +7,20 @@ package com.github.tonivade.resp.command.server;
 import com.github.tonivade.resp.annotation.Command;
 import com.github.tonivade.resp.command.ICommand;
 import com.github.tonivade.resp.command.IRequest;
-import com.github.tonivade.resp.command.IResponse;
+import com.github.tonivade.resp.protocol.RedisToken;
 
 @Command("ping")
 public class PingCommand implements ICommand {
 
-    public static final String PONG = "PONG";
+  public static final String PONG = "PONG";
 
-    @Override
-    public void execute(IRequest request, IResponse response) {
-        if (request.getLength() > 0) {
-            response.addBulkStr(request.getParam(0));
-        } else {
-            response.addSimpleStr(PONG);
-        }
+  @Override
+  public RedisToken execute(IRequest request) {
+    if (request.getLength() > 0) {
+      return RedisToken.string(request.getParam(0));
+    } else {
+      return RedisToken.status(PONG);
     }
+  }
 
 }
