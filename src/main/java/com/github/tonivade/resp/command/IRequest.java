@@ -18,4 +18,5 @@ public interface IRequest {
   boolean isEmpty();
   ISession getSession();
   IServerContext getServerContext();
+  boolean isExit();
 }

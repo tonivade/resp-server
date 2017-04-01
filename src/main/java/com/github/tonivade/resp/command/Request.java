@@ -4,6 +4,8 @@
  */
 package com.github.tonivade.resp.command;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -23,8 +25,8 @@ public class Request implements IRequest {
   public Request(IServerContext server, ISession session, SafeString command, List<SafeString> params) {
     this.server = server;
     this.session = session;
-    this.command = command;
-    this.params = params;
+    this.command = requireNonNull(command);
+    this.params = requireNonNull(params);
   }
 
   @Override
@@ -54,10 +56,15 @@ public class Request implements IRequest {
   public int getLength() {
     return params.size();
   }
-  
+
   @Override
   public boolean isEmpty() {
-    return params.size() == 0;
+    return params.isEmpty();
+  }
+
+  @Override
+  public boolean isExit() {
+    return command.toString().equalsIgnoreCase("quit");
   }
 
   @Override

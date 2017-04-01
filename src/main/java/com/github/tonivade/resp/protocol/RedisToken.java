@@ -17,6 +17,9 @@ import java.util.Objects;
 
 public abstract class RedisToken {
 
+  private static final RedisToken NULL_STRING = new StringRedisToken(null);
+  private static final RedisToken RESPONSE_OK = new StatusRedisToken(safeString("OK"));
+
   private static final String SEPARATOR = "=>";
 
   private final RedisTokenType type;
@@ -53,7 +56,11 @@ public abstract class RedisToken {
   }
 
   public static RedisToken nullString() {
-    return new StringRedisToken(null);
+    return NULL_STRING;
+  }
+
+  public static RedisToken responseOk() {
+    return RESPONSE_OK;
   }
 
   public static RedisToken string(SafeString str) {

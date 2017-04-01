@@ -22,11 +22,9 @@ import java.util.logging.Logger;
 import com.github.tonivade.resp.command.CommandSuite;
 import com.github.tonivade.resp.command.ICommand;
 import com.github.tonivade.resp.command.IRequest;
-import com.github.tonivade.resp.command.IResponse;
 import com.github.tonivade.resp.command.IServerContext;
 import com.github.tonivade.resp.command.ISession;
 import com.github.tonivade.resp.command.Request;
-import com.github.tonivade.resp.command.Response;
 import com.github.tonivade.resp.command.Session;
 import com.github.tonivade.resp.protocol.RedisDecoder;
 import com.github.tonivade.resp.protocol.RedisEncoder;
@@ -197,8 +195,8 @@ public class RedisServer implements IRedis, IServerContext {
     return commands;
   }
 
-  protected void executeCommand(ICommand command, IRequest request, IResponse response) {
-    response.add(command.execute(request));
+  protected RedisToken executeCommand(ICommand command, IRequest request) {
+    return command.execute(request);
   }
 
   protected void cleanSession(ISession session) {
@@ -251,12 +249,11 @@ public class RedisServer implements IRedis, IServerContext {
     LOGGER.fine(() -> "received command: " + request);
 
     ISession session = request.getSession();
-    IResponse response = new Response();
     ICommand command = commands.getCommand(request.getCommand());
     try {
-      execute(command, request, response).observeOn(scheduler).subscribe(token -> {
+      execute(command, request).observeOn(scheduler).subscribe(token -> {
         session.publish(token);
-        if (response.isExit()) {
+        if (request.isExit()) {
           session.close();
         }
       });
@@ -265,10 +262,9 @@ public class RedisServer implements IRedis, IServerContext {
     }
   }
 
-  private Observable<RedisToken> execute(ICommand command, IRequest request, IResponse response) {
+  private Observable<RedisToken> execute(ICommand command, IRequest request) {
     return Observable.create(observer -> {
-      executeCommand(command, request, response);
-      observer.onNext(response.build());
+      observer.onNext(executeCommand(command, request));
       observer.onComplete();
     });
   }
