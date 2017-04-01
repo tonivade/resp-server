@@ -52,6 +52,10 @@ public abstract class RedisToken {
     return type + SEPARATOR + value;
   }
 
+  public static RedisToken nullString() {
+    return new StringRedisToken(null);
+  }
+
   public static RedisToken string(SafeString str) {
     return new StringRedisToken(str);
   }
