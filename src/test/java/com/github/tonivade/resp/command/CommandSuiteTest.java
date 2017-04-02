@@ -87,11 +87,15 @@ public class CommandSuiteTest {
 
   @Command("bad")
   static class BadCommand implements ICommand {
-    public BadCommand(String bad) {
+    private String string;
+
+    public BadCommand(String string) {
+      this.string = string;
     }
+
     @Override
     public RedisToken execute(IRequest request) {
-      return RedisToken.responseOk();
+      return RedisToken.string(string);
     }
   }
 }
