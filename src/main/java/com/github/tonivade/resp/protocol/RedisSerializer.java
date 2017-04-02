@@ -40,6 +40,8 @@ public class RedisSerializer {
       break;
     case UNKNOWN:
       break;
+    default:
+      break;
     }
     return builder.build();
   }
