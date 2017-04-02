@@ -7,6 +7,10 @@ group = 'com.github.tonivade'
 archivesBaseName = 'resp-server'
 version = '0.6.0-SNAPSHOT'
 
+configurations {
+  codacy
+}
+
 buildscript {
     repositories {
         mavenCentral()
@@ -36,6 +40,9 @@ repositories {
     }
     maven {
         url = "http://dl.bintray.com/typesafe/maven-releases" 
+    }
+    maven { 
+      url = "https://jitpack.io"
     }
 }
 
@@ -96,10 +103,6 @@ nexus {
 task copyToLib(type: Copy) {
     into "$buildDir/output/lib"
     from configurations.runtime
-}
-
-configurations {
-  codacy
 }
 
 task sendCoverageToCodacy(type: JavaExec, dependsOn: jacocoTestReport) {
