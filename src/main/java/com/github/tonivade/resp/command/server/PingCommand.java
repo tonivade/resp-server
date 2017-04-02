@@ -22,5 +22,4 @@ public class PingCommand implements ICommand {
       return RedisToken.status(PONG);
     }
   }
-
 }

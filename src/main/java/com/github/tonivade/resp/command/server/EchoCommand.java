@@ -20,5 +20,4 @@ public class EchoCommand implements ICommand {
   public RedisToken execute(IRequest request) {
     return string(request.getParam(0));
   }
-
 }

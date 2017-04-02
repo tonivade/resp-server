@@ -12,7 +12,6 @@ import com.github.tonivade.resp.protocol.RedisToken;
 @Command("quit")
 public class QuitCommand implements ICommand {
 
-  // FIXME: solve exit problems
   @Override
   public RedisToken execute(IRequest request) {
     return RedisToken.responseOk();

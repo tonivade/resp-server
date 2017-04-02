@@ -55,6 +55,14 @@ public class CommandSuite {
        .onFailure(e -> LOGGER.log(Level.SEVERE, "error loading command: " + clazz.getName(), e));
   }
 
+  protected void addCommand(String name, ICommand command) {
+    commands.put(name, factory.wrap(command));
+  }
+
+  protected boolean contains(String name) {
+    return commands.get(name) != null;
+  }
+
   private void processCommand(Object command) {
     Class<?> clazz = command.getClass();
     Command annotation = clazz.getAnnotation(Command.class);
