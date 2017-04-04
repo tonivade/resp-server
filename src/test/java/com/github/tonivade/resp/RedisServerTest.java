@@ -21,7 +21,6 @@ import org.mockito.ArgumentCaptor;
 import com.github.tonivade.resp.command.CommandSuite;
 import com.github.tonivade.resp.protocol.RedisToken;
 import com.github.tonivade.resp.protocol.RedisTokenType;
-import com.github.tonivade.resp.protocol.SafeString;
 
 public class RedisServerTest {
 
@@ -103,12 +102,12 @@ public class RedisServerTest {
   }
 
   private void verifyResponse(String response) {
-    ArgumentCaptor<RedisToken> captor = ArgumentCaptor.forClass(RedisToken.class);
+    ArgumentCaptor<RedisToken<?>> captor = ArgumentCaptor.forClass(RedisToken.class);
 
     verify(callback, timeout(TIMEOUT)).onMessage(captor.capture());
 
-    RedisToken token = captor.getValue();
+    RedisToken<?> token = captor.getValue();
     assertThat(token.getType(), equalTo(RedisTokenType.STATUS));
-    assertThat(token.<SafeString>getValue(), equalTo(safeString(response)));
+    assertThat(token.getValue(), equalTo(safeString(response)));
   }
 }

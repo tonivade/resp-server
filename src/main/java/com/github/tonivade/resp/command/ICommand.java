@@ -8,5 +8,5 @@ import com.github.tonivade.resp.protocol.RedisToken;
 
 @FunctionalInterface
 public interface ICommand {
-  RedisToken execute(IRequest request);
+  RedisToken<?> execute(IRequest request);
 }

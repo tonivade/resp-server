@@ -10,7 +10,7 @@ import com.github.tonivade.resp.protocol.RedisToken;
 
 class NullCommand implements ICommand {
   @Override
-  public RedisToken execute(IRequest request) {
+  public RedisToken<?> execute(IRequest request) {
     return error("ERR unknown command '" + request.getCommand() + "'");
   }
 }

@@ -13,5 +13,5 @@ public interface IRedis {
   void channel(SocketChannel channel);
   void connected(ChannelHandlerContext ctx);
   void disconnected(ChannelHandlerContext ctx);
-  void receive(ChannelHandlerContext ctx, RedisToken message);
+  void receive(ChannelHandlerContext ctx, RedisToken<?> message);
 }

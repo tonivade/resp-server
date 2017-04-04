@@ -108,12 +108,12 @@ public class RedisClient implements IRedis {
     writeAndFlush(message + DELIMITER);
   }
 
-  public void send(RedisToken message) {
+  public void send(RedisToken<?> message) {
     writeAndFlush(message);
   }
 
   @Override
-  public void receive(ChannelHandlerContext ctx, RedisToken message) {
+  public void receive(ChannelHandlerContext ctx, RedisToken<?> message) {
     callback.onMessage(message);
   }
 

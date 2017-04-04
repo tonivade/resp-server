@@ -27,7 +27,7 @@ public class NullCommandTest {
   public void execute() {
     when(request.getCommand()).thenReturn("notExists");
 
-    RedisToken response = nullCommand.execute(request);
+    RedisToken<?> response = nullCommand.execute(request);
 
     assertThat(response, equalTo(error("ERR unknown command 'notExists'")));
   }
