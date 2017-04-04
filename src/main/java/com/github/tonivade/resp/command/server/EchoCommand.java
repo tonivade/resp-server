@@ -17,7 +17,7 @@ import com.github.tonivade.resp.protocol.RedisToken;
 public class EchoCommand implements ICommand {
 
   @Override
-  public RedisToken execute(IRequest request) {
+  public RedisToken<?> execute(IRequest request) {
     return string(request.getParam(0));
   }
 }
