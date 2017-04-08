@@ -4,8 +4,6 @@
  */
 package com.github.tonivade.resp.command.server;
 
-import java.util.List;
-
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -22,8 +20,8 @@ public class TimeCommandTest {
   public void testExecute() {
     rule.execute();
 
-    List<RedisToken> array = rule.getResponse().getValue();
-    
-    array.forEach(System.out::println);
+    RedisToken<?> array = rule.getResponse();
+
+    System.out.println(array);
   }
 }

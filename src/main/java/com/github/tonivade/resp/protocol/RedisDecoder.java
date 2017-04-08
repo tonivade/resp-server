@@ -50,7 +50,7 @@ public class RedisDecoder extends ReplayingDecoder<Void> {
     return i;
   }
 
-  private RedisToken parseResponse(ChannelHandlerContext ctx, ByteBuf buffer) {
+  private RedisToken<?> parseResponse(ChannelHandlerContext ctx, ByteBuf buffer) {
     RedisParser parser = new RedisParser(maxLength, new RedisSource() {
       @Override
       public SafeString readString(int size) {
@@ -63,7 +63,7 @@ public class RedisDecoder extends ReplayingDecoder<Void> {
       }
     });
 
-    RedisToken token = parser.parse();
+    RedisToken<?> token = parser.parse();
     checkpoint();
     return token;
   }

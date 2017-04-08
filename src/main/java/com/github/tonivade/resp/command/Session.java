@@ -31,7 +31,7 @@ public class Session implements ISession {
   }
 
   @Override
-  public void publish(RedisToken msg) {
+  public void publish(RedisToken<?> msg) {
     ctx.writeAndFlush(msg);
   }
 

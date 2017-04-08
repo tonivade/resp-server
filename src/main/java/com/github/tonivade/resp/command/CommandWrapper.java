@@ -24,7 +24,7 @@ public class CommandWrapper implements ICommand {
   }
 
   @Override
-  public RedisToken execute(IRequest request) {
+  public RedisToken<?> execute(IRequest request) {
     if (request.getLength() < params) {
       return error("ERR wrong number of arguments for '" + request.getCommand() + "' command");
     }

@@ -7,7 +7,6 @@ package com.github.tonivade.resp.protocol;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Collection;
-import java.util.List;
 
 public class RedisSerializer {
   private static final byte ARRAY = '*';
@@ -21,22 +20,23 @@ public class RedisSerializer {
 
   private ByteBufferBuilder builder = new ByteBufferBuilder();
 
-  public byte[] encodeToken(RedisToken msg) {
+  @SuppressWarnings("unchecked")
+  public byte[] encodeToken(RedisToken<?> msg) {
     switch (msg.getType()) {
     case STRING:
-      addBulkStr(msg.<SafeString>getValue());
+      addBulkStr((SafeString) msg.getValue());
       break;
     case STATUS:
-      addSimpleStr(msg.<SafeString>getValue());
+      addSimpleStr((SafeString) msg.getValue());
       break;
     case INTEGER:
-      addInt(msg.<Integer>getValue());
+      addInt((Integer) msg.getValue());
       break;
     case ERROR:
-      addError(msg.<SafeString>getValue());
+      addError((SafeString) msg.getValue());
       break;
     case ARRAY:
-      addArray(msg.<List<RedisToken>>getValue());
+      addArray((Collection<RedisToken<?>>) msg.getValue());
       break;
     case UNKNOWN:
       break;
@@ -59,7 +59,7 @@ public class RedisSerializer {
     builder.append(SIMPLE_STRING).append(str.getBytes()).append(DELIMITER);
   }
 
-  private void addInt(int value) {
+  private void addInt(Integer value) {
     builder.append(INTEGER).append(value).append(DELIMITER);
   }
 
@@ -67,10 +67,10 @@ public class RedisSerializer {
     builder.append(ERROR).append(str.getBytes()).append(DELIMITER);
   }
 
-  private void addArray(Collection<RedisToken> array) {
+  private void addArray(Collection<RedisToken<?>> array) {
     if (array != null) {
       builder.append(ARRAY).append(array.size()).append(DELIMITER);
-      for (RedisToken token : array) {
+      for (RedisToken<?> token : array) {
         builder.append(new RedisSerializer().encodeToken(token));
       }
     } else {

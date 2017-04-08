@@ -20,7 +20,6 @@ import org.mockito.ArgumentCaptor;
 
 import com.github.tonivade.resp.protocol.RedisToken;
 import com.github.tonivade.resp.protocol.RedisTokenType;
-import com.github.tonivade.resp.protocol.SafeString;
 
 public class RedisClientTest {
 
@@ -54,13 +53,13 @@ public class RedisClientTest {
 
     redisClient.send(array(string("PING")));
 
-    ArgumentCaptor<RedisToken> captor = ArgumentCaptor.forClass(RedisToken.class);
+    ArgumentCaptor<RedisToken<?>> captor = ArgumentCaptor.forClass(RedisToken.class);
 
     verify(callback, timeout(TIMEOUT)).onMessage(captor.capture());
 
-    RedisToken token = captor.getValue();
+    RedisToken<?> token = captor.getValue();
     assertThat(token.getType(), equalTo(RedisTokenType.STATUS));
-    assertThat(token.<SafeString>getValue(), equalTo(safeString("PONG")));
+    assertThat(token.getValue(), equalTo(safeString("PONG")));
   }
 
   @Test
@@ -70,11 +69,11 @@ public class RedisClientTest {
 
     redisClient.send(array(string("PING"), string(readBigFile())));
 
-    ArgumentCaptor<RedisToken> captor = ArgumentCaptor.forClass(RedisToken.class);
+    ArgumentCaptor<RedisToken<?>> captor = ArgumentCaptor.forClass(RedisToken.class);
 
     verify(callback, timeout(TIMEOUT)).onMessage(captor.capture());
 
-    RedisToken token = captor.getValue();
+    RedisToken<?> token = captor.getValue();
     assertThat(token.getType(), equalTo(RedisTokenType.STRING));
   }
 

@@ -17,11 +17,14 @@ import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import com.github.tonivade.resp.protocol.RedisToken.ArrayRedisToken;
+import com.github.tonivade.resp.protocol.RedisToken.StringRedisToken;
+
 import javaslang.control.Try;
 
 public class RespSerializer {
 
-  public RedisToken getValue(Object object) {
+  public RedisToken<?> getValue(Object object) {
     return Match(object).of(
         Case(isPrimitive(), this::getStringValue),
         Case(instanceOf(Object[].class), this::getArrayValue),
@@ -32,21 +35,21 @@ public class RespSerializer {
         Case($(), this::getObjectValue));
   }
 
-  private RedisToken getMapValue(Map<?, ?> map) {
+  private ArrayRedisToken getMapValue(Map<?, ?> map) {
     return RedisToken.array(map.entrySet().stream()
         .flatMap(entry -> Stream.of(getValue(entry.getKey()), getValue(entry.getValue())))
         .collect(toList()));
   }
 
-  private RedisToken getCollectionValue(Collection<?> collection) {
+  private ArrayRedisToken getCollectionValue(Collection<?> collection) {
     return RedisToken.array(collection.stream().map(this::getValue).collect(toList()));
   }
 
-  private RedisToken getArrayValue(Object[] array) {
+  private ArrayRedisToken getArrayValue(Object[] array) {
     return RedisToken.array(Stream.of(array).map(this::getValue).collect(toList()));
   }
 
-  private RedisToken getObjectValue(Object object) {
+  private ArrayRedisToken getObjectValue(Object object) {
     return RedisToken.array(Stream.of(object.getClass().getDeclaredFields())
         .filter(field -> !field.getName().startsWith("$"))
         .flatMap(field -> Stream.of(string(field.getName()), getValue(tryGetFieldValue(object, field))))
@@ -62,7 +65,7 @@ public class RespSerializer {
     return field.get(object);
   }
 
-  private RedisToken getStringValue(Object value) {
+  private StringRedisToken getStringValue(Object value) {
     return string(String.valueOf(value));
   }
 

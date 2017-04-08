@@ -29,6 +29,8 @@ import com.github.tonivade.resp.command.Session;
 import com.github.tonivade.resp.protocol.RedisDecoder;
 import com.github.tonivade.resp.protocol.RedisEncoder;
 import com.github.tonivade.resp.protocol.RedisToken;
+import com.github.tonivade.resp.protocol.RedisToken.ArrayRedisToken;
+import com.github.tonivade.resp.protocol.RedisToken.StringRedisToken;
 import com.github.tonivade.resp.protocol.RedisTokenType;
 import com.github.tonivade.resp.protocol.SafeString;
 
@@ -147,7 +149,7 @@ public class RedisServer implements IRedis, IServerContext {
   }
 
   @Override
-  public void receive(ChannelHandlerContext ctx, RedisToken message) {
+  public void receive(ChannelHandlerContext ctx, RedisToken<?> message) {
     String sourceKey = sourceKey(ctx.channel());
 
     LOGGER.finest(() -> "message received: " + sourceKey);
@@ -195,7 +197,7 @@ public class RedisServer implements IRedis, IServerContext {
     return commands;
   }
 
-  protected RedisToken executeCommand(ICommand command, IRequest request) {
+  protected RedisToken<?> executeCommand(ICommand command, IRequest request) {
     return command.execute(request);
   }
 
@@ -217,17 +219,17 @@ public class RedisServer implements IRedis, IServerContext {
     return session;
   }
 
-  private Optional<IRequest> parseMessage(String sourceKey, RedisToken message, ISession session) {
+  private Optional<IRequest> parseMessage(String sourceKey, RedisToken<?> message, ISession session) {
     IRequest request = null;
     if (message.getType() == RedisTokenType.ARRAY) {
-      request = parseArray(sourceKey, message, session);
+      request = parseArray(sourceKey, (ArrayRedisToken) message, session);
     } else if (message.getType() == RedisTokenType.UNKNOWN) {
-      request = parseLine(sourceKey, message, session);
+      request = parseLine(sourceKey, (StringRedisToken) message, session);
     }
     return Optional.ofNullable(request);
   }
 
-  private Request parseLine(String sourceKey, RedisToken message, ISession session) {
+  private Request parseLine(String sourceKey, StringRedisToken message, ISession session) {
     SafeString command = message.getValue();
     String[] params = command.toString().split(" ");
     String[] array = new String[params.length - 1];
@@ -235,11 +237,11 @@ public class RedisServer implements IRedis, IServerContext {
     return new Request(this, session, safeString(params[0]), safeAsList(array));
   }
 
-  private Request parseArray(String sourceKey, RedisToken message, ISession session) {
+  private Request parseArray(String sourceKey, ArrayRedisToken message, ISession session) {
     List<SafeString> params = new LinkedList<>();
-    for (RedisToken token : message.<List<RedisToken>>getValue()) {
+    for (RedisToken<?> token : message.getValue()) {
       if (token.getType() == RedisTokenType.STRING) {
-        params.add(token.getValue());
+        params.add((SafeString) token.getValue());
       }
     }
     return new Request(this, session, params.remove(0), params);
@@ -262,7 +264,7 @@ public class RedisServer implements IRedis, IServerContext {
     }
   }
 
-  private Observable<RedisToken> execute(ICommand command, IRequest request) {
+  private Observable<RedisToken<?>> execute(ICommand command, IRequest request) {
     return Observable.create(observer -> {
       observer.onNext(executeCommand(command, request));
       observer.onComplete();

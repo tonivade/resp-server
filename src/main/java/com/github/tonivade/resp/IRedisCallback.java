@@ -9,5 +9,5 @@ import com.github.tonivade.resp.protocol.RedisToken;
 public interface IRedisCallback {
   void onConnect();
   void onDisconnect();
-  void onMessage(RedisToken token);
+  void onMessage(RedisToken<?> token);
 }
