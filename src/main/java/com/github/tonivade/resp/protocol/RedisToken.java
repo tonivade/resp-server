@@ -93,7 +93,7 @@ public abstract class RedisToken<T> {
     return new ArrayRedisToken(redisTokens);
   }
 
-  public static class UnknownRedisToken extends RedisToken<SafeString> {
+  public final static class UnknownRedisToken extends RedisToken<SafeString> {
     UnknownRedisToken(SafeString value) {
       super(RedisTokenType.UNKNOWN, value);
     }
