@@ -22,14 +22,14 @@ public class PingCommandTest {
   @Test
   public void testExecute() {
     rule.execute()
-        .then(status("PONG"));
+        .assertThat(status("PONG"));
   }
 
   @Test
   public void testExecuteWithParam() {
     rule.withParams("Hi!")
         .execute()
-        .then(string("Hi!"));
+        .assertThat(string("Hi!"));
   }
 
 }

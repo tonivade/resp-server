@@ -21,6 +21,6 @@ public class EchoCommandTest {
   public void testExecute() {
     rule.withParams("test")
         .execute()
-        .then(string("test"));
+        .assertThat(string("test"));
   }
 }

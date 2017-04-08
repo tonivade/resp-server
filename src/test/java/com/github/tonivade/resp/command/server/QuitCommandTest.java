@@ -21,6 +21,6 @@ public class QuitCommandTest {
   public void testExecute() {
     rule.withParams()
         .execute()
-        .then(responseOk());
+        .assertThat(responseOk());
   }
 }

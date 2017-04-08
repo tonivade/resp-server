@@ -100,7 +100,7 @@ public class CommandRule implements TestRule {
     return this;
   }
 
-  public void then(RedisToken<?> token) {
+  public void assertThat(RedisToken<?> token) {
     Assert.assertThat(response, equalTo(token));
   }
 
