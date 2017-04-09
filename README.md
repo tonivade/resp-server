@@ -8,7 +8,7 @@ I love REDIS, IMHO is one of the best pieces of code ever made. Is fast, small
 and easy. One of the things I love of REDIS is the RESP protocol, and I think that
 it would be nice to build a library to implement services using this protocol. I
 have to say that this piece of code is based in another project I'm working 
-[tiny-db](https://github.com/tonivade/tiny-db).
+[tinydb](https://github.com/tonivade/tinydb).
 
 ## What?
 
@@ -72,11 +72,11 @@ issues at all, the same way as REDIS works.
 It's very easy, you only need 2 lines of code to start the server
 
 ```java
-    RedisServer redisServer = new RedisServer("localhost", 12345, new CommandSuite());
-    redisServer.start();
+    RespServer server = new RespServer("localhost", 12345, new CommandSuite());
+    server.start();
 ```
 
-CommandSuite is the default commands suite but you can extend and add your own,
+CommandSuite is the default commands suite but you can extend and add your own commands,
 well, that's the point :)
 
 What a command looks like?
@@ -85,15 +85,14 @@ What a command looks like?
     @Command("ping")
     public class PingCommand implements ICommand {
         @Override
-        public void execute(IRequest request, IResponse response) {
-            response.addSimpleStr("PONG");
+        public RedisToken<?> execute(IRequest request) {
+            return RedisToken.status("PONG");
         }
     }
 ```
     
-A command must implement the interface ICommand. This interface only defines
-the method execute, who receives a request object and a response object. It's
-looks very familiar, isn't it? Is very similar to Servlet API.
+A command must implement the interface `ICommand`. This interface only defines
+the method `execute`, who receives a request object and returns a `RedisToken`.
 
 You can get the parameter of the command like this
 
@@ -108,10 +107,10 @@ wraps the bytes received, but, don't worry, it's not going to be a problem, trus
 And you can response to a request this way:
 
 ```java
-    response.addBulkStr(request.getParam(0));
+    return RedisToken.status("PONG");
 ```
     
-You have similar methods like `addSimpleStr`, `addInteger`, `addArray`, `addError`...
+You have similar methods like `array`, `integer`, `string`, `error`...
 
 Annotations are used to define some metadata to the commands, `@Command` annotation
 defines the command name, also there's another annotation, `@ParamLength` to define
@@ -122,8 +121,8 @@ the number of the parameter accepted for this command
     @ParamLength(1)
     public class EchoCommand implements ICommand {
         @Override
-        public void execute(IRequest request, IResponse response) {
-            response.addBulkStr(request.getParam(0));
+        public RedisToken<?> execute(IRequest request) {
+            return RedisToken.string(request.getParam(0));
         }
     }
 ```
@@ -136,17 +135,16 @@ is rejected with an error.
     <dependency>
         <groupId>com.github.tonivade</groupId>
         <artifactId>resp-server</artifactId>
-        <version>0.5.0</version>
+        <version>0.6.0</version>
     </dependency>
 
 ## Gradle
 
-    compile 'com.github.tonivade:resp-server:0.5.0'
+    compile 'com.github.tonivade:resp-server:0.6.0'
 
 ## Continuous Integration
 
 [![Build Status](https://api.travis-ci.org/tonivade/resp-server.svg?branch=develop)](https://travis-ci.org/tonivade/resp-server)
-
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/47b2b3213b7248eca911e4783ed6d031)](https://www.codacy.com/app/tonivade/resp-server?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tonivade/resp-server&amp;utm_campaign=Badge_Grade)
 [![Codacy Coverage](https://api.codacy.com/project/badge/Coverage/47b2b3213b7248eca911e4783ed6d031)](https://www.codacy.com/app/tonivade/resp-server?utm_source=github.com&utm_medium=referral&utm_content=tonivade/resp-server&utm_campaign=Badge_Coverage)
 
