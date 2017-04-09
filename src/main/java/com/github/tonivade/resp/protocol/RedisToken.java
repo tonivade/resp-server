@@ -45,7 +45,9 @@ public abstract class RedisToken<T> {
 
   @Override
   public boolean equals(Object obj) {
-    return equalizer(this).append((one, other) -> Objects.equals(one.value, other.value)).applyTo(obj);
+    return equalizer(this)
+        .append((one, other) -> Objects.equals(one.value, other.value))
+        .applyTo(obj);
   }
 
   @Override
@@ -93,19 +95,19 @@ public abstract class RedisToken<T> {
     return new ArrayRedisToken(redisTokens);
   }
 
-  public final static class UnknownRedisToken extends RedisToken<SafeString> {
+  public static final class UnknownRedisToken extends RedisToken<SafeString> {
     UnknownRedisToken(SafeString value) {
       super(RedisTokenType.UNKNOWN, value);
     }
   }
 
-  public final static class StringRedisToken extends RedisToken<SafeString> {
+  public static final class StringRedisToken extends RedisToken<SafeString> {
     StringRedisToken(SafeString value) {
       super(RedisTokenType.STRING, value);
     }
   }
 
-  public final static class StatusRedisToken extends RedisToken<SafeString> {
+  public static final class StatusRedisToken extends RedisToken<SafeString> {
     StatusRedisToken(SafeString value) {
       super(RedisTokenType.STATUS, value);
     }

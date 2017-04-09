@@ -21,10 +21,10 @@ public class RedisDecoder extends ReplayingDecoder<Void> {
 
   @Override
   protected void decode(ChannelHandlerContext ctx, ByteBuf buffer, List<Object> out) throws Exception {
-    out.add(parseResponse(ctx, buffer));
+    out.add(parseResponse(buffer));
   }
 
-  private SafeString readLine(ChannelHandlerContext ctx, ByteBuf buffer) {
+  private SafeString readLine(ByteBuf buffer) {
     int eol = findEndOfLine(buffer);
     int size = eol - buffer.readerIndex();
     return readString(buffer, size);
@@ -50,21 +50,34 @@ public class RedisDecoder extends ReplayingDecoder<Void> {
     return i;
   }
 
-  private RedisToken<?> parseResponse(ChannelHandlerContext ctx, ByteBuf buffer) {
-    RedisParser parser = new RedisParser(maxLength, new RedisSource() {
-      @Override
-      public SafeString readString(int size) {
-        return RedisDecoder.this.readString(buffer, size);
-      }
-
-      @Override
-      public SafeString readLine() {
-        return RedisDecoder.this.readLine(ctx, buffer);
-      }
-    });
-
-    RedisToken<?> token = parser.parse();
+  private RedisToken<?> parseResponse(ByteBuf buffer) {
+    RedisToken<?> token = createParser(buffer).parse();
     checkpoint();
     return token;
+  }
+
+  private RedisParser createParser(ByteBuf buffer)
+  {
+    return new RedisParser(maxLength, new NettyRedisSource(this, buffer));
+  }
+
+  private static class NettyRedisSource implements RedisSource {
+    private RedisDecoder decoder;
+    private ByteBuf buffer;
+
+    public NettyRedisSource(RedisDecoder decoder, ByteBuf buffer) {
+      this.decoder = decoder;
+      this.buffer = buffer;
+    }
+
+    @Override
+    public SafeString readString(int size) {
+      return decoder.readString(buffer, size);
+    }
+
+    @Override
+    public SafeString readLine() {
+      return decoder.readLine(buffer);
+    }
   }
 }
