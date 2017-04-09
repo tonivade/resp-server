@@ -15,14 +15,14 @@ public class RedisServerRule implements TestRule {
   private static final String DEFAULT_HOST = "localhost";
   private static final int DEFAULT_PORT = 12345;
 
-  private final RedisServer server;
+  private final RespServer server;
 
   public RedisServerRule() {
     this(DEFAULT_HOST, DEFAULT_PORT);
   }
 
   public RedisServerRule(String host, int port) {
-    this.server = new RedisServer(host, port, new CommandSuite());
+    this.server = new RespServer(host, port, new CommandSuite());
   }
 
   @Override

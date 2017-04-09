@@ -8,11 +8,11 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 
-public class RedisInitializerHandler extends ChannelInitializer<SocketChannel> {
+public class RespInitializerHandler extends ChannelInitializer<SocketChannel> {
 
-  private final IRedis impl;
+  private final Resp impl;
 
-  public RedisInitializerHandler(IRedis impl) {
+  public RespInitializerHandler(Resp impl) {
     this.impl = impl;
   }
 

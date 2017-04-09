@@ -48,9 +48,9 @@ import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.schedulers.Schedulers;
 
-public class RedisServer implements IRedis, IServerContext {
+public class RespServer implements Resp, IServerContext {
 
-  private static final Logger LOGGER = Logger.getLogger(RedisServer.class.getName());
+  private static final Logger LOGGER = Logger.getLogger(RespServer.class.getName());
 
   private static final int BUFFER_SIZE = 1024 * 1024;
   private static final int MAX_FRAME_SIZE = BUFFER_SIZE * 100;
@@ -63,8 +63,8 @@ public class RedisServer implements IRedis, IServerContext {
 
   private ServerBootstrap bootstrap;
 
-  private RedisInitializerHandler acceptHandler;
-  private RedisConnectionHandler connectionHandler;
+  private RespInitializerHandler acceptHandler;
+  private RespConnectionHandler connectionHandler;
 
   private ChannelFuture future;
 
@@ -76,7 +76,7 @@ public class RedisServer implements IRedis, IServerContext {
 
   private final Scheduler scheduler = Schedulers.from(Executors.newSingleThreadExecutor());
 
-  public RedisServer(String host, int port, CommandSuite commands) {
+  public RespServer(String host, int port, CommandSuite commands) {
     this.host = requireNonNull(host);
     this.port = requireRange(port, 1024, 65535);
     this.commands = requireNonNull(commands);
@@ -85,8 +85,8 @@ public class RedisServer implements IRedis, IServerContext {
   public void start() {
     bossGroup = new NioEventLoopGroup();
     workerGroup = new NioEventLoopGroup(Runtime.getRuntime().availableProcessors() * 2);
-    acceptHandler = new RedisInitializerHandler(this);
-    connectionHandler = new RedisConnectionHandler(this);
+    acceptHandler = new RespInitializerHandler(this);
+    connectionHandler = new RespConnectionHandler(this);
 
     bootstrap = new ServerBootstrap();
     bootstrap.group(bossGroup, workerGroup)

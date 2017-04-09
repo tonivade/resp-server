@@ -22,21 +22,21 @@ import com.github.tonivade.resp.command.CommandSuite;
 import com.github.tonivade.resp.protocol.RedisToken;
 import com.github.tonivade.resp.protocol.RedisTokenType;
 
-public class RedisServerTest {
+public class RespServerTest {
 
   private static final String HOST = "localhost";
   private static final int PORT = 12345;
   private static final int TIMEOUT = 1000;
 
-  private RedisServer redisServer;
+  private RespServer redisServer;
 
   private CommandSuite commands = new CommandSuite();
 
-  private IRedisCallback callback = mock(IRedisCallback.class);
+  private RespCallback callback = mock(RespCallback.class);
 
   @Before
   public void setUp() {
-    redisServer = new RedisServer(HOST, PORT, commands);
+    redisServer = new RespServer(HOST, PORT, commands);
     redisServer.start();
   }
 
@@ -47,7 +47,7 @@ public class RedisServerTest {
 
   @Test
   public void serverRespond() {
-    RedisClient redisClient = createClient();
+    RespClient redisClient = createClient();
 
     redisClient.send(array(string("PING")));
 
@@ -56,7 +56,7 @@ public class RedisServerTest {
 
   @Test
   public void clientDisconects() {
-    RedisClient redisClient = createClient();
+    RespClient redisClient = createClient();
 
     redisClient.stop();
 
@@ -65,7 +65,7 @@ public class RedisServerTest {
 
   @Test
   public void serverDisconects() {
-    RedisClient redisClient = createClient();
+    RespClient redisClient = createClient();
 
     redisServer.stop();
 
@@ -76,26 +76,26 @@ public class RedisServerTest {
 
   @Test(expected = NullPointerException.class)
   public void requireHost() {
-    new RedisServer(null, 0, commands);
+    new RespServer(null, 0, commands);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void requirePortLowerThan1024() {
-    new RedisServer(HOST, 0, commands);
+    new RespServer(HOST, 0, commands);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void requirePortGreaterThan65535() {
-    new RedisServer(HOST, 987654321, commands);
+    new RespServer(HOST, 987654321, commands);
   }
 
   @Test(expected = NullPointerException.class)
   public void requireCallback() {
-    new RedisServer(HOST, PORT, null);
+    new RespServer(HOST, PORT, null);
   }
 
-  private RedisClient createClient() {
-    RedisClient redisClient = new RedisClient(HOST, PORT, callback);
+  private RespClient createClient() {
+    RespClient redisClient = new RespClient(HOST, PORT, callback);
     redisClient.start();
     verify(callback, timeout(TIMEOUT)).onConnect();
     return redisClient;

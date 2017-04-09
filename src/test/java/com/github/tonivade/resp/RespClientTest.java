@@ -21,7 +21,7 @@ import org.mockito.ArgumentCaptor;
 import com.github.tonivade.resp.protocol.RedisToken;
 import com.github.tonivade.resp.protocol.RedisTokenType;
 
-public class RedisClientTest {
+public class RespClientTest {
 
   private static final String HOST = "localhost";
   private static final int PORT = 12345;
@@ -30,13 +30,13 @@ public class RedisClientTest {
   @Rule
   public RedisServerRule redisServerRule = new RedisServerRule(HOST, PORT);
 
-  private RedisClient redisClient;
+  private RespClient redisClient;
 
-  private IRedisCallback callback = mock(IRedisCallback.class);
+  private RespCallback callback = mock(RespCallback.class);
 
   @Before
   public void setUp() {
-    redisClient = new RedisClient(HOST, PORT, callback);
+    redisClient = new RespClient(HOST, PORT, callback);
   }
 
   @Test
@@ -96,21 +96,21 @@ public class RedisClientTest {
 
   @Test(expected = NullPointerException.class)
   public void requireHost() {
-    new RedisClient(null, 0, callback);
+    new RespClient(null, 0, callback);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void requirePortLowerThan1024() {
-    new RedisClient("localshot", 0, callback);
+    new RespClient("localshot", 0, callback);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void requirePortGreaterThan65535() {
-    new RedisClient("localshot", 987654321, callback);
+    new RespClient("localshot", 987654321, callback);
   }
 
   @Test(expected = NullPointerException.class)
   public void requireCallback() {
-    new RedisClient("localhost", 12345, null);
+    new RespClient("localhost", 12345, null);
   }
 }

@@ -28,9 +28,9 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.util.CharsetUtil;
 
-public class RedisClient implements IRedis {
+public class RespClient implements Resp {
 
-  private static final Logger LOGGER = Logger.getLogger(RedisClient.class.getName());
+  private static final Logger LOGGER = Logger.getLogger(RespClient.class.getName());
 
   private static final int BUFFER_SIZE = 1024 * 1024;
   private static final int MAX_FRAME_SIZE = BUFFER_SIZE * 100;
@@ -44,12 +44,12 @@ public class RedisClient implements IRedis {
   private ChannelFuture future;
 
   private ChannelHandlerContext context;
-  private RedisInitializerHandler initHandler;
-  private RedisConnectionHandler connectionHandler;
+  private RespInitializerHandler initHandler;
+  private RespConnectionHandler connectionHandler;
 
-  private final IRedisCallback callback;
+  private final RespCallback callback;
 
-  public RedisClient(String host, int port, IRedisCallback callback) {
+  public RespClient(String host, int port, RespCallback callback) {
     this.host = requireNonNull(host);
     this.port = requireRange(port, 1024, 65535);
     this.callback = requireNonNull(callback);
@@ -57,8 +57,8 @@ public class RedisClient implements IRedis {
 
   public void start() {
     workerGroup = new NioEventLoopGroup(Runtime.getRuntime().availableProcessors());
-    initHandler = new RedisInitializerHandler(this);
-    connectionHandler = new RedisConnectionHandler(this);
+    initHandler = new RespInitializerHandler(this);
+    connectionHandler = new RespConnectionHandler(this);
 
     bootstrap = new Bootstrap().group(workerGroup)
         .channel(NioSocketChannel.class)
