@@ -56,7 +56,7 @@ public class CommandSuite {
   }
 
   protected void addCommand(String name, ICommand command) {
-    commands.put(name, factory.wrap(command));
+    commands.put(name.toLowerCase(), factory.wrap(command));
   }
 
   protected boolean contains(String name) {
