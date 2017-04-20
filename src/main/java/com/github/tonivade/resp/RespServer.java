@@ -154,7 +154,7 @@ public class RespServer implements Resp, IServerContext {
 
     LOGGER.finest(() -> "message received: " + sourceKey);
 
-    parseMessage(sourceKey, message, getSession(sourceKey, ctx)).ifPresent(this::processCommand);
+    parseMessage(message, getSession(sourceKey, ctx)).ifPresent(this::processCommand);
   }
 
   @Override
@@ -219,17 +219,17 @@ public class RespServer implements Resp, IServerContext {
     return session;
   }
 
-  private Optional<IRequest> parseMessage(String sourceKey, RedisToken<?> message, ISession session) {
+  private Optional<IRequest> parseMessage(RedisToken<?> message, ISession session) {
     IRequest request = null;
     if (message.getType() == RedisTokenType.ARRAY) {
-      request = parseArray(sourceKey, (ArrayRedisToken) message, session);
+      request = parseArray((ArrayRedisToken) message, session);
     } else if (message.getType() == RedisTokenType.UNKNOWN) {
-      request = parseLine(sourceKey, (StringRedisToken) message, session);
+      request = parseLine((StringRedisToken) message, session);
     }
     return Optional.ofNullable(request);
   }
 
-  private Request parseLine(String sourceKey, StringRedisToken message, ISession session) {
+  private Request parseLine(StringRedisToken message, ISession session) {
     SafeString command = message.getValue();
     String[] params = command.toString().split(" ");
     String[] array = new String[params.length - 1];
@@ -237,7 +237,7 @@ public class RespServer implements Resp, IServerContext {
     return new Request(this, session, safeString(params[0]), safeAsList(array));
   }
 
-  private Request parseArray(String sourceKey, ArrayRedisToken message, ISession session) {
+  private Request parseArray(ArrayRedisToken message, ISession session) {
     List<SafeString> params = new LinkedList<>();
     for (RedisToken<?> token : message.getValue()) {
       if (token.getType() == RedisTokenType.STRING) {
