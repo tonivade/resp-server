@@ -4,13 +4,17 @@
  */
 package com.github.tonivade.resp;
 
+import static com.github.tonivade.resp.protocol.RedisToken.array;
+import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toList;
 
 import java.util.logging.Logger;
 
 import com.github.tonivade.resp.protocol.RedisDecoder;
 import com.github.tonivade.resp.protocol.RedisEncoder;
 import com.github.tonivade.resp.protocol.RedisToken;
+import com.github.tonivade.resp.protocol.RedisToken.ArrayRedisToken;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -24,11 +28,9 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.util.CharsetUtil;
 
-public class RedisClient implements IRedis {
+public class RespClient implements Resp {
 
-  private static final Logger LOGGER = Logger.getLogger(RedisClient.class.getName());
-
-  private static final String DELIMITER = "\r\n";
+  private static final Logger LOGGER = Logger.getLogger(RespClient.class.getName());
 
   private static final int BUFFER_SIZE = 1024 * 1024;
   private static final int MAX_FRAME_SIZE = BUFFER_SIZE * 100;
@@ -42,12 +44,12 @@ public class RedisClient implements IRedis {
   private ChannelFuture future;
 
   private ChannelHandlerContext context;
-  private RedisInitializerHandler initHandler;
-  private RedisConnectionHandler connectionHandler;
+  private RespInitializerHandler initHandler;
+  private RespConnectionHandler connectionHandler;
 
-  private final IRedisCallback callback;
+  private final RespCallback callback;
 
-  public RedisClient(String host, int port, IRedisCallback callback) {
+  public RespClient(String host, int port, RespCallback callback) {
     this.host = requireNonNull(host);
     this.port = requireRange(port, 1024, 65535);
     this.callback = requireNonNull(callback);
@@ -55,8 +57,8 @@ public class RedisClient implements IRedis {
 
   public void start() {
     workerGroup = new NioEventLoopGroup(Runtime.getRuntime().availableProcessors());
-    initHandler = new RedisInitializerHandler(this);
-    connectionHandler = new RedisConnectionHandler(this);
+    initHandler = new RespInitializerHandler(this);
+    connectionHandler = new RespConnectionHandler(this);
 
     bootstrap = new Bootstrap().group(workerGroup)
         .channel(NioSocketChannel.class)
@@ -104,16 +106,16 @@ public class RedisClient implements IRedis {
     }
   }
 
-  public void send(String message) {
-    writeAndFlush(message + DELIMITER);
+  public void send(String... message) {
+    send(array(asList(message).stream().map(RedisToken::string).collect(toList())));
   }
 
-  public void send(RedisToken message) {
+  public void send(ArrayRedisToken message) {
     writeAndFlush(message);
   }
 
   @Override
-  public void receive(ChannelHandlerContext ctx, RedisToken message) {
+  public void receive(ChannelHandlerContext ctx, RedisToken<?> message) {
     callback.onMessage(message);
   }
 

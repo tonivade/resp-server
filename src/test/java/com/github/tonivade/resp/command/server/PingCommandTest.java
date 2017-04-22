@@ -4,7 +4,8 @@
  */
 package com.github.tonivade.resp.command.server;
 
-import static com.github.tonivade.resp.protocol.SafeString.safeString;
+import static com.github.tonivade.resp.protocol.RedisToken.status;
+import static com.github.tonivade.resp.protocol.RedisToken.string;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -21,14 +22,14 @@ public class PingCommandTest {
   @Test
   public void testExecute() {
     rule.execute()
-        .verify().addSimpleStr("PONG");
+        .assertThat(status("PONG"));
   }
 
   @Test
   public void testExecuteWithParam() {
     rule.withParams("Hi!")
         .execute()
-        .verify().addBulkStr(safeString("Hi!"));
+        .assertThat(string("Hi!"));
   }
 
 }

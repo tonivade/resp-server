@@ -20,19 +20,19 @@ public class RedisParserTest {
 
   private RedisParser parser = new RedisParser(100000, source);
 
-  private RedisToken intToken = RedisToken.integer(1);
-  private RedisToken abcString = RedisToken.string("abc");
-  private RedisToken pongString = RedisToken.status("pong");
-  private RedisToken errorString = RedisToken.error("ERR");
-  private RedisToken arrayToken = RedisToken.array(intToken, abcString);
-  private RedisToken unknownString = new UnknownRedisToken(safeString("what?"));
+  private RedisToken<?> intToken = RedisToken.integer(1);
+  private RedisToken<?> abcString = RedisToken.string("abc");
+  private RedisToken<?> pongString = RedisToken.status("pong");
+  private RedisToken<?> errorString = RedisToken.error("ERR");
+  private RedisToken<?> arrayToken = RedisToken.array(intToken, abcString);
+  private RedisToken<?> unknownString = new UnknownRedisToken(safeString("what?"));
 
   @Test
   public void testBulkString() {
     when(source.readLine()).thenReturn(safeString("$3"));
     when(source.readString(3)).thenReturn(safeString("abc"));
 
-    RedisToken token = parser.parse();
+    RedisToken<?> token = parser.parse();
 
     assertThat(token, equalTo(abcString));
   }
@@ -41,7 +41,7 @@ public class RedisParserTest {
   public void testSimpleString() {
     when(source.readLine()).thenReturn(safeString("+pong"));
 
-    RedisToken token = parser.parse();
+    RedisToken<?> token = parser.parse();
 
     assertThat(token, equalTo(pongString));
   }
@@ -50,7 +50,7 @@ public class RedisParserTest {
   public void testInteger() {
     when(source.readLine()).thenReturn(safeString(":1"));
 
-    RedisToken token = parser.parse();
+    RedisToken<?> token = parser.parse();
 
     assertThat(token, equalTo(intToken));
   }
@@ -59,7 +59,7 @@ public class RedisParserTest {
   public void testErrorString() {
     when(source.readLine()).thenReturn(safeString("-ERR"));
 
-    RedisToken token = parser.parse();
+    RedisToken<?> token = parser.parse();
 
     assertThat(token, equalTo(errorString));
   }
@@ -68,7 +68,7 @@ public class RedisParserTest {
   public void testUnknownString() {
     when(source.readLine()).thenReturn(safeString("what?"));
 
-    RedisToken token = parser.parse();
+    RedisToken<?> token = parser.parse();
 
     assertThat(token, equalTo(unknownString));
   }
@@ -78,7 +78,7 @@ public class RedisParserTest {
     when(source.readLine()).thenReturn(safeString("*2"), safeString(":1"), safeString("$3"));
     when(source.readString(3)).thenReturn(safeString("abc"));
 
-    RedisToken token = parser.parse();
+    RedisToken<?> token = parser.parse();
 
     assertThat(token, equalTo(arrayToken));
   }

@@ -4,13 +4,8 @@
  */
 package com.github.tonivade.resp.command.server;
 
-import java.util.Collection;
-import java.util.Iterator;
-
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 
 import com.github.tonivade.resp.command.CommandRule;
 import com.github.tonivade.resp.command.CommandUnderTest;
@@ -21,21 +16,12 @@ public class TimeCommandTest {
   @Rule
   public final CommandRule rule = new CommandRule(this);
 
-  @Captor
-  private ArgumentCaptor<Collection<RedisToken>> captor;
-
   @Test
   public void testExecute() {
-    rule.execute()
-        .verify().addArray(captor.capture());
+    rule.execute();
 
-    Collection<RedisToken> value = captor.getValue();
+    RedisToken<?> array = rule.getResponse();
 
-    Iterator<RedisToken> iterator = value.iterator();
-    RedisToken secs = iterator.next();
-    RedisToken mics = iterator.next();
-
-    System.out.println(secs);
-    System.out.println(mics);
+    System.out.println(array);
   }
 }

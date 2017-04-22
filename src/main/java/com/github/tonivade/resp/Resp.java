@@ -9,9 +9,9 @@ import com.github.tonivade.resp.protocol.RedisToken;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.socket.SocketChannel;
 
-public interface IRedis {
+public interface Resp {
   void channel(SocketChannel channel);
   void connected(ChannelHandlerContext ctx);
   void disconnected(ChannelHandlerContext ctx);
-  void receive(ChannelHandlerContext ctx, RedisToken message);
+  void receive(ChannelHandlerContext ctx, RedisToken<?> message);
 }

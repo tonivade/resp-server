@@ -4,7 +4,7 @@
  */
 package com.github.tonivade.resp.command.server;
 
-import static com.github.tonivade.resp.protocol.SafeString.safeString;
+import static com.github.tonivade.resp.protocol.RedisToken.string;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -21,6 +21,6 @@ public class EchoCommandTest {
   public void testExecute() {
     rule.withParams("test")
         .execute()
-        .verify().addBulkStr(safeString("test"));
+        .assertThat(string("test"));
   }
 }

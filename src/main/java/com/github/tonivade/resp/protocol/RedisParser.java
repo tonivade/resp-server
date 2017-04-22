@@ -31,12 +31,12 @@ public class RedisParser {
     this.source = source;
   }
 
-  public RedisToken parse() {
+  public RedisToken<?> parse() {
     return parseToken(source.readLine());
   }
 
-  private RedisToken parseToken(SafeString line) {
-    RedisToken token = new UnknownRedisToken(SafeString.EMPTY_STRING);
+  private RedisToken<?> parseToken(SafeString line) {
+    RedisToken<?> token = new UnknownRedisToken(SafeString.EMPTY_STRING);
     if (line != null && !line.isEmpty()) {
       if (line.startsWith(ARRAY_PREFIX)) {
         int size = Integer.parseInt(line.substring(1));
@@ -56,13 +56,13 @@ public class RedisParser {
     return token;
   }
 
-  private RedisToken parseIntegerToken(SafeString line) {
+  private IntegerRedisToken parseIntegerToken(SafeString line) {
     Integer value = Integer.valueOf(line.substring(1));
     return new IntegerRedisToken(value);
   }
 
-  private RedisToken parseStringToken(SafeString line) {
-    RedisToken token;
+  private StringRedisToken parseStringToken(SafeString line) {
+    StringRedisToken token;
     int length = Integer.parseInt(line.substring(1));
     if (length > 0 && length < maxLength) {
       token = new StringRedisToken(source.readString(length));
@@ -73,7 +73,7 @@ public class RedisParser {
   }
 
   private ArrayRedisToken parseArray(int size) {
-    List<RedisToken> array = new ArrayList<>(size);
+    List<RedisToken<?>> array = new ArrayList<>(size);
 
     for (int i = 0; i < size; i++) {
       array.add(parseToken(source.readLine()));

@@ -4,9 +4,13 @@
  */
 package com.github.tonivade.resp.command;
 
-public class NullCommand implements ICommand {
+import static com.github.tonivade.resp.protocol.RedisToken.error;
+
+import com.github.tonivade.resp.protocol.RedisToken;
+
+class NullCommand implements ICommand {
   @Override
-  public void execute(IRequest request, IResponse response) {
-    response.addError("ERR unknown command '" + request.getCommand() + "'");
+  public RedisToken<?> execute(IRequest request) {
+    return error("ERR unknown command '" + request.getCommand() + "'");
   }
 }

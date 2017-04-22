@@ -15,13 +15,13 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.ReferenceCountUtil;
 
 @Sharable
-public class RedisConnectionHandler extends ChannelInboundHandlerAdapter {
+public class RespConnectionHandler extends ChannelInboundHandlerAdapter {
 
-  private static final Logger LOGGER = Logger.getLogger(RedisConnectionHandler.class.getName());
+  private static final Logger LOGGER = Logger.getLogger(RespConnectionHandler.class.getName());
 
-  private final IRedis impl;
+  private final Resp impl;
 
-  public RedisConnectionHandler(IRedis impl) {
+  public RespConnectionHandler(Resp impl) {
     this.impl = impl;
   }
 
@@ -33,7 +33,7 @@ public class RedisConnectionHandler extends ChannelInboundHandlerAdapter {
   @Override
   public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
     try {
-      impl.receive(ctx, (RedisToken) msg);
+      impl.receive(ctx, (RedisToken<?>) msg);
     } finally {
       ReferenceCountUtil.release(msg);
     }

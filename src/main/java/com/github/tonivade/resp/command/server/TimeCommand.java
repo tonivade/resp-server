@@ -4,36 +4,33 @@
  */
 package com.github.tonivade.resp.command.server;
 
+import static com.github.tonivade.resp.protocol.RedisToken.array;
 import static com.github.tonivade.resp.protocol.RedisToken.string;
-import static java.util.Arrays.asList;
 
 import java.time.Clock;
-import java.util.List;
 
 import com.github.tonivade.resp.annotation.Command;
 import com.github.tonivade.resp.command.ICommand;
 import com.github.tonivade.resp.command.IRequest;
-import com.github.tonivade.resp.command.IResponse;
 import com.github.tonivade.resp.protocol.RedisToken;
 
 @Command("time")
 public class TimeCommand implements ICommand {
 
-    private static final int SCALE = 1000;
+  private static final int SCALE = 1000;
 
-    @Override
-    public void execute(IRequest request, IResponse response) {
-        long currentTimeMillis = Clock.systemDefaultZone().millis();
-        List<RedisToken> result = asList(string(seconds(currentTimeMillis)), string(microseconds(currentTimeMillis)));
-        response.addArray(result);
-    }
+  @Override
+  public RedisToken<?> execute(IRequest request) {
+    long currentTimeMillis = Clock.systemDefaultZone().millis();
+    return array(string(seconds(currentTimeMillis)), string(microseconds(currentTimeMillis)));
+  }
 
-    private String seconds(long currentTimeMillis) {
-        return String.valueOf(currentTimeMillis / SCALE);
-    }
+  private String seconds(long currentTimeMillis) {
+    return String.valueOf(currentTimeMillis / SCALE);
+  }
 
-    // XXX: Java doesn't have microsecond accuracy
-    private String microseconds(long currentTimeMillis) {
-        return String.valueOf((currentTimeMillis % SCALE) * SCALE);
-    }
+  // XXX: Java doesn't have microsecond accuracy
+  private String microseconds(long currentTimeMillis) {
+    return String.valueOf((currentTimeMillis % SCALE) * SCALE);
+  }
 }
