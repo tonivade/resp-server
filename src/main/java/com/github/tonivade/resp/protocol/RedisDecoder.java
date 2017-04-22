@@ -7,9 +7,9 @@ package com.github.tonivade.resp.protocol;
 import java.util.List;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufProcessor;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ReplayingDecoder;
-import io.netty.util.ByteProcessor;
 
 public class RedisDecoder extends ReplayingDecoder<Void> {
 
@@ -43,7 +43,7 @@ public class RedisDecoder extends ReplayingDecoder<Void> {
   }
 
   private static int findEndOfLine(final ByteBuf buffer) {
-    int i = buffer.forEachByte(ByteProcessor.FIND_CRLF);
+    int i = buffer.forEachByte(ByteBufProcessor.FIND_CRLF);
     if (i > 0 && buffer.getByte(i - 1) == '\r') {
       i--;
     }
