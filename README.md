@@ -144,10 +144,10 @@ is rejected with an error.
 
 ## Continuous Integration
 
-[![Build Status](https://api.travis-ci.org/tonivade/resp-server.svg?branch=develop)](https://travis-ci.org/tonivade/resp-server)
+[![Build Status](https://api.travis-ci.org/tonivade/resp-server.svg?branch=master)](https://travis-ci.org/tonivade/resp-server)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/47b2b3213b7248eca911e4783ed6d031)](https://www.codacy.com/app/tonivade/resp-server?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tonivade/resp-server&amp;utm_campaign=Badge_Grade)
 [![Codacy Coverage](https://api.codacy.com/project/badge/Coverage/47b2b3213b7248eca911e4783ed6d031)](https://www.codacy.com/app/tonivade/resp-server?utm_source=github.com&utm_medium=referral&utm_content=tonivade/resp-server&utm_campaign=Badge_Coverage)
-[![Dependency Status](https://www.versioneye.com/user/projects/58d4cb70dcaf9e0045d972d3/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/58d4cb70dcaf9e0045d972d3)
+[![Dependency Status](https://www.versioneye.com/user/projects/58d4cb67dcaf9e0041b5bfa0/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/58d4cb67dcaf9e0041b5bfa0)
 
 ## LICENSE
 
