@@ -16,7 +16,7 @@ import com.github.tonivade.resp.command.server.PingCommand;
 import com.github.tonivade.resp.command.server.QuitCommand;
 import com.github.tonivade.resp.command.server.TimeCommand;
 
-import javaslang.control.Try;
+import io.vavr.control.Try;
 
 public class CommandSuite {
 

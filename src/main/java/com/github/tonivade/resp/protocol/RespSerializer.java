@@ -5,11 +5,11 @@
 package com.github.tonivade.resp.protocol;
 
 import static com.github.tonivade.resp.protocol.RedisToken.string;
+import static io.vavr.API.$;
+import static io.vavr.API.Case;
+import static io.vavr.API.Match;
+import static io.vavr.Predicates.instanceOf;
 import static java.util.stream.Collectors.toList;
-import static javaslang.API.$;
-import static javaslang.API.Case;
-import static javaslang.API.Match;
-import static javaslang.Predicates.instanceOf;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
@@ -20,18 +20,18 @@ import java.util.stream.Stream;
 import com.github.tonivade.resp.protocol.RedisToken.ArrayRedisToken;
 import com.github.tonivade.resp.protocol.RedisToken.StringRedisToken;
 
-import javaslang.control.Try;
+import io.vavr.control.Try;
 
 public class RespSerializer {
 
   public RedisToken<?> getValue(Object object) {
     return Match(object).of(
-        Case(isPrimitive(), this::getStringValue),
-        Case(instanceOf(Object[].class), this::getArrayValue),
-        Case(instanceOf(Number.class), this::getStringValue),
-        Case(instanceOf(String.class), this::getStringValue),
-        Case(instanceOf(Collection.class), this::getCollectionValue),
-        Case(instanceOf(Map.class), this::getMapValue),
+        Case($(isPrimitive()), this::getStringValue),
+        Case($(instanceOf(Object[].class)), this::getArrayValue),
+        Case($(instanceOf(Number.class)), this::getStringValue),
+        Case($(instanceOf(String.class)), this::getStringValue),
+        Case($(instanceOf(Collection.class)), this::getCollectionValue),
+        Case($(instanceOf(Map.class)), this::getMapValue),
         Case($(), this::getObjectValue));
   }
 
