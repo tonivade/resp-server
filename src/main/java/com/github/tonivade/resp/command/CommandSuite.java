@@ -49,6 +49,10 @@ public class CommandSuite {
     return getMetadata(name).isAnnotationPresent(annotationClass);
   }
 
+  public boolean contains(String name) {
+    return commands.get(name) != null;
+  }
+
   protected void addCommand(Class<?> clazz) {
     Try.of(clazz::newInstance)
        .onSuccess(this::processCommand)
@@ -57,10 +61,6 @@ public class CommandSuite {
 
   protected void addCommand(String name, ICommand command) {
     commands.put(name.toLowerCase(), factory.wrap(command));
-  }
-
-  protected boolean contains(String name) {
-    return commands.get(name) != null;
   }
 
   private void processCommand(Object command) {
