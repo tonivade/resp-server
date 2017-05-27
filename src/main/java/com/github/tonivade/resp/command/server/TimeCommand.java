@@ -10,17 +10,17 @@ import static com.github.tonivade.resp.protocol.RedisToken.string;
 import java.time.Clock;
 
 import com.github.tonivade.resp.annotation.Command;
-import com.github.tonivade.resp.command.ICommand;
-import com.github.tonivade.resp.command.IRequest;
+import com.github.tonivade.resp.command.RespCommand;
+import com.github.tonivade.resp.command.Request;
 import com.github.tonivade.resp.protocol.RedisToken;
 
 @Command("time")
-public class TimeCommand implements ICommand {
+public class TimeCommand implements RespCommand {
 
   private static final int SCALE = 1000;
 
   @Override
-  public RedisToken<?> execute(IRequest request) {
+  public RedisToken<?> execute(Request request) {
     long currentTimeMillis = Clock.systemDefaultZone().millis();
     return array(string(seconds(currentTimeMillis)), string(microseconds(currentTimeMillis)));
   }

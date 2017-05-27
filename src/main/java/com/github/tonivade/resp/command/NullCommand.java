@@ -8,9 +8,9 @@ import static com.github.tonivade.resp.protocol.RedisToken.error;
 
 import com.github.tonivade.resp.protocol.RedisToken;
 
-class NullCommand implements ICommand {
+class NullCommand implements RespCommand {
   @Override
-  public RedisToken<?> execute(IRequest request) {
+  public RedisToken<?> execute(Request request) {
     return error("ERR unknown command '" + request.getCommand() + "'");
   }
 }

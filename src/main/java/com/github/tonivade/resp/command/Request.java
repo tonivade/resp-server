@@ -4,81 +4,19 @@
  */
 package com.github.tonivade.resp.command;
 
-import static java.util.Objects.requireNonNull;
-
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import com.github.tonivade.resp.protocol.SafeString;
 
-public class Request implements IRequest {
-
-  private final SafeString command;
-
-  private final List<SafeString> params;
-
-  private final ISession session;
-
-  private final IServerContext server;
-
-  public Request(IServerContext server, ISession session, SafeString command, List<SafeString> params) {
-    this.server = server;
-    this.session = session;
-    this.command = requireNonNull(command);
-    this.params = requireNonNull(params);
-  }
-
-  @Override
-  public String getCommand() {
-    return command.toString();
-  }
-
-  @Override
-  public List<SafeString> getParams() {
-    return Collections.unmodifiableList(params);
-  }
-
-  @Override
-  public SafeString getParam(int i) {
-    if (i < params.size()) {
-      return params.get(i);
-    }
-    return null;
-  }
-
-  @Override
-  public Optional<SafeString> getOptionalParam(int i) {
-    return Optional.ofNullable(getParam(i));
-  }
-
-  @Override
-  public int getLength() {
-    return params.size();
-  }
-
-  @Override
-  public boolean isEmpty() {
-    return params.isEmpty();
-  }
-
-  @Override
-  public boolean isExit() {
-    return command.toString().equalsIgnoreCase("quit");
-  }
-
-  @Override
-  public ISession getSession() {
-    return session;
-  }
-
-  @Override
-  public IServerContext getServerContext() {
-    return server;
-  }
-
-  @Override
-  public String toString() {
-    return command + "[" + params.size() + "]: " + params;
-  }
+public interface Request {
+  String getCommand();
+  List<SafeString> getParams();
+  SafeString getParam(int i);
+  Optional<SafeString> getOptionalParam(int i);
+  int getLength();
+  boolean isEmpty();
+  Session getSession();
+  ServerContext getServerContext();
+  boolean isExit();
 }

@@ -27,15 +27,15 @@ import com.github.tonivade.resp.protocol.SafeString;
 
 public class CommandRule implements TestRule {
 
-  private IRequest request;
+  private Request request;
 
-  private IServerContext server;
+  private ServerContext server;
 
-  private ISession session;
+  private Session session;
 
   private final Object target;
 
-  private ICommand command;
+  private RespCommand command;
 
   private RedisToken<?> response;
 
@@ -43,7 +43,7 @@ public class CommandRule implements TestRule {
     this.target = target;
   }
 
-  public IRequest getRequest() {
+  public Request getRequest() {
     return request;
   }
 
@@ -56,9 +56,9 @@ public class CommandRule implements TestRule {
     return new Statement() {
       @Override
       public void evaluate() throws Throwable {
-        server = mock(IServerContext.class);
-        request = mock(IRequest.class);
-        session = mock(ISession.class);
+        server = mock(ServerContext.class);
+        request = mock(Request.class);
+        session = mock(Session.class);
 
         when(request.getServerContext()).thenReturn(server);
         when(request.getSession()).thenReturn(session);
@@ -106,9 +106,9 @@ public class CommandRule implements TestRule {
 
   @SuppressWarnings("unchecked")
   public <T> T verify(Class<T> type) {
-    if (type.equals(IServerContext.class)) {
+    if (type.equals(ServerContext.class)) {
       return (T) Mockito.verify(server);
-    } else if (type.equals(ISession.class)) {
+    } else if (type.equals(Session.class)) {
       return (T) Mockito.verify(session);
     }
     throw new IllegalArgumentException();

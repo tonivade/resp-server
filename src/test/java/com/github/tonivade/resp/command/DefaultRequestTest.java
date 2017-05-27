@@ -12,10 +12,10 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-public class RequestTest {
+public class DefaultRequestTest {
   @Test
   public void testRequest() {
-    Request request = new Request(null, null, safeString("a"), safeAsList("1", "2", "3"));
+    DefaultRequest request = new DefaultRequest(null, null, safeString("a"), safeAsList("1", "2", "3"));
 
     assertThat(request.getCommand(), is("a"));
     assertThat(request.getLength(), is(3));

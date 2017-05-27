@@ -20,12 +20,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.github.tonivade.resp.command.CommandSuite;
-import com.github.tonivade.resp.command.ICommand;
-import com.github.tonivade.resp.command.IRequest;
-import com.github.tonivade.resp.command.IServerContext;
-import com.github.tonivade.resp.command.ISession;
+import com.github.tonivade.resp.command.RespCommand;
 import com.github.tonivade.resp.command.Request;
+import com.github.tonivade.resp.command.ServerContext;
 import com.github.tonivade.resp.command.Session;
+import com.github.tonivade.resp.command.DefaultRequest;
+import com.github.tonivade.resp.command.DefaultSession;
 import com.github.tonivade.resp.protocol.RedisDecoder;
 import com.github.tonivade.resp.protocol.RedisEncoder;
 import com.github.tonivade.resp.protocol.RedisToken;
@@ -48,7 +48,7 @@ import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.schedulers.Schedulers;
 
-public class RespServer implements Resp, IServerContext {
+public class RespServer implements Resp, ServerContext {
 
   private static final Logger LOGGER = Logger.getLogger(RespServer.class.getName());
 
@@ -70,7 +70,7 @@ public class RespServer implements Resp, IServerContext {
 
   private final Map<String, Object> state = new HashMap<>();
 
-  private final ConcurrentHashMap<String, ISession> clients = new ConcurrentHashMap<>();
+  private final ConcurrentHashMap<String, Session> clients = new ConcurrentHashMap<>();
 
   private final CommandSuite commands;
 
@@ -142,7 +142,7 @@ public class RespServer implements Resp, IServerContext {
 
     LOGGER.fine(() -> "client disconnected: " + sourceKey);
 
-    ISession session = clients.remove(sourceKey);
+    Session session = clients.remove(sourceKey);
     if (session != null) {
       cleanSession(session);
     }
@@ -168,7 +168,7 @@ public class RespServer implements Resp, IServerContext {
   }
 
   @Override
-  public ICommand getCommand(String name) {
+  public RespCommand getCommand(String name) {
     return commands.getCommand(name);
   }
 
@@ -189,7 +189,7 @@ public class RespServer implements Resp, IServerContext {
     state.put(key, value);
   }
 
-  public ISession getSession(String key) {
+  public Session getSession(String key) {
     return clients.get(key);
   }
 
@@ -197,30 +197,30 @@ public class RespServer implements Resp, IServerContext {
     return commands;
   }
 
-  protected RedisToken<?> executeCommand(ICommand command, IRequest request) {
+  protected RedisToken<?> executeCommand(RespCommand command, Request request) {
     return command.execute(request);
   }
 
-  protected void cleanSession(ISession session) {
+  protected void cleanSession(Session session) {
 
   }
 
-  protected void createSession(ISession session) {
+  protected void createSession(Session session) {
 
   }
 
-  private ISession getSession(String sourceKey, ChannelHandlerContext ctx) {
+  private Session getSession(String sourceKey, ChannelHandlerContext ctx) {
     return clients.computeIfAbsent(sourceKey, key -> newSession(ctx, key));
   }
 
-  private ISession newSession(ChannelHandlerContext ctx, String key) {
-    Session session = new Session(key, ctx);
+  private Session newSession(ChannelHandlerContext ctx, String key) {
+    DefaultSession session = new DefaultSession(key, ctx);
     createSession(session);
     return session;
   }
 
-  private Optional<IRequest> parseMessage(RedisToken<?> message, ISession session) {
-    IRequest request = null;
+  private Optional<Request> parseMessage(RedisToken<?> message, Session session) {
+    Request request = null;
     if (message.getType() == RedisTokenType.ARRAY) {
       request = parseArray((ArrayRedisToken) message, session);
     } else if (message.getType() == RedisTokenType.UNKNOWN) {
@@ -229,29 +229,29 @@ public class RespServer implements Resp, IServerContext {
     return Optional.ofNullable(request);
   }
 
-  private Request parseLine(StringRedisToken message, ISession session) {
+  private DefaultRequest parseLine(StringRedisToken message, Session session) {
     SafeString command = message.getValue();
     String[] params = command.toString().split(" ");
     String[] array = new String[params.length - 1];
     System.arraycopy(params, 1, array, 0, array.length);
-    return new Request(this, session, safeString(params[0]), safeAsList(array));
+    return new DefaultRequest(this, session, safeString(params[0]), safeAsList(array));
   }
 
-  private Request parseArray(ArrayRedisToken message, ISession session) {
+  private DefaultRequest parseArray(ArrayRedisToken message, Session session) {
     List<SafeString> params = new LinkedList<>();
     for (RedisToken<?> token : message.getValue()) {
       if (token.getType() == RedisTokenType.STRING) {
         params.add((SafeString) token.getValue());
       }
     }
-    return new Request(this, session, params.remove(0), params);
+    return new DefaultRequest(this, session, params.remove(0), params);
   }
 
-  private void processCommand(IRequest request) {
+  private void processCommand(Request request) {
     LOGGER.fine(() -> "received command: " + request);
 
-    ISession session = request.getSession();
-    ICommand command = commands.getCommand(request.getCommand());
+    Session session = request.getSession();
+    RespCommand command = commands.getCommand(request.getCommand());
     try {
       execute(command, request).observeOn(scheduler).subscribe(token -> {
         session.publish(token);
@@ -264,7 +264,7 @@ public class RespServer implements Resp, IServerContext {
     }
   }
 
-  private Observable<RedisToken<?>> execute(ICommand command, IRequest request) {
+  private Observable<RedisToken<?>> execute(RespCommand command, Request request) {
     return Observable.create(observer -> {
       observer.onNext(executeCommand(command, request));
       observer.onComplete();

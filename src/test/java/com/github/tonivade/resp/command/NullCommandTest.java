@@ -19,7 +19,7 @@ import com.github.tonivade.resp.protocol.RedisToken;
 @RunWith(MockitoJUnitRunner.class)
 public class NullCommandTest {
   @Mock
-  private IRequest request;
+  private Request request;
 
   private final NullCommand nullCommand = new NullCommand();
 

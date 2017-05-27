@@ -68,25 +68,25 @@ public class CommandSuiteTest {
 
   @Test
   public void getCommandNull() {
-    ICommand command = commandSuite.getCommand("notExists");
+    RespCommand command = commandSuite.getCommand("notExists");
 
     assertThat(command, is(instanceOf(NullCommand.class)));
   }
 
-  private IRequest request(String command) {
-    return new Request(null, null, safeString(command), emptyList());
+  private Request request(String command) {
+    return new DefaultRequest(null, null, safeString(command), emptyList());
   }
 
   @Command("good")
-  static class GoodCommand implements ICommand {
+  static class GoodCommand implements RespCommand {
     @Override
-    public RedisToken<?> execute(IRequest request) {
+    public RedisToken<?> execute(Request request) {
       return RedisToken.responseOk();
     }
   }
 
   @Command("bad")
-  static class BadCommand implements ICommand {
+  static class BadCommand implements RespCommand {
     private String string;
 
     public BadCommand(String string) {
@@ -94,7 +94,7 @@ public class CommandSuiteTest {
     }
 
     @Override
-    public RedisToken<?> execute(IRequest request) {
+    public RedisToken<?> execute(Request request) {
       return RedisToken.string(string);
     }
   }

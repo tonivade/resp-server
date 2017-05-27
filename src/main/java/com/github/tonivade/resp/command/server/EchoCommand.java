@@ -8,16 +8,16 @@ import static com.github.tonivade.resp.protocol.RedisToken.string;
 
 import com.github.tonivade.resp.annotation.Command;
 import com.github.tonivade.resp.annotation.ParamLength;
-import com.github.tonivade.resp.command.ICommand;
-import com.github.tonivade.resp.command.IRequest;
+import com.github.tonivade.resp.command.RespCommand;
+import com.github.tonivade.resp.command.Request;
 import com.github.tonivade.resp.protocol.RedisToken;
 
 @Command("echo")
 @ParamLength(1)
-public class EchoCommand implements ICommand {
+public class EchoCommand implements RespCommand {
 
   @Override
-  public RedisToken<?> execute(IRequest request) {
+  public RedisToken<?> execute(Request request) {
     return string(request.getParam(0));
   }
 }

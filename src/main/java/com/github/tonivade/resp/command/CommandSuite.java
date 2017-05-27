@@ -23,7 +23,7 @@ public class CommandSuite {
   private static final Logger LOGGER = Logger.getLogger(CommandSuite.class.getName());
 
   private final Map<String, Class<?>> metadata = new HashMap<>();
-  private final Map<String, ICommand> commands = new HashMap<>();
+  private final Map<String, RespCommand> commands = new HashMap<>();
 
   private final NullCommand nullCommand = new NullCommand();
 
@@ -41,7 +41,7 @@ public class CommandSuite {
     addCommand(TimeCommand.class);
   }
 
-  public ICommand getCommand(String name) {
+  public RespCommand getCommand(String name) {
     return commands.getOrDefault(name.toLowerCase(), nullCommand);
   }
 
@@ -59,7 +59,7 @@ public class CommandSuite {
        .onFailure(e -> LOGGER.log(Level.SEVERE, "error loading command: " + clazz.getName(), e));
   }
 
-  protected void addCommand(String name, ICommand command) {
+  protected void addCommand(String name, RespCommand command) {
     commands.put(name.toLowerCase(), factory.wrap(command));
   }
 
