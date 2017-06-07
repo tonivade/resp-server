@@ -8,6 +8,13 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Collection;
 
+import com.github.tonivade.resp.protocol.AbstractRedisToken.ArrayRedisToken;
+import com.github.tonivade.resp.protocol.AbstractRedisToken.ErrorRedisToken;
+import com.github.tonivade.resp.protocol.AbstractRedisToken.IntegerRedisToken;
+import com.github.tonivade.resp.protocol.AbstractRedisToken.StatusRedisToken;
+import com.github.tonivade.resp.protocol.AbstractRedisToken.StringRedisToken;
+import com.github.tonivade.resp.protocol.AbstractRedisToken.UnknownRedisToken;
+
 public class RedisSerializer {
   private static final byte ARRAY = '*';
   private static final byte ERROR = '-';
@@ -20,29 +27,38 @@ public class RedisSerializer {
 
   private ByteBufferBuilder builder = new ByteBufferBuilder();
 
-  @SuppressWarnings("unchecked")
-  public byte[] encodeToken(RedisToken<?> msg) {
-    switch (msg.getType()) {
-    case STRING:
-      addBulkStr((SafeString) msg.getValue());
-      break;
-    case STATUS:
-      addSimpleStr((SafeString) msg.getValue());
-      break;
-    case INTEGER:
-      addInt((Integer) msg.getValue());
-      break;
-    case ERROR:
-      addError((SafeString) msg.getValue());
-      break;
-    case ARRAY:
-      addArray((Collection<RedisToken<?>>) msg.getValue());
-      break;
-    case UNKNOWN:
-      break;
-    default:
-      break;
-    }
+  public byte[] encodeToken(RedisToken msg) {
+    msg.accept(new RedisTokenVisitor() {
+      @Override
+      public void unknown(UnknownRedisToken token) {
+        
+      }
+      
+      @Override
+      public void string(StringRedisToken token) {
+        addBulkStr(token.getValue());
+      }
+      
+      @Override
+      public void status(StatusRedisToken token) {
+        addSimpleStr(token.getValue());
+      }
+      
+      @Override
+      public void integer(IntegerRedisToken token) {
+        addInt(token.getValue());
+      }
+      
+      @Override
+      public void error(ErrorRedisToken token) {
+        addError(token.getValue());
+      }
+      
+      @Override
+      public void array(ArrayRedisToken token) {
+        addArray(token.getValue());
+      }
+    });
     return builder.build();
   }
 
@@ -67,10 +83,10 @@ public class RedisSerializer {
     builder.append(ERROR).append(str.getBytes()).append(DELIMITER);
   }
 
-  private void addArray(Collection<RedisToken<?>> array) {
+  private void addArray(Collection<RedisToken> array) {
     if (array != null) {
       builder.append(ARRAY).append(array.size()).append(DELIMITER);
-      for (RedisToken<?> token : array) {
+      for (RedisToken token : array) {
         builder.append(new RedisSerializer().encodeToken(token));
       }
     } else {

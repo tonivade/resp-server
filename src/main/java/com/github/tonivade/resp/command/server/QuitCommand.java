@@ -13,7 +13,7 @@ import com.github.tonivade.resp.protocol.RedisToken;
 public class QuitCommand implements RespCommand {
 
   @Override
-  public RedisToken<?> execute(Request request) {
+  public RedisToken execute(Request request) {
     return RedisToken.responseOk();
   }
 

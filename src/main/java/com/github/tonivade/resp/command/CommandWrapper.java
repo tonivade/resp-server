@@ -24,7 +24,7 @@ public class CommandWrapper implements RespCommand {
   }
 
   @Override
-  public RedisToken<?> execute(Request request) {
+  public RedisToken execute(Request request) {
     if (request.getLength() < params) {
       return error("ERR wrong number of arguments for '" + request.getCommand() + "' command");
     }

@@ -20,7 +20,7 @@ public class TimeCommand implements RespCommand {
   private static final int SCALE = 1000;
 
   @Override
-  public RedisToken<?> execute(Request request) {
+  public RedisToken execute(Request request) {
     long currentTimeMillis = Clock.systemDefaultZone().millis();
     return array(string(seconds(currentTimeMillis)), string(microseconds(currentTimeMillis)));
   }

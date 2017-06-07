@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2015-2017, Antonio Gabriel Muñoz Conejo <antoniogmc at gmail dot com>
+ * Copyright (c) 2015-2017, Antonio Gabriel Muñoz Conejo <antoniogmc at gmail dot com>
  * Distributed under the terms of the MIT License
  */
 package com.github.tonivade.resp;
@@ -33,7 +34,7 @@ public class RespConnectionHandler extends ChannelInboundHandlerAdapter {
   @Override
   public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
     try {
-      impl.receive(ctx, (RedisToken<?>) msg);
+      impl.receive(ctx, (RedisToken) msg);
     } finally {
       ReferenceCountUtil.release(msg);
     }

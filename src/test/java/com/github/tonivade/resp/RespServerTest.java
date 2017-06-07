@@ -6,7 +6,6 @@ package com.github.tonivade.resp;
 
 import static com.github.tonivade.resp.protocol.RedisToken.array;
 import static com.github.tonivade.resp.protocol.RedisToken.string;
-import static com.github.tonivade.resp.protocol.SafeString.safeString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
@@ -20,7 +19,6 @@ import org.mockito.ArgumentCaptor;
 
 import com.github.tonivade.resp.command.CommandSuite;
 import com.github.tonivade.resp.protocol.RedisToken;
-import com.github.tonivade.resp.protocol.RedisTokenType;
 
 public class RespServerTest {
 
@@ -102,12 +100,10 @@ public class RespServerTest {
   }
 
   private void verifyResponse(String response) {
-    ArgumentCaptor<RedisToken<?>> captor = ArgumentCaptor.forClass(RedisToken.class);
+    ArgumentCaptor<RedisToken> captor = ArgumentCaptor.forClass(RedisToken.class);
 
     verify(callback, timeout(TIMEOUT)).onMessage(captor.capture());
 
-    RedisToken<?> token = captor.getValue();
-    assertThat(token.getType(), equalTo(RedisTokenType.STATUS));
-    assertThat(token.getValue(), equalTo(safeString(response)));
+    assertThat(captor.getValue(), equalTo(RedisToken.status(response)));
   }
 }

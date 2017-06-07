@@ -10,10 +10,10 @@ import static com.github.tonivade.resp.protocol.RedisToken.status;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.github.tonivade.resp.protocol.RedisToken.ArrayRedisToken;
-import com.github.tonivade.resp.protocol.RedisToken.IntegerRedisToken;
-import com.github.tonivade.resp.protocol.RedisToken.StringRedisToken;
-import com.github.tonivade.resp.protocol.RedisToken.UnknownRedisToken;
+import com.github.tonivade.resp.protocol.AbstractRedisToken.ArrayRedisToken;
+import com.github.tonivade.resp.protocol.AbstractRedisToken.IntegerRedisToken;
+import com.github.tonivade.resp.protocol.AbstractRedisToken.StringRedisToken;
+import com.github.tonivade.resp.protocol.AbstractRedisToken.UnknownRedisToken;
 
 public class RedisParser {
 
@@ -31,12 +31,12 @@ public class RedisParser {
     this.source = source;
   }
 
-  public RedisToken<?> parse() {
+  public RedisToken parse() {
     return parseToken(source.readLine());
   }
 
-  private RedisToken<?> parseToken(SafeString line) {
-    RedisToken<?> token = new UnknownRedisToken(SafeString.EMPTY_STRING);
+  private RedisToken parseToken(SafeString line) {
+    RedisToken token = new UnknownRedisToken(SafeString.EMPTY_STRING);
     if (line != null && !line.isEmpty()) {
       if (line.startsWith(ARRAY_PREFIX)) {
         int size = Integer.parseInt(line.substring(1));
@@ -73,7 +73,7 @@ public class RedisParser {
   }
 
   private ArrayRedisToken parseArray(int size) {
-    List<RedisToken<?>> array = new ArrayList<>(size);
+    List<RedisToken> array = new ArrayList<>(size);
 
     for (int i = 0; i < size; i++) {
       array.add(parseToken(source.readLine()));

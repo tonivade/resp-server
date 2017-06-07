@@ -14,7 +14,6 @@ import java.util.logging.Logger;
 import com.github.tonivade.resp.protocol.RedisDecoder;
 import com.github.tonivade.resp.protocol.RedisEncoder;
 import com.github.tonivade.resp.protocol.RedisToken;
-import com.github.tonivade.resp.protocol.RedisToken.ArrayRedisToken;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -110,12 +109,12 @@ public class RespClient implements Resp {
     send(array(asList(message).stream().map(RedisToken::string).collect(toList())));
   }
 
-  public void send(ArrayRedisToken message) {
+  public void send(RedisToken message) {
     writeAndFlush(message);
   }
 
   @Override
-  public void receive(ChannelHandlerContext ctx, RedisToken<?> message) {
+  public void receive(ChannelHandlerContext ctx, RedisToken message) {
     callback.onMessage(message);
   }
 

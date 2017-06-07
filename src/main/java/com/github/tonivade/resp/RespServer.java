@@ -14,23 +14,26 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.github.tonivade.resp.command.CommandSuite;
-import com.github.tonivade.resp.command.RespCommand;
-import com.github.tonivade.resp.command.Request;
-import com.github.tonivade.resp.command.ServerContext;
-import com.github.tonivade.resp.command.Session;
 import com.github.tonivade.resp.command.DefaultRequest;
 import com.github.tonivade.resp.command.DefaultSession;
+import com.github.tonivade.resp.command.Request;
+import com.github.tonivade.resp.command.RespCommand;
+import com.github.tonivade.resp.command.ServerContext;
+import com.github.tonivade.resp.command.Session;
+import com.github.tonivade.resp.protocol.AbstractRedisToken.ArrayRedisToken;
+import com.github.tonivade.resp.protocol.AbstractRedisToken.StringRedisToken;
+import com.github.tonivade.resp.protocol.AbstractRedisToken.UnknownRedisToken;
+import com.github.tonivade.resp.protocol.AbstractRedisTokenVisitor;
 import com.github.tonivade.resp.protocol.RedisDecoder;
 import com.github.tonivade.resp.protocol.RedisEncoder;
 import com.github.tonivade.resp.protocol.RedisToken;
-import com.github.tonivade.resp.protocol.RedisToken.ArrayRedisToken;
-import com.github.tonivade.resp.protocol.RedisToken.StringRedisToken;
 import com.github.tonivade.resp.protocol.RedisTokenType;
 import com.github.tonivade.resp.protocol.SafeString;
 
@@ -149,7 +152,7 @@ public class RespServer implements Resp, ServerContext {
   }
 
   @Override
-  public void receive(ChannelHandlerContext ctx, RedisToken<?> message) {
+  public void receive(ChannelHandlerContext ctx, RedisToken message) {
     String sourceKey = sourceKey(ctx.channel());
 
     LOGGER.finest(() -> "message received: " + sourceKey);
@@ -197,7 +200,7 @@ public class RespServer implements Resp, ServerContext {
     return commands;
   }
 
-  protected RedisToken<?> executeCommand(RespCommand command, Request request) {
+  protected RedisToken executeCommand(RespCommand command, Request request) {
     return command.execute(request);
   }
 
@@ -219,17 +222,25 @@ public class RespServer implements Resp, ServerContext {
     return session;
   }
 
-  private Optional<Request> parseMessage(RedisToken<?> message, Session session) {
-    Request request = null;
-    if (message.getType() == RedisTokenType.ARRAY) {
-      request = parseArray((ArrayRedisToken) message, session);
-    } else if (message.getType() == RedisTokenType.UNKNOWN) {
-      request = parseLine((StringRedisToken) message, session);
-    }
-    return Optional.ofNullable(request);
+  private Optional<Request> parseMessage(RedisToken message, Session session) {
+    // FIXME: do not use in this way
+    Queue<Request> request = new LinkedList<>();
+    message.accept(new AbstractRedisTokenVisitor() {
+      @Override
+      public void unknown(UnknownRedisToken token) {
+        request.add(RespServer.this.parseLine(token, session));
+      }
+      
+      @Override
+      public void array(ArrayRedisToken token)
+      {
+        request.add(RespServer.this.parseArray(token, session));
+      }
+    });
+    return Optional.ofNullable(request.poll());
   }
 
-  private DefaultRequest parseLine(StringRedisToken message, Session session) {
+  private Request parseLine(UnknownRedisToken message, Session session) {
     SafeString command = message.getValue();
     String[] params = command.toString().split(" ");
     String[] array = new String[params.length - 1];
@@ -237,11 +248,12 @@ public class RespServer implements Resp, ServerContext {
     return new DefaultRequest(this, session, safeString(params[0]), safeAsList(array));
   }
 
-  private DefaultRequest parseArray(ArrayRedisToken message, Session session) {
+  private Request parseArray(ArrayRedisToken message, Session session) {
     List<SafeString> params = new LinkedList<>();
-    for (RedisToken<?> token : message.getValue()) {
+    for (RedisToken token : message.getValue()) {
       if (token.getType() == RedisTokenType.STRING) {
-        params.add((SafeString) token.getValue());
+        // FIXME: use visitor
+        params.add(((StringRedisToken) token).getValue());
       }
     }
     return new DefaultRequest(this, session, params.remove(0), params);
@@ -264,7 +276,7 @@ public class RespServer implements Resp, ServerContext {
     }
   }
 
-  private Observable<RedisToken<?>> execute(RespCommand command, Request request) {
+  private Observable<RedisToken> execute(RespCommand command, Request request) {
     return Observable.create(observer -> {
       observer.onNext(executeCommand(command, request));
       observer.onComplete();

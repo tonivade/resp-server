@@ -50,8 +50,8 @@ public class RedisDecoder extends ReplayingDecoder<Void> {
     return i;
   }
 
-  private RedisToken<?> parseResponse(ByteBuf buffer) {
-    RedisToken<?> token = createParser(buffer).parse();
+  private RedisToken parseResponse(ByteBuf buffer) {
+    RedisToken token = createParser(buffer).parse();
     checkpoint();
     return token;
   }

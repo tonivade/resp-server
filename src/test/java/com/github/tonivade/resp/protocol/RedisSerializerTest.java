@@ -17,12 +17,12 @@ public class RedisSerializerTest {
 
   private RedisSerializer encoder = new RedisSerializer();
 
-  private RedisToken<?> intToken = RedisToken.integer(1);
-  private RedisToken<?> abcString = RedisToken.string("abc");
-  private RedisToken<?> pongString = RedisToken.status("pong");
-  private RedisToken<?> errorString = RedisToken.error("ERR");
-  private RedisToken<?> arrayToken = RedisToken.array(intToken, abcString);
-  private RedisToken<?> arrayOfArraysToken = RedisToken.array(arrayToken, arrayToken);
+  private RedisToken intToken = RedisToken.integer(1);
+  private RedisToken abcString = RedisToken.string("abc");
+  private RedisToken pongString = RedisToken.status("pong");
+  private RedisToken errorString = RedisToken.error("ERR");
+  private RedisToken arrayToken = RedisToken.array(intToken, abcString);
+  private RedisToken arrayOfArraysToken = RedisToken.array(arrayToken, arrayToken);
 
   @Test
   public void encodeString() {

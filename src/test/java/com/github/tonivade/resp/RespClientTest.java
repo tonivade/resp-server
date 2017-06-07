@@ -5,8 +5,8 @@
 package com.github.tonivade.resp;
 
 import static com.github.tonivade.resp.protocol.RedisToken.array;
+import static com.github.tonivade.resp.protocol.RedisToken.status;
 import static com.github.tonivade.resp.protocol.RedisToken.string;
-import static com.github.tonivade.resp.protocol.SafeString.safeString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
@@ -53,13 +53,11 @@ public class RespClientTest {
 
     redisClient.send(array(string("PING")));
 
-    ArgumentCaptor<RedisToken<?>> captor = ArgumentCaptor.forClass(RedisToken.class);
+    ArgumentCaptor<RedisToken> captor = ArgumentCaptor.forClass(RedisToken.class);
 
     verify(callback, timeout(TIMEOUT)).onMessage(captor.capture());
 
-    RedisToken<?> token = captor.getValue();
-    assertThat(token.getType(), equalTo(RedisTokenType.STATUS));
-    assertThat(token.getValue(), equalTo(safeString("PONG")));
+    assertThat(captor.getValue(), equalTo(status("PONG")));
   }
 
   @Test
@@ -69,11 +67,11 @@ public class RespClientTest {
 
     redisClient.send(array(string("PING"), string(readBigFile())));
 
-    ArgumentCaptor<RedisToken<?>> captor = ArgumentCaptor.forClass(RedisToken.class);
+    ArgumentCaptor<RedisToken> captor = ArgumentCaptor.forClass(RedisToken.class);
 
     verify(callback, timeout(TIMEOUT)).onMessage(captor.capture());
 
-    RedisToken<?> token = captor.getValue();
+    RedisToken token = captor.getValue();
     assertThat(token.getType(), equalTo(RedisTokenType.STRING));
   }
 

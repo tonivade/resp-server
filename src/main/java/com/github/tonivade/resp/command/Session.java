@@ -10,7 +10,7 @@ import com.github.tonivade.resp.protocol.RedisToken;
 
 public interface Session {
   String getId();
-  void publish(RedisToken<?> msg);
+  void publish(RedisToken msg);
   void close();
   void destroy();
   <T> Optional<T> getValue(String key);

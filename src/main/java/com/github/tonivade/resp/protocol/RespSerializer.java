@@ -17,14 +17,11 @@ import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import com.github.tonivade.resp.protocol.RedisToken.ArrayRedisToken;
-import com.github.tonivade.resp.protocol.RedisToken.StringRedisToken;
-
 import io.vavr.control.Try;
 
 public class RespSerializer {
 
-  public RedisToken<?> getValue(Object object) {
+  public RedisToken getValue(Object object) {
     return Match(object).of(
         Case($(isPrimitive()), this::getStringValue),
         Case($(instanceOf(Object[].class)), this::getArrayValue),
@@ -35,21 +32,21 @@ public class RespSerializer {
         Case($(), this::getObjectValue));
   }
 
-  private ArrayRedisToken getMapValue(Map<?, ?> map) {
+  private RedisToken getMapValue(Map<?, ?> map) {
     return RedisToken.array(map.entrySet().stream()
         .flatMap(entry -> Stream.of(getValue(entry.getKey()), getValue(entry.getValue())))
         .collect(toList()));
   }
 
-  private ArrayRedisToken getCollectionValue(Collection<?> collection) {
+  private RedisToken getCollectionValue(Collection<?> collection) {
     return RedisToken.array(collection.stream().map(this::getValue).collect(toList()));
   }
 
-  private ArrayRedisToken getArrayValue(Object[] array) {
+  private RedisToken getArrayValue(Object[] array) {
     return RedisToken.array(Stream.of(array).map(this::getValue).collect(toList()));
   }
 
-  private ArrayRedisToken getObjectValue(Object object) {
+  private RedisToken getObjectValue(Object object) {
     return RedisToken.array(Stream.of(object.getClass().getDeclaredFields())
         .filter(field -> !field.getName().startsWith("$"))
         .flatMap(field -> Stream.of(string(field.getName()), getValue(tryGetFieldValue(object, field))))
@@ -60,12 +57,13 @@ public class RespSerializer {
     return Try.of(() -> getFieldValue(object, field)).get();
   }
 
-  private Object getFieldValue(Object object, Field field) throws IllegalArgumentException, IllegalAccessException {
+  private Object getFieldValue(Object object, Field field) 
+      throws IllegalArgumentException, IllegalAccessException {
     field.setAccessible(true);
     return field.get(object);
   }
 
-  private StringRedisToken getStringValue(Object value) {
+  private RedisToken getStringValue(Object value) {
     return string(String.valueOf(value));
   }
 

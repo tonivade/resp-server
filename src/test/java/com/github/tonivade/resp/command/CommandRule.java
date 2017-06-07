@@ -37,7 +37,7 @@ public class CommandRule implements TestRule {
 
   private RespCommand command;
 
-  private RedisToken<?> response;
+  private RedisToken response;
 
   public CommandRule(Object target) {
     this.target = target;
@@ -47,7 +47,7 @@ public class CommandRule implements TestRule {
     return request;
   }
 
-  public RedisToken<?> getResponse() {
+  public RedisToken getResponse() {
     return response;
   }
 
@@ -100,7 +100,7 @@ public class CommandRule implements TestRule {
     return this;
   }
 
-  public void assertThat(RedisToken<?> token) {
+  public void assertThat(RedisToken token) {
     Assert.assertThat(response, equalTo(token));
   }
 

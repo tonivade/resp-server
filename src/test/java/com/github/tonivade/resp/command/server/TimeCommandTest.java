@@ -20,7 +20,7 @@ public class TimeCommandTest {
   public void testExecute() {
     rule.execute();
 
-    RedisToken<?> array = rule.getResponse();
+    RedisToken array = rule.getResponse();
 
     System.out.println(array);
   }

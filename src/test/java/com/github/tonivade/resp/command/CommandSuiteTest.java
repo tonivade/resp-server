@@ -33,7 +33,7 @@ public class CommandSuiteTest {
     String command = "test";
     commandSuite.addCommand(command, request -> string(request.getCommand()));
 
-    RedisToken<?> response = commandSuite.getCommand(command).execute(request(command));
+    RedisToken response = commandSuite.getCommand(command).execute(request(command));
 
     assertThat(response, equalTo(string(command)));
   }
@@ -80,7 +80,7 @@ public class CommandSuiteTest {
   @Command("good")
   static class GoodCommand implements RespCommand {
     @Override
-    public RedisToken<?> execute(Request request) {
+    public RedisToken execute(Request request) {
       return RedisToken.responseOk();
     }
   }
@@ -94,7 +94,7 @@ public class CommandSuiteTest {
     }
 
     @Override
-    public RedisToken<?> execute(Request request) {
+    public RedisToken execute(Request request) {
       return RedisToken.string(string);
     }
   }

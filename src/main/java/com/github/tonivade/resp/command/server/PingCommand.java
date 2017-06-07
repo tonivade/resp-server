@@ -15,7 +15,7 @@ public class PingCommand implements RespCommand {
   public static final String PONG = "PONG";
 
   @Override
-  public RedisToken<?> execute(Request request) {
+  public RedisToken execute(Request request) {
     if (request.getLength() > 0) {
       return RedisToken.string(request.getParam(0));
     } else {
