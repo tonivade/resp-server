@@ -5,7 +5,6 @@
 package com.github.tonivade.resp.protocol;
 
 import static com.github.tonivade.resp.protocol.SafeString.safeString;
-import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Objects.requireNonNull;
 import static tonivade.equalizer.Equalizer.equalizer;
@@ -16,8 +15,8 @@ import java.util.Objects;
 
 public abstract class AbstractRedisToken<T> implements RedisToken {
 
-  private static final StringRedisToken NULL_STRING = new StringRedisToken(null);
-  private static final StatusRedisToken RESPONSE_OK = new StatusRedisToken(safeString("OK"));
+  static final StringRedisToken NULL_STRING = new StringRedisToken(null);
+  static final StatusRedisToken RESPONSE_OK = new StatusRedisToken(safeString("OK"));
 
   private static final String SEPARATOR = "=>";
 
@@ -54,46 +53,6 @@ public abstract class AbstractRedisToken<T> implements RedisToken {
   @Override
   public String toString() {
     return type + SEPARATOR + value;
-  }
-
-  public static StringRedisToken nullString() {
-    return NULL_STRING;
-  }
-
-  public static StatusRedisToken responseOk() {
-    return RESPONSE_OK;
-  }
-
-  public static StringRedisToken string(SafeString str) {
-    return new StringRedisToken(str);
-  }
-
-  public static StringRedisToken string(String str) {
-    return new StringRedisToken(safeString(str));
-  }
-
-  public static StatusRedisToken status(String str) {
-    return new StatusRedisToken(safeString(str));
-  }
-
-  public static IntegerRedisToken integer(boolean b) {
-    return new IntegerRedisToken(b ? 1 : 0);
-  }
-
-  public static IntegerRedisToken integer(int i) {
-    return new IntegerRedisToken(i);
-  }
-
-  public static ErrorRedisToken error(String str) {
-    return new ErrorRedisToken(safeString(str));
-  }
-
-  public static ArrayRedisToken array(RedisToken... redisTokens) {
-    return new ArrayRedisToken(asList(redisTokens));
-  }
-
-  public static ArrayRedisToken array(Collection<RedisToken> redisTokens) {
-    return new ArrayRedisToken(redisTokens);
   }
 
   public static final class UnknownRedisToken extends AbstractRedisToken<SafeString> {

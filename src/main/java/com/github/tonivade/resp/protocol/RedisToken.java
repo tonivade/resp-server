@@ -16,19 +16,17 @@ import com.github.tonivade.resp.protocol.AbstractRedisToken.StatusRedisToken;
 import com.github.tonivade.resp.protocol.AbstractRedisToken.StringRedisToken;
 
 public interface RedisToken {
-  RedisToken NULL_STRING = new StringRedisToken(null);
-  RedisToken RESPONSE_OK = new StatusRedisToken(safeString("OK"));
   
   RedisTokenType getType();
   
   void accept(RedisTokenVisitor visitor);
 
   static RedisToken nullString() {
-    return NULL_STRING;
+    return AbstractRedisToken.NULL_STRING;
   }
 
   static RedisToken responseOk() {
-    return RESPONSE_OK;
+    return AbstractRedisToken.RESPONSE_OK;
   }
 
   static RedisToken string(SafeString str) {
