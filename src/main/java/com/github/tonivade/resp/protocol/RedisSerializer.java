@@ -71,7 +71,7 @@ public class RedisSerializer {
     builder.append(DELIMITER);
   }
 
-  private void addSimpleStr(SafeString str) {
+  private void addSimpleStr(String str) {
     builder.append(SIMPLE_STRING).append(str.getBytes()).append(DELIMITER);
   }
 
@@ -79,7 +79,7 @@ public class RedisSerializer {
     builder.append(INTEGER).append(value).append(DELIMITER);
   }
 
-  private void addError(SafeString str) {
+  private void addError(String str) {
     builder.append(ERROR).append(str.getBytes()).append(DELIMITER);
   }
 

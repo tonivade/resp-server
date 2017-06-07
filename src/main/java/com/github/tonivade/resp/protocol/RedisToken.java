@@ -16,17 +16,20 @@ import com.github.tonivade.resp.protocol.AbstractRedisToken.StatusRedisToken;
 import com.github.tonivade.resp.protocol.AbstractRedisToken.StringRedisToken;
 
 public interface RedisToken {
+
+  RedisToken NULL_STRING = status(null);
+  RedisToken RESPONSE_OK = status("OK");
   
   RedisTokenType getType();
   
   void accept(RedisTokenVisitor visitor);
 
   static RedisToken nullString() {
-    return AbstractRedisToken.NULL_STRING;
+    return NULL_STRING;
   }
 
   static RedisToken responseOk() {
-    return AbstractRedisToken.RESPONSE_OK;
+    return RESPONSE_OK;
   }
 
   static RedisToken string(SafeString str) {
@@ -38,7 +41,7 @@ public interface RedisToken {
   }
 
   static RedisToken status(String str) {
-    return new StatusRedisToken(safeString(str));
+    return new StatusRedisToken(str);
   }
 
   static RedisToken integer(boolean b) {
@@ -50,7 +53,7 @@ public interface RedisToken {
   }
 
   static RedisToken error(String str) {
-    return new ErrorRedisToken(safeString(str));
+    return new ErrorRedisToken(str);
   }
 
   static RedisToken array(RedisToken... redisTokens) {

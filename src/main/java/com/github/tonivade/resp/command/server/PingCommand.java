@@ -4,6 +4,9 @@
  */
 package com.github.tonivade.resp.command.server;
 
+import static com.github.tonivade.resp.protocol.RedisToken.status;
+import static com.github.tonivade.resp.protocol.RedisToken.string;
+
 import com.github.tonivade.resp.annotation.Command;
 import com.github.tonivade.resp.command.RespCommand;
 import com.github.tonivade.resp.command.Request;
@@ -17,9 +20,9 @@ public class PingCommand implements RespCommand {
   @Override
   public RedisToken execute(Request request) {
     if (request.getLength() > 0) {
-      return RedisToken.string(request.getParam(0));
+      return string(request.getParam(0));
     } else {
-      return RedisToken.status(PONG);
+      return status(PONG);
     }
   }
 }

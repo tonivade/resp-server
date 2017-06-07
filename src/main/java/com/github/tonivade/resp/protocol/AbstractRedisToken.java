@@ -4,7 +4,6 @@
  */
 package com.github.tonivade.resp.protocol;
 
-import static com.github.tonivade.resp.protocol.SafeString.safeString;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Objects.requireNonNull;
 import static tonivade.equalizer.Equalizer.equalizer;
@@ -14,9 +13,6 @@ import java.util.Collection;
 import java.util.Objects;
 
 public abstract class AbstractRedisToken<T> implements RedisToken {
-
-  static final StringRedisToken NULL_STRING = new StringRedisToken(null);
-  static final StatusRedisToken RESPONSE_OK = new StatusRedisToken(safeString("OK"));
 
   private static final String SEPARATOR = "=>";
 
@@ -79,8 +75,8 @@ public abstract class AbstractRedisToken<T> implements RedisToken {
     }
   }
 
-  public static final class StatusRedisToken extends AbstractRedisToken<SafeString> {
-    StatusRedisToken(SafeString value) {
+  public static final class StatusRedisToken extends AbstractRedisToken<String> {
+    StatusRedisToken(String value) {
       super(RedisTokenType.STATUS, value);
     }
     
@@ -91,8 +87,8 @@ public abstract class AbstractRedisToken<T> implements RedisToken {
     }
   }
 
-  public static final class ErrorRedisToken extends AbstractRedisToken<SafeString> {
-    ErrorRedisToken(SafeString value) {
+  public static final class ErrorRedisToken extends AbstractRedisToken<String> {
+    ErrorRedisToken(String value) {
       super(RedisTokenType.ERROR, value);
     }
     
