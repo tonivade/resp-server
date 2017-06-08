@@ -11,11 +11,11 @@ import com.github.tonivade.resp.protocol.AbstractRedisToken.StatusRedisToken;
 import com.github.tonivade.resp.protocol.AbstractRedisToken.StringRedisToken;
 import com.github.tonivade.resp.protocol.AbstractRedisToken.UnknownRedisToken;
 
-public interface RedisTokenVisitor {
-  void array(ArrayRedisToken token);
-  void status(StatusRedisToken token);
-  void string(StringRedisToken token);
-  void error(ErrorRedisToken token);
-  void unknown(UnknownRedisToken token);
-  void integer(IntegerRedisToken token);
+public interface RedisTokenVisitor<T> {
+  T array(ArrayRedisToken token);
+  T status(StatusRedisToken token);
+  T string(StringRedisToken token);
+  T error(ErrorRedisToken token);
+  T unknown(UnknownRedisToken token);
+  T integer(IntegerRedisToken token);
 }

@@ -28,35 +28,40 @@ public class RedisSerializer {
   private ByteBufferBuilder builder = new ByteBufferBuilder();
 
   public byte[] encodeToken(RedisToken msg) {
-    msg.accept(new RedisTokenVisitor() {
+    msg.accept(new RedisTokenVisitor<Void>() {
       @Override
-      public void unknown(UnknownRedisToken token) {
-        
+      public Void unknown(UnknownRedisToken token) {
+        return null;
       }
       
       @Override
-      public void string(StringRedisToken token) {
+      public Void string(StringRedisToken token) {
         addBulkStr(token.getValue());
+        return null;
       }
       
       @Override
-      public void status(StatusRedisToken token) {
+      public Void status(StatusRedisToken token) {
         addSimpleStr(token.getValue());
+        return null;
       }
       
       @Override
-      public void integer(IntegerRedisToken token) {
+      public Void integer(IntegerRedisToken token) {
         addInt(token.getValue());
+        return null;
       }
       
       @Override
-      public void error(ErrorRedisToken token) {
+      public Void error(ErrorRedisToken token) {
         addError(token.getValue());
+        return null;
       }
       
       @Override
-      public void array(ArrayRedisToken token) {
+      public Void array(ArrayRedisToken token) {
         addArray(token.getValue());
+        return null;
       }
     });
     return builder.build();

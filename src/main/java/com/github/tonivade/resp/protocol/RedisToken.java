@@ -22,7 +22,7 @@ public interface RedisToken {
   
   RedisTokenType getType();
   
-  void accept(RedisTokenVisitor visitor);
+  <T> T accept(RedisTokenVisitor<T> visitor);
 
   static RedisToken nullString() {
     return NULL_STRING;

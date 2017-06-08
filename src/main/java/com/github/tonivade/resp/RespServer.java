@@ -6,19 +6,23 @@ package com.github.tonivade.resp;
 
 import static com.github.tonivade.resp.protocol.SafeString.safeAsList;
 import static com.github.tonivade.resp.protocol.SafeString.safeString;
+import static io.vavr.API.$;
+import static io.vavr.API.Case;
+import static io.vavr.API.Match;
+import static io.vavr.Predicates.instanceOf;
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toList;
 
 import java.net.InetSocketAddress;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 import com.github.tonivade.resp.command.CommandSuite;
 import com.github.tonivade.resp.command.DefaultRequest;
@@ -30,11 +34,9 @@ import com.github.tonivade.resp.command.Session;
 import com.github.tonivade.resp.protocol.AbstractRedisToken.ArrayRedisToken;
 import com.github.tonivade.resp.protocol.AbstractRedisToken.StringRedisToken;
 import com.github.tonivade.resp.protocol.AbstractRedisToken.UnknownRedisToken;
-import com.github.tonivade.resp.protocol.AbstractRedisTokenVisitor;
 import com.github.tonivade.resp.protocol.RedisDecoder;
 import com.github.tonivade.resp.protocol.RedisEncoder;
 import com.github.tonivade.resp.protocol.RedisToken;
-import com.github.tonivade.resp.protocol.RedisTokenType;
 import com.github.tonivade.resp.protocol.SafeString;
 
 import io.netty.bootstrap.ServerBootstrap;
@@ -223,21 +225,10 @@ public class RespServer implements Resp, ServerContext {
   }
 
   private Optional<Request> parseMessage(RedisToken message, Session session) {
-    // FIXME: do not use in this way
-    Queue<Request> request = new LinkedList<>();
-    message.accept(new AbstractRedisTokenVisitor() {
-      @Override
-      public void unknown(UnknownRedisToken token) {
-        request.add(RespServer.this.parseLine(token, session));
-      }
-      
-      @Override
-      public void array(ArrayRedisToken token)
-      {
-        request.add(RespServer.this.parseArray(token, session));
-      }
-    });
-    return Optional.ofNullable(request.poll());
+    return Match(message)
+        .of(Case($(instanceOf(ArrayRedisToken.class)), token -> Optional.of(parseArray(token, session))), 
+            Case($(instanceOf(UnknownRedisToken.class)), token -> Optional.of(parseLine(token, session))),
+            Case($(), token -> Optional.empty()));
   }
 
   private Request parseLine(UnknownRedisToken message, Session session) {
@@ -249,13 +240,11 @@ public class RespServer implements Resp, ServerContext {
   }
 
   private Request parseArray(ArrayRedisToken message, Session session) {
-    List<SafeString> params = new LinkedList<>();
-    for (RedisToken token : message.getValue()) {
-      if (token.getType() == RedisTokenType.STRING) {
-        // FIXME: use visitor
-        params.add(((StringRedisToken) token).getValue());
-      }
-    }
+    List<SafeString> params = message.getValue().stream()
+        .flatMap(token -> Match(token)
+                 .of(Case($(instanceOf(StringRedisToken.class)), string -> Stream.of(string.getValue())), 
+                     Case($(), Stream.empty())))
+        .collect(toList());
     return new DefaultRequest(this, session, params.remove(0), params);
   }
 
