@@ -3,5 +3,6 @@
 .settings
 .project
 .classpath
+.vscode
 build
 gradle.properties
