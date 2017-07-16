@@ -83,7 +83,7 @@ What a command looks like?
 
 ```java
     @Command("ping")
-    public class PingCommand implements ICommand {
+    public class PingCommand implements RespCommand {
         @Override
         public RedisToken execute(IRequest request) {
             return RedisToken.status("PONG");
@@ -91,7 +91,7 @@ What a command looks like?
     }
 ```
     
-A command must implement the interface `ICommand`. This interface only defines
+A command must implement the interface `RespCommand`. This interface only defines
 the method `execute`, who receives a request object and returns a `RedisToken`.
 
 You can get the parameter of the command like this
@@ -119,7 +119,7 @@ the number of the parameter accepted for this command
 ```java
     @Command("echo")
     @ParamLength(1)
-    public class EchoCommand implements ICommand {
+    public class EchoCommand implements RespCommand {
         @Override
         public RedisToken execute(IRequest request) {
             return RedisToken.string(request.getParam(0));
