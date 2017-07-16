@@ -13,7 +13,6 @@ import com.github.tonivade.resp.protocol.AbstractRedisToken.ErrorRedisToken;
 import com.github.tonivade.resp.protocol.AbstractRedisToken.IntegerRedisToken;
 import com.github.tonivade.resp.protocol.AbstractRedisToken.StatusRedisToken;
 import com.github.tonivade.resp.protocol.AbstractRedisToken.StringRedisToken;
-import com.github.tonivade.resp.protocol.AbstractRedisToken.UnknownRedisToken;
 
 public class RedisSerializer {
   private static final byte ARRAY = '*';
@@ -28,36 +27,31 @@ public class RedisSerializer {
   private ByteBufferBuilder builder = new ByteBufferBuilder();
 
   public byte[] encodeToken(RedisToken msg) {
-    msg.accept(new RedisTokenVisitor<Void>() {
-      @Override
-      public Void unknown(UnknownRedisToken token) {
-        return null;
-      }
-      
+    msg.accept(new AbstractRedisTokenVisitor<Void>() {
       @Override
       public Void string(StringRedisToken token) {
         addBulkStr(token.getValue());
         return null;
       }
-      
+
       @Override
       public Void status(StatusRedisToken token) {
         addSimpleStr(token.getValue());
         return null;
       }
-      
+
       @Override
       public Void integer(IntegerRedisToken token) {
         addInt(token.getValue());
         return null;
       }
-      
+
       @Override
       public Void error(ErrorRedisToken token) {
         addError(token.getValue());
         return null;
       }
-      
+
       @Override
       public Void array(ArrayRedisToken token) {
         addArray(token.getValue());

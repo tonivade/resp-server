@@ -18,4 +18,8 @@ public interface RedisTokenVisitor<T> {
   T error(ErrorRedisToken token);
   T unknown(UnknownRedisToken token);
   T integer(IntegerRedisToken token);
+
+  public static <T> LambdaRedisTokenVisitor.Builder<T> builder() {
+    return new LambdaRedisTokenVisitor.Builder<>();
+  }
 }

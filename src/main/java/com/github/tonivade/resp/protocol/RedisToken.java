@@ -6,8 +6,8 @@ package com.github.tonivade.resp.protocol;
 
 import static com.github.tonivade.resp.protocol.SafeString.safeString;
 import static java.util.Arrays.asList;
-
 import java.util.Collection;
+import java.util.stream.Stream;
 
 import com.github.tonivade.resp.protocol.AbstractRedisToken.ArrayRedisToken;
 import com.github.tonivade.resp.protocol.AbstractRedisToken.ErrorRedisToken;
@@ -15,13 +15,13 @@ import com.github.tonivade.resp.protocol.AbstractRedisToken.IntegerRedisToken;
 import com.github.tonivade.resp.protocol.AbstractRedisToken.StatusRedisToken;
 import com.github.tonivade.resp.protocol.AbstractRedisToken.StringRedisToken;
 
-public interface RedisToken {
 
+public interface RedisToken {
   RedisToken NULL_STRING = string((SafeString) null);
   RedisToken RESPONSE_OK = status("OK");
-  
+
   RedisTokenType getType();
-  
+
   <T> T accept(RedisTokenVisitor<T> visitor);
 
   static RedisToken nullString() {
@@ -62,5 +62,10 @@ public interface RedisToken {
 
   static RedisToken array(Collection<RedisToken> redisTokens) {
     return new ArrayRedisToken(redisTokens);
+  }
+
+  public static <T> Stream<T> visit(Stream<RedisToken> tokens, RedisTokenVisitor<T> visitor)
+  {
+    return tokens.map(token -> token.accept(visitor));
   }
 }
