@@ -19,7 +19,7 @@ public interface RedisTokenVisitor<T> {
   T unknown(UnknownRedisToken token);
   T integer(IntegerRedisToken token);
 
-  public static <T> LambdaRedisTokenVisitor.Builder<T> builder() {
+  static <T> LambdaRedisTokenVisitor.Builder<T> builder() {
     return new LambdaRedisTokenVisitor.Builder<>();
   }
 }

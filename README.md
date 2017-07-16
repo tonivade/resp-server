@@ -85,7 +85,7 @@ What a command looks like?
     @Command("ping")
     public class PingCommand implements ICommand {
         @Override
-        public RedisToken<?> execute(IRequest request) {
+        public RedisToken execute(IRequest request) {
             return RedisToken.status("PONG");
         }
     }
@@ -121,7 +121,7 @@ the number of the parameter accepted for this command
     @ParamLength(1)
     public class EchoCommand implements ICommand {
         @Override
-        public RedisToken<?> execute(IRequest request) {
+        public RedisToken execute(IRequest request) {
             return RedisToken.string(request.getParam(0));
         }
     }
@@ -135,12 +135,12 @@ is rejected with an error.
     <dependency>
         <groupId>com.github.tonivade</groupId>
         <artifactId>resp-server</artifactId>
-        <version>0.6.0</version>
+        <version>0.7.0</version>
     </dependency>
 
 ## Gradle
 
-    compile 'com.github.tonivade:resp-server:0.6.0'
+    compile 'com.github.tonivade:resp-server:0.7.0'
 
 ## Continuous Integration
 
