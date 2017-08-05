@@ -8,19 +8,25 @@ import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 import static tonivade.equalizer.Equalizer.equalizer;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-public class SafeString implements Comparable<SafeString> {
+public class SafeString implements Comparable<SafeString>, Serializable {
+  
+  private static final long serialVersionUID = -8770835877491298225L;
 
   public static final SafeString EMPTY_STRING = new SafeString(new byte[] {});
 
   private static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
-  private final ByteBuffer buffer;
+  private transient ByteBuffer buffer;
 
   public SafeString(byte[] bytes) {
     this.buffer = ByteBuffer.wrap(requireNonNull(bytes));
@@ -103,5 +109,18 @@ public class SafeString implements Comparable<SafeString> {
 
   public String substring(int i) {
     return toString().substring(i);
+  }
+  
+  private void writeObject(ObjectOutputStream out) throws IOException {
+    byte[] bytes = getBytes();
+    out.writeInt(bytes.length);
+    out.write(bytes);
+  }
+  
+  private void readObject(ObjectInputStream input) throws IOException {
+    int length = input.readInt();
+    byte[] bytes = new byte[length];
+    input.read(bytes);
+    this.buffer = ByteBuffer.wrap(bytes);
   }
 }
