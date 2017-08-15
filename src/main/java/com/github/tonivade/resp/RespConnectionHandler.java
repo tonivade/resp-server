@@ -5,8 +5,8 @@
  */
 package com.github.tonivade.resp;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.github.tonivade.resp.protocol.RedisToken;
 
@@ -18,7 +18,7 @@ import io.netty.util.ReferenceCountUtil;
 @Sharable
 public class RespConnectionHandler extends ChannelInboundHandlerAdapter {
 
-  private static final Logger LOGGER = Logger.getLogger(RespConnectionHandler.class.getName());
+  private static final Logger LOGGER = LoggerFactory.getLogger(RespConnectionHandler.class);
 
   private final Resp impl;
 
@@ -42,14 +42,14 @@ public class RespConnectionHandler extends ChannelInboundHandlerAdapter {
 
   @Override
   public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-    LOGGER.log(Level.FINE, "channel inactive");
+    LOGGER.debug("channel inactive");
     impl.disconnected(ctx);
     ctx.close();
   }
 
   @Override
   public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-    LOGGER.log(Level.FINE, "uncaught exception", cause);
+    LOGGER.debug("uncaught exception", cause);
     impl.disconnected(ctx);
     ctx.close();
   }

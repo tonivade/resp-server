@@ -20,9 +20,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Stream;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.github.tonivade.resp.command.CommandSuite;
 import com.github.tonivade.resp.command.DefaultRequest;
@@ -55,7 +56,7 @@ import io.reactivex.schedulers.Schedulers;
 
 public class RespServer implements Resp, ServerContext {
 
-  private static final Logger LOGGER = Logger.getLogger(RespServer.class.getName());
+  private static final Logger LOGGER = LoggerFactory.getLogger(RespServer.class);
 
   private static final int BUFFER_SIZE = 1024 * 1024;
   private static final int MAX_FRAME_SIZE = BUFFER_SIZE * 100;
@@ -107,7 +108,7 @@ public class RespServer implements Resp, ServerContext {
     // Bind and start to accept incoming connections.
     future.syncUninterruptibly();
 
-    LOGGER.info(() -> "server started: " + host + ":" + port);
+    LOGGER.info("server started: {}:{}", host, port);
   }
 
   public void stop() {
@@ -122,12 +123,12 @@ public class RespServer implements Resp, ServerContext {
 
     clients.clear();
 
-    LOGGER.info(() -> "server stopped");
+    LOGGER.info("server stopped");
   }
 
   @Override
   public void channel(SocketChannel channel) {
-    LOGGER.fine(() -> "new channel: " + sourceKey(channel));
+    LOGGER.debug("new channel: {}", sourceKey(channel));
 
     channel.pipeline().addLast("redisEncoder", new RedisEncoder());
     channel.pipeline().addLast("linDelimiter", new RedisDecoder(MAX_FRAME_SIZE));
@@ -137,7 +138,7 @@ public class RespServer implements Resp, ServerContext {
   @Override
   public void connected(ChannelHandlerContext ctx) {
     String sourceKey = sourceKey(ctx.channel());
-    LOGGER.fine(() -> "client connected: " + sourceKey);
+    LOGGER.debug("client connected: {}", sourceKey);
     getSession(sourceKey, ctx);
   }
 
@@ -145,7 +146,7 @@ public class RespServer implements Resp, ServerContext {
   public void disconnected(ChannelHandlerContext ctx) {
     String sourceKey = sourceKey(ctx.channel());
 
-    LOGGER.fine(() -> "client disconnected: " + sourceKey);
+    LOGGER.debug("client disconnected: {}", sourceKey);
 
     Session session = clients.remove(sourceKey);
     if (session != null) {
@@ -157,7 +158,7 @@ public class RespServer implements Resp, ServerContext {
   public void receive(ChannelHandlerContext ctx, RedisToken message) {
     String sourceKey = sourceKey(ctx.channel());
 
-    LOGGER.finest(() -> "message received: " + sourceKey);
+    LOGGER.debug("message received: {}", sourceKey);
 
     parseMessage(message, getSession(sourceKey, ctx)).ifPresent(this::processCommand);
   }
@@ -249,7 +250,7 @@ public class RespServer implements Resp, ServerContext {
   }
 
   private void processCommand(Request request) {
-    LOGGER.fine(() -> "received command: " + request);
+    LOGGER.debug("received command: {}", request);
 
     Session session = request.getSession();
     RespCommand command = commands.getCommand(request.getCommand());
@@ -261,7 +262,7 @@ public class RespServer implements Resp, ServerContext {
         }
       });
     } catch (RuntimeException e) {
-      LOGGER.log(Level.SEVERE, "error executing command: " + request, e);
+      LOGGER.error("error executing command: " + request, e);
     }
   }
 

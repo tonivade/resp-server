@@ -7,8 +7,9 @@ package com.github.tonivade.resp.command;
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.github.tonivade.resp.annotation.Command;
 import com.github.tonivade.resp.command.server.EchoCommand;
@@ -20,7 +21,7 @@ import io.vavr.control.Try;
 
 public class CommandSuite {
 
-  private static final Logger LOGGER = Logger.getLogger(CommandSuite.class.getName());
+  private static final Logger LOGGER = LoggerFactory.getLogger(CommandSuite.class);
 
   private final Map<String, Class<?>> metadata = new HashMap<>();
   private final Map<String, RespCommand> commands = new HashMap<>();
@@ -56,7 +57,7 @@ public class CommandSuite {
   protected void addCommand(Class<?> clazz) {
     Try.of(clazz::newInstance)
        .onSuccess(this::processCommand)
-       .onFailure(e -> LOGGER.log(Level.SEVERE, "error loading command: " + clazz.getName(), e));
+       .onFailure(e -> LOGGER.error("error loading command: " + clazz.getName(), e));
   }
 
   protected void addCommand(String name, RespCommand command) {
@@ -70,7 +71,7 @@ public class CommandSuite {
       commands.put(annotation.value(), factory.wrap(command));
       metadata.put(annotation.value(), clazz);
     } else {
-      LOGGER.warning(() -> "annotation not present at " + clazz.getName());
+      LOGGER.warn("annotation not present at {}", clazz.getName());
     }
   }
 

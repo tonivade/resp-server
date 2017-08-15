@@ -9,7 +9,8 @@ import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.github.tonivade.resp.protocol.RedisDecoder;
 import com.github.tonivade.resp.protocol.RedisEncoder;
@@ -29,7 +30,7 @@ import io.netty.util.CharsetUtil;
 
 public class RespClient implements Resp {
 
-  private static final Logger LOGGER = Logger.getLogger(RespClient.class.getName());
+  private static final Logger LOGGER = LoggerFactory.getLogger(RespClient.class);
 
   private static final int BUFFER_SIZE = 1024 * 1024;
   private static final int MAX_FRAME_SIZE = BUFFER_SIZE * 100;
@@ -82,7 +83,7 @@ public class RespClient implements Resp {
 
   @Override
   public void channel(SocketChannel channel) {
-    LOGGER.info(() -> "connected to server: " + host + ":" + port);
+    LOGGER.info("connected to server: {}:{}", host, port);
     channel.pipeline().addLast("redisEncoder", new RedisEncoder());
     channel.pipeline().addLast("stringEncoder", new StringEncoder(CharsetUtil.UTF_8));
     channel.pipeline().addLast("linDelimiter", new RedisDecoder(MAX_FRAME_SIZE));
@@ -91,14 +92,14 @@ public class RespClient implements Resp {
 
   @Override
   public void connected(ChannelHandlerContext ctx) {
-    LOGGER.info(() -> "channel active");
+    LOGGER.info("channel active");
     this.context = ctx;
     callback.onConnect();
   }
 
   @Override
   public void disconnected(ChannelHandlerContext ctx) {
-    LOGGER.info(() -> "client disconected from server: " + host + ":" + port);
+    LOGGER.info("client disconected from server: {}:{}", host, port);
     if (this.context != null) {
       callback.onDisconnect();
       this.context = null;
@@ -119,7 +120,7 @@ public class RespClient implements Resp {
   }
 
   private ChannelFuture connect() {
-    LOGGER.info(() -> "trying to connect");
+    LOGGER.info("trying to connect");
     ChannelFuture future = bootstrap.connect(host, port);
     future.syncUninterruptibly();
     return future;
