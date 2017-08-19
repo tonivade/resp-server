@@ -101,7 +101,7 @@ You can get the parameter of the command like this
 ```
     
 Every parameter is a `SafeString`, and what the hell is a `SafeString`? Previously,
-we that RESP is binary-safe, so, it means that you can receive anything. SafeString
+we said that RESP is binary-safe, so, it means that you can receive anything. `SafeString`
 wraps the bytes received, but, don't worry, it's not going to be a problem, trust me.
 
 And you can response to a request this way:
@@ -135,12 +135,12 @@ is rejected with an error.
     <dependency>
         <groupId>com.github.tonivade</groupId>
         <artifactId>resp-server</artifactId>
-        <version>0.7.0</version>
+        <version>0.7.1</version>
     </dependency>
 
 ## Gradle
 
-    compile 'com.github.tonivade:resp-server:0.7.0'
+    compile 'com.github.tonivade:resp-server:0.7.1'
 
 ## Continuous Integration
 
