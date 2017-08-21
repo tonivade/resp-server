@@ -9,6 +9,8 @@ import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 
+import java.util.concurrent.TimeUnit;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,7 +70,7 @@ public class RespClient implements Resp {
         .option(ChannelOption.SO_KEEPALIVE, true)
         .handler(initHandler);
 
-    future = connect();
+    future = connect().addListener(new ConnectionListener(this));
   }
 
   public void stop() {
@@ -103,6 +105,7 @@ public class RespClient implements Resp {
     if (this.context != null) {
       callback.onDisconnect();
       this.context = null;
+      future.channel().eventLoop().schedule(this::start, 1L, TimeUnit.SECONDS);
     }
   }
 
@@ -121,9 +124,7 @@ public class RespClient implements Resp {
 
   private ChannelFuture connect() {
     LOGGER.info("trying to connect");
-    ChannelFuture future = bootstrap.connect(host, port);
-    future.syncUninterruptibly();
-    return future;
+    return bootstrap.connect(host, port);
   }
 
   private void writeAndFlush(Object message) {
