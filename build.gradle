@@ -47,7 +47,7 @@ repositories {
 }
 
 dependencies {
-    compile 'io.netty:netty-all:4.1.14.Final'
+    compile 'io.netty:netty-all:4.1.15.Final'
     compile 'com.github.tonivade:equalizer:0.2.0'
     compile 'io.reactivex.rxjava2:rxjava:2.1.3'
     compile 'io.vavr:vavr:0.9.0'
