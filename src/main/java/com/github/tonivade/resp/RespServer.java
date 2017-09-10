@@ -215,6 +215,10 @@ public class RespServer implements Resp, ServerContext {
 
   }
 
+  protected <T> Observable<T> executeOn(Observable<T> observable) {
+    return observable.observeOn(scheduler);
+  }
+
   private Session getSession(String sourceKey, ChannelHandlerContext ctx) {
     return clients.computeIfAbsent(sourceKey, key -> newSession(ctx, key));
   }
@@ -227,7 +231,7 @@ public class RespServer implements Resp, ServerContext {
 
   private Optional<Request> parseMessage(RedisToken message, Session session) {
     return Match(message)
-        .of(Case($(instanceOf(ArrayRedisToken.class)), token -> Optional.of(parseArray(token, session))), 
+        .of(Case($(instanceOf(ArrayRedisToken.class)), token -> Optional.of(parseArray(token, session))),
             Case($(instanceOf(UnknownRedisToken.class)), token -> Optional.of(parseLine(token, session))),
             Case($(), token -> Optional.empty()));
   }
@@ -243,7 +247,7 @@ public class RespServer implements Resp, ServerContext {
   private Request parseArray(ArrayRedisToken message, Session session) {
     List<SafeString> params = message.getValue().stream()
         .flatMap(token -> Match(token)
-                 .of(Case($(instanceOf(StringRedisToken.class)), string -> Stream.of(string.getValue())), 
+                 .of(Case($(instanceOf(StringRedisToken.class)), string -> Stream.of(string.getValue())),
                      Case($(), Stream.empty())))
         .collect(toList());
     return new DefaultRequest(this, session, params.remove(0), params);
@@ -255,7 +259,7 @@ public class RespServer implements Resp, ServerContext {
     Session session = request.getSession();
     RespCommand command = commands.getCommand(request.getCommand());
     try {
-      execute(command, request).observeOn(scheduler).subscribe(token -> {
+      executeOn(execute(command, request)).subscribe(token -> {
         session.publish(token);
         if (request.isExit()) {
           session.close();
