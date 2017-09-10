@@ -25,6 +25,7 @@ public class SafeString implements Comparable<SafeString>, Serializable {
   public static final SafeString EMPTY_STRING = new SafeString(new byte[] {});
 
   private static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
+  private static final char[] CHARS = "0123456789ABCDEF".toCharArray();
 
   private transient ByteBuffer buffer;
 
@@ -80,8 +81,6 @@ public class SafeString implements Comparable<SafeString>, Serializable {
     }
     return sb.toString();
   }
-
-  private static final char[] CHARS = "0123456789ABCDEF".toCharArray();
 
   public static SafeString safeString(String str) {
     return new SafeString(DEFAULT_CHARSET.encode(requireNonNull(str)));
