@@ -19,7 +19,7 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 public class SafeString implements Comparable<SafeString>, Serializable {
-  
+
   private static final long serialVersionUID = -8770835877491298225L;
 
   public static final SafeString EMPTY_STRING = new SafeString(new byte[] {});
@@ -71,8 +71,28 @@ public class SafeString implements Comparable<SafeString>, Serializable {
     return DEFAULT_CHARSET.decode(buffer.duplicate()).toString();
   }
 
+  public String toHexString() {
+    StringBuilder sb = new StringBuilder();
+    byte[] bytes = getBytes();
+    for (int i = 0; i < bytes.length; i++) {
+      int v = bytes[i] & 0xFF;
+      sb.append(CHARS[v >>> 4]).append(CHARS[v & 0x0F]);
+    }
+    return sb.toString();
+  }
+
+  private static final char[] CHARS = "0123456789ABCDEF".toCharArray();
+
   public static SafeString safeString(String str) {
     return new SafeString(DEFAULT_CHARSET.encode(requireNonNull(str)));
+  }
+
+  public static SafeString fromHexString(String string) {
+    byte[] array = new byte[string.length() / 2];
+    for (int i = 0; i < array.length; i++) {
+      array[i] = (byte) Integer.parseInt(string.substring((i * 2), (i * 2) + 2), 16);
+    }
+    return new SafeString(array);
   }
 
   public static List<SafeString> safeAsList(String... strs) {
@@ -110,13 +130,13 @@ public class SafeString implements Comparable<SafeString>, Serializable {
   public String substring(int i) {
     return toString().substring(i);
   }
-  
+
   private void writeObject(ObjectOutputStream out) throws IOException {
     byte[] bytes = getBytes();
     out.writeInt(bytes.length);
     out.write(bytes);
   }
-  
+
   private void readObject(ObjectInputStream input) throws IOException {
     int length = input.readInt();
     byte[] bytes = new byte[length];
