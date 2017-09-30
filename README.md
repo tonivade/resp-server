@@ -8,7 +8,7 @@ I love REDIS, IMHO is one of the best pieces of code ever made. Is fast, small
 and easy. One of the things I love of REDIS is the RESP protocol, and I think that
 it would be nice to build a library to implement services using this protocol. I
 have to say that this piece of code is based in another project I'm working 
-[tinydb](https://github.com/tonivade/tinydb).
+[ClauDB](https://github.com/tonivade/claudb).
 
 ## What?
 
