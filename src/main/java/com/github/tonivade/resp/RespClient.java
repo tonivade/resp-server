@@ -76,10 +76,14 @@ public class RespClient implements Resp {
   public void stop() {
     try {
       if (future != null) {
-        future.channel().close();
+        future.channel().close().syncUninterruptibly();
+        future = null;
       }
     } finally {
-      workerGroup.shutdownGracefully();
+      if (workerGroup != null) {
+        workerGroup.shutdownGracefully().syncUninterruptibly();
+        workerGroup = null;
+      }
     }
   }
 

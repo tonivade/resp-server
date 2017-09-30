@@ -114,11 +114,24 @@ public class RespServer implements Resp, ServerContext {
   public void stop() {
     try {
       if (future != null) {
-        future.channel().close();
+        LOGGER.debug("closing future");
+        future.channel().close().syncUninterruptibly();
+        LOGGER.debug("future closed");
+        future = null;
       }
     } finally {
-      workerGroup.shutdownGracefully();
-      bossGroup.shutdownGracefully();
+      if (workerGroup != null) {
+        LOGGER.debug("workerGroup future");
+        workerGroup.shutdownGracefully().syncUninterruptibly();
+        LOGGER.debug("workerGroup closed");
+        workerGroup = null;
+      }
+      if (bossGroup != null) {
+        LOGGER.debug("bossgroup future");
+        bossGroup.shutdownGracefully().syncUninterruptibly();
+        LOGGER.debug("bossGroup closed");
+        bossGroup = null;
+      }
     }
 
     clients.clear();
