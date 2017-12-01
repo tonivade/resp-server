@@ -53,14 +53,14 @@ public class CommandSuiteTest {
   }
 
   @Test
-  public void isPresent() throws Exception {
+  public void isPresent() {
     commandSuite.addCommand(GoodCommand.class);
 
     assertThat(commandSuite.isPresent("good", Command.class), is(true));
   }
 
   @Test
-  public void notPresent() throws Exception {
+  public void notPresent() {
     commandSuite.addCommand(GoodCommand.class);
 
     assertThat(commandSuite.isPresent("good", ParamLength.class), is(false));
