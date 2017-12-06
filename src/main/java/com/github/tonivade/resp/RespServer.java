@@ -22,7 +22,6 @@ import org.slf4j.LoggerFactory;
 
 import com.github.tonivade.resp.command.DefaultRequest;
 import com.github.tonivade.resp.command.Request;
-import com.github.tonivade.resp.command.RespCommand;
 import com.github.tonivade.resp.command.Session;
 import com.github.tonivade.resp.protocol.AbstractRedisToken.ArrayRedisToken;
 import com.github.tonivade.resp.protocol.AbstractRedisToken.StringRedisToken;
@@ -42,7 +41,6 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.reactivex.Observable;
 
 public class RespServer implements Resp {
 
@@ -148,7 +146,8 @@ public class RespServer implements Resp {
 
     LOGGER.debug("message received: {}", sourceKey);
 
-    parseMessage(message, serverContext.getSession(sourceKey, ctx)).ifPresent(this::processCommand);
+    parseMessage(message, serverContext.getSession(sourceKey, ctx))
+      .ifPresent(serverContext::processCommand);
   }
 
   private Optional<Request> parseMessage(RedisToken message, Session session) {
@@ -167,36 +166,20 @@ public class RespServer implements Resp {
   }
 
   private Request parseArray(ArrayRedisToken message, Session session) {
-    List<SafeString> params = message.getValue().stream()
-        .flatMap(token -> Match(token)
-                 .of(Case($(instanceOf(StringRedisToken.class)), string -> Stream.of(string.getValue())),
-                     Case($(), Stream.empty())))
-        .collect(toList());
+    List<SafeString> params = toParams(message);
     return new DefaultRequest(serverContext, session, params.remove(0), params);
   }
 
-  private void processCommand(Request request) {
-    LOGGER.debug("received command: {}", request);
-
-    Session session = request.getSession();
-    RespCommand command = serverContext.getCommand(request.getCommand());
-    try {
-      serverContext.executeOn(execute(command, request)).subscribe(token -> {
-        session.publish(token);
-        if (request.isExit()) {
-          session.close();
-        }
-      });
-    } catch (RuntimeException e) {
-      LOGGER.error("error executing command: " + request, e);
-    }
+  private List<SafeString> toParams(ArrayRedisToken message) {
+    return message.getValue().stream()
+        .flatMap(this::toSafeStrings)
+        .collect(toList());
   }
 
-  private Observable<RedisToken> execute(RespCommand command, Request request) {
-    return Observable.create(observer -> {
-      observer.onNext(serverContext.executeCommand(command, request));
-      observer.onComplete();
-    });
+  private Stream<SafeString> toSafeStrings(RedisToken token) {
+    return Match(token)
+             .of(Case($(instanceOf(StringRedisToken.class)), string -> Stream.of(string.getValue())),
+                 Case($(), Stream.empty()));
   }
 
   private String sourceKey(Channel channel) {

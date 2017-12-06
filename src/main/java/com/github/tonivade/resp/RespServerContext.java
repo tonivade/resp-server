@@ -12,6 +12,9 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.tonivade.resp.command.CommandSuite;
 import com.github.tonivade.resp.command.DefaultSession;
 import com.github.tonivade.resp.command.Request;
@@ -26,6 +29,8 @@ import io.reactivex.Scheduler;
 import io.reactivex.schedulers.Schedulers;
 
 public class RespServerContext implements ServerContext {
+  private static final Logger LOGGER = LoggerFactory.getLogger(RespServerContext.class);
+
   private final Map<String, Object> state = new HashMap<>();
   private final ConcurrentHashMap<String, Session> clients = new ConcurrentHashMap<>();
   private final Scheduler scheduler = Schedulers.from(Executors.newSingleThreadExecutor());
@@ -45,7 +50,7 @@ public class RespServerContext implements ServerContext {
   }
   
   public void stop() {
-    
+    clear();
   }
 
   @Override
@@ -75,6 +80,7 @@ public class RespServerContext implements ServerContext {
     state.put(key, value);
   }
   
+  @Override
   public String getHost() {
     return host;
   }
@@ -84,13 +90,20 @@ public class RespServerContext implements ServerContext {
     return port;
   }
 
-  void clear() {
-    clients.clear();
-    state.clear();
-  }
-
   Session getSession(String sourceKey, ChannelHandlerContext ctx) {
     return clients.computeIfAbsent(sourceKey, key -> newSession(ctx, key));
+  }
+
+  void processCommand(Request request) {
+    LOGGER.debug("received command: {}", request);
+
+    RespCommand command = getCommand(request.getCommand());
+    try {
+      executeOn(execute(command, request))
+        .subscribe(response -> processResponse(request, response));
+    } catch (RuntimeException e) {
+      LOGGER.error("error executing command: " + request, e);
+    }
   }
 
   protected CommandSuite getCommands() {
@@ -124,6 +137,20 @@ public class RespServerContext implements ServerContext {
 
   }
 
+  private void processResponse(Request request, RedisToken token) {
+    request.getSession().publish(token);
+    if (request.isExit()) {
+      request.getSession().close();
+    }
+  }
+
+  private Observable<RedisToken> execute(RespCommand command, Request request) {
+    return Observable.create(observer -> {
+      observer.onNext(executeCommand(command, request));
+      observer.onComplete();
+    });
+  }
+
   private Session newSession(ChannelHandlerContext ctx, String key) {
     DefaultSession session = new DefaultSession(key, ctx);
     createSession(session);
@@ -135,5 +162,10 @@ public class RespServerContext implements ServerContext {
       throw new IllegalArgumentException(min + " <= " + value + " < " + max);
     }
     return value;
+  }
+
+  private void clear() {
+    clients.clear();
+    state.clear();
   }
 }
