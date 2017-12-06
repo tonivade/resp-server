@@ -17,7 +17,6 @@ public abstract class AbstractRedisToken<T> implements RedisToken {
   private static final String SEPARATOR = "=>";
 
   private final RedisTokenType type;
-
   private final T value;
 
   private AbstractRedisToken(RedisTokenType type, T value) {
@@ -57,8 +56,7 @@ public abstract class AbstractRedisToken<T> implements RedisToken {
     }
     
     @Override
-    public <T> T accept(RedisTokenVisitor<T> visitor)
-    {
+    public <T> T accept(RedisTokenVisitor<T> visitor) {
       return visitor.unknown(this);
     }
   }
@@ -69,8 +67,7 @@ public abstract class AbstractRedisToken<T> implements RedisToken {
     }
     
     @Override
-    public <T> T accept(RedisTokenVisitor<T> visitor)
-    {
+    public <T> T accept(RedisTokenVisitor<T> visitor) {
       return visitor.string(this);
     }
   }
@@ -81,8 +78,7 @@ public abstract class AbstractRedisToken<T> implements RedisToken {
     }
     
     @Override
-    public <T> T accept(RedisTokenVisitor<T> visitor)
-    {
+    public <T> T accept(RedisTokenVisitor<T> visitor) {
       return visitor.status(this);
     }
   }
@@ -93,8 +89,7 @@ public abstract class AbstractRedisToken<T> implements RedisToken {
     }
     
     @Override
-    public <T> T accept(RedisTokenVisitor<T> visitor)
-    {
+    public <T> T accept(RedisTokenVisitor<T> visitor) {
       return visitor.error(this);
     }
   }
@@ -105,8 +100,7 @@ public abstract class AbstractRedisToken<T> implements RedisToken {
     }
     
     @Override
-    public <T> T accept(RedisTokenVisitor<T> visitor)
-    {
+    public <T> T accept(RedisTokenVisitor<T> visitor) {
       return visitor.integer(this);
     }
   }
@@ -117,8 +111,7 @@ public abstract class AbstractRedisToken<T> implements RedisToken {
     }
     
     @Override
-    public <T> T accept(RedisTokenVisitor<T> visitor)
-    {
+    public <T> T accept(RedisTokenVisitor<T> visitor) {
       return visitor.array(this);
     }
 

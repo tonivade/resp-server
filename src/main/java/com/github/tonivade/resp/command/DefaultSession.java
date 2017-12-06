@@ -4,10 +4,9 @@
  */
 package com.github.tonivade.resp.command;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
+import com.github.tonivade.resp.StateHolder;
 import com.github.tonivade.resp.protocol.RedisToken;
 
 import io.netty.channel.ChannelHandlerContext;
@@ -18,7 +17,7 @@ public class DefaultSession implements Session {
 
   private final ChannelHandlerContext ctx;
 
-  private final Map<String, Object> state = new HashMap<>();
+  private final StateHolder state = new StateHolder();
 
   public DefaultSession(String id, ChannelHandlerContext ctx) {
     this.id = id;
@@ -42,24 +41,21 @@ public class DefaultSession implements Session {
 
   @Override
   public void destroy() {
-
+    state.clear();
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public <T> Optional<T> getValue(String key) {
-    return (Optional<T>) Optional.ofNullable(state.get(key));
+    return state.getValue(key);
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public <T> Optional<T> removeValue(String key) {
-    return (Optional<T>) Optional.ofNullable(state.remove(key));
+    return state.removeValue(key);
   }
 
   @Override
   public void putValue(String key, Object value) {
-    state.put(key, value);
+    state.putValue(key, value);
   }
-
 }

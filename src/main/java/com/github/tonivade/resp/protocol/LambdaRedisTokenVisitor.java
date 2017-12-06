@@ -25,7 +25,6 @@ class LambdaRedisTokenVisitor<T> implements RedisTokenVisitor<T> {
   LambdaRedisTokenVisitor(Function<ArrayRedisToken, T> onArray, Function<StatusRedisToken, T> onStatus,
       Function<StringRedisToken, T> onString, Function<ErrorRedisToken, T> onError,
       Function<IntegerRedisToken, T> onInteger, Function<UnknownRedisToken, T> onUnknown) {
-    super();
     this.onArray = onArray;
     this.onStatus = onStatus;
     this.onString = onString;
@@ -111,5 +110,4 @@ class LambdaRedisTokenVisitor<T> implements RedisTokenVisitor<T> {
       return function != null ? function : x -> null;
     }
   }
-
 }

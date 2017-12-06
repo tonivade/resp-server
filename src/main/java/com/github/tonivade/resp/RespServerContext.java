@@ -6,8 +6,6 @@ package com.github.tonivade.resp;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -30,7 +28,7 @@ import io.reactivex.schedulers.Schedulers;
 public class RespServerContext implements ServerContext {
   private static final Logger LOGGER = LoggerFactory.getLogger(RespServerContext.class);
 
-  private final Map<String, Object> state = new HashMap<>();
+  private final StateHolder state = new StateHolder();
   private final ConcurrentHashMap<String, Session> clients = new ConcurrentHashMap<>();
   private final Scheduler scheduler = Schedulers.from(Executors.newSingleThreadExecutor());
 
@@ -63,20 +61,18 @@ public class RespServerContext implements ServerContext {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public <T> Optional<T> getValue(String key) {
-    return (Optional<T>) Optional.ofNullable(state.get(key));
+    return state.getValue(key);
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public <T> Optional<T> removeValue(String key) {
-    return (Optional<T>) Optional.ofNullable(state.remove(key));
+    return state.removeValue(key);
   }
 
   @Override
   public void putValue(String key, Object value) {
-    state.put(key, value);
+    state.putValue(key, value);
   }
   
   @Override

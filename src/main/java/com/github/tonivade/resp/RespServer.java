@@ -10,6 +10,7 @@ import static io.vavr.API.$;
 import static io.vavr.API.Case;
 import static io.vavr.API.Match;
 import static io.vavr.Predicates.instanceOf;
+import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 
 import java.net.InetSocketAddress;
@@ -60,7 +61,7 @@ public class RespServer implements Resp {
   private final RespServerContext serverContext;
 
   public RespServer(RespServerContext serverContext) {
-    this.serverContext = serverContext;
+    this.serverContext = requireNonNull(serverContext);
   }
 
   public void start() {
