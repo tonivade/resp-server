@@ -7,6 +7,7 @@ package com.github.tonivade.resp.command;
 import java.util.Optional;
 
 public interface ServerContext {
+  String getHost();
   int getPort();
   int getClients();
   RespCommand getCommand(String name);

@@ -22,7 +22,7 @@ public class RedisServerRule implements TestRule {
   }
 
   public RedisServerRule(String host, int port) {
-    this.server = new RespServer(host, port, new CommandSuite());
+    this.server = new RespServer(new RespServerContext(host, port, new CommandSuite()));
   }
 
   @Override

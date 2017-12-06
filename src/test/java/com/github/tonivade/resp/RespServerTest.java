@@ -34,7 +34,7 @@ public class RespServerTest {
 
   @Before
   public void setUp() {
-    redisServer = new RespServer(HOST, PORT, commands);
+    redisServer = new RespServer(new RespServerContext(HOST, PORT, commands));
     redisServer.start();
   }
 
@@ -74,22 +74,22 @@ public class RespServerTest {
 
   @Test(expected = NullPointerException.class)
   public void requireHost() {
-    new RespServer(null, 0, commands);
+    new RespServer(new RespServerContext(null, PORT, commands));
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void requirePortLowerThan1024() {
-    new RespServer(HOST, 0, commands);
+    new RespServer(new RespServerContext(HOST, 0, commands));
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void requirePortGreaterThan65535() {
-    new RespServer(HOST, 987654321, commands);
+    new RespServer(new RespServerContext(HOST, 91231231, commands));
   }
 
   @Test(expected = NullPointerException.class)
   public void requireCallback() {
-    new RespServer(HOST, PORT, null);
+    new RespServer(new RespServerContext(HOST, PORT, null));
   }
 
   private RespClient createClient() {
