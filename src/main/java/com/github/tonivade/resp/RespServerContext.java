@@ -11,19 +11,18 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
+import java.util.function.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.tonivade.resp.command.CommandSuite;
-import com.github.tonivade.resp.command.DefaultSession;
 import com.github.tonivade.resp.command.Request;
 import com.github.tonivade.resp.command.RespCommand;
 import com.github.tonivade.resp.command.ServerContext;
 import com.github.tonivade.resp.command.Session;
 import com.github.tonivade.resp.protocol.RedisToken;
 
-import io.netty.channel.ChannelHandlerContext;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.schedulers.Schedulers;
@@ -90,8 +89,8 @@ public class RespServerContext implements ServerContext {
     return port;
   }
 
-  Session getSession(String sourceKey, ChannelHandlerContext ctx) {
-    return clients.computeIfAbsent(sourceKey, key -> newSession(ctx, key));
+  Session getSession(String sourceKey, Function<String, Session> factory) {
+    return clients.computeIfAbsent(sourceKey, factory::apply);
   }
 
   void processCommand(Request request) {
@@ -149,12 +148,6 @@ public class RespServerContext implements ServerContext {
       observer.onNext(executeCommand(command, request));
       observer.onComplete();
     });
-  }
-
-  private Session newSession(ChannelHandlerContext ctx, String key) {
-    DefaultSession session = new DefaultSession(key, ctx);
-    createSession(session);
-    return session;
   }
 
   private int requireRange(int value, int min, int max) {

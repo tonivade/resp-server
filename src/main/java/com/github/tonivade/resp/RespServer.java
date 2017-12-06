@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.tonivade.resp.command.DefaultRequest;
+import com.github.tonivade.resp.command.DefaultSession;
 import com.github.tonivade.resp.command.Request;
 import com.github.tonivade.resp.command.Session;
 import com.github.tonivade.resp.protocol.AbstractRedisToken.ArrayRedisToken;
@@ -128,7 +129,7 @@ public class RespServer implements Resp {
   public void connected(ChannelHandlerContext ctx) {
     String sourceKey = sourceKey(ctx.channel());
     LOGGER.debug("client connected: {}", sourceKey);
-    serverContext.getSession(sourceKey, ctx);
+    getSession(ctx, sourceKey);
   }
 
   @Override
@@ -146,7 +147,7 @@ public class RespServer implements Resp {
 
     LOGGER.debug("message received: {}", sourceKey);
 
-    parseMessage(message, serverContext.getSession(sourceKey, ctx))
+    parseMessage(message, getSession(ctx, sourceKey))
       .ifPresent(serverContext::processCommand);
   }
 
@@ -185,5 +186,16 @@ public class RespServer implements Resp {
   private String sourceKey(Channel channel) {
     InetSocketAddress remoteAddress = (InetSocketAddress) channel.remoteAddress();
     return remoteAddress.getHostName() + ":" + remoteAddress.getPort();
+  }
+
+  private Session getSession(ChannelHandlerContext ctx, String sourceKey) {
+    return serverContext.getSession(sourceKey, key -> newSession(ctx, key));
+  }
+
+  private Session newSession(ChannelHandlerContext ctx, String key) {
+    DefaultSession session = new DefaultSession(key, ctx);
+    // FIXME: move this to servletContext
+    serverContext.createSession(session);
+    return session;
   }
 }
