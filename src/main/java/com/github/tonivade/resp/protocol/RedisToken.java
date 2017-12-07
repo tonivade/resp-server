@@ -15,7 +15,6 @@ import com.github.tonivade.resp.protocol.AbstractRedisToken.IntegerRedisToken;
 import com.github.tonivade.resp.protocol.AbstractRedisToken.StatusRedisToken;
 import com.github.tonivade.resp.protocol.AbstractRedisToken.StringRedisToken;
 
-
 public interface RedisToken {
   RedisToken NULL_STRING = string((SafeString) null);
   RedisToken RESPONSE_OK = status("OK");

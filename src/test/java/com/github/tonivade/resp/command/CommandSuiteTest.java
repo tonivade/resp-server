@@ -95,7 +95,7 @@ public class CommandSuiteTest {
 
     @Override
     public RedisToken execute(Request request) {
-      return RedisToken.string(string);
+      return string(string);
     }
   }
 }
