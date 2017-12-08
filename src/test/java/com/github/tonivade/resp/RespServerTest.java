@@ -72,26 +72,6 @@ public class RespServerTest {
     redisClient.stop();
   }
 
-  @Test(expected = NullPointerException.class)
-  public void requireHost() {
-    new RespServer(new RespServerContext(null, PORT, commands));
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void requirePortLowerThan1024() {
-    new RespServer(new RespServerContext(HOST, 0, commands));
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void requirePortGreaterThan65535() {
-    new RespServer(new RespServerContext(HOST, 91231231, commands));
-  }
-
-  @Test(expected = NullPointerException.class)
-  public void requireCallback() {
-    new RespServer(new RespServerContext(HOST, PORT, null));
-  }
-
   private RespClient createClient() {
     RespClient redisClient = new RespClient(HOST, PORT, callback);
     redisClient.start();

@@ -95,9 +95,10 @@ public class RespServerContext implements ServerContext {
     RespCommand command = getCommand(request.getCommand());
     try {
       executeOn(execute(command, request))
-        .subscribe(response -> processResponse(request, response));
-    } catch (RuntimeException e) {
-      LOGGER.error("error executing command: " + request, e);
+        .subscribe(response -> processResponse(request, response),
+                   ex -> LOGGER.error("error executing command: " + request, ex));
+    } catch (RuntimeException ex) {
+      LOGGER.error("error executing command: " + request, ex);
     }
   }
 
