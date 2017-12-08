@@ -4,6 +4,7 @@
  */
 package com.github.tonivade.resp;
 
+import static com.github.tonivade.resp.SessionListener.nullListener;
 import static java.util.Objects.requireNonNull;
 
 import java.util.Optional;
@@ -35,11 +36,18 @@ public class RespServerContext implements ServerContext {
   private final String host;
   private final int port;
   private final CommandSuite commands;
+  private SessionListener sessionListener;
   
   public RespServerContext(String host, int port, CommandSuite commands) {
+    this(host, port, commands, nullListener());
+  }
+  
+  public RespServerContext(String host, int port, CommandSuite commands, 
+                           SessionListener sessionListener) {
     this.host = requireNonNull(host);
     this.port = requireRange(port, 1024, 65535);
     this.commands = requireNonNull(commands);
+    this.sessionListener = sessionListener;
   }
   
   public void start() {
@@ -86,7 +94,11 @@ public class RespServerContext implements ServerContext {
   }
 
   Session getSession(String sourceKey, Function<String, Session> factory) {
-    return clients.computeIfAbsent(sourceKey, factory::apply);
+    return clients.computeIfAbsent(sourceKey, key -> {
+      Session session = factory.apply(key);
+      sessionListener.sessionCreated(session);
+      return session;
+    });
   }
 
   void processCommand(Request request) {
@@ -109,7 +121,7 @@ public class RespServerContext implements ServerContext {
   protected void removeSession(String sourceKey) {
     Session session = clients.remove(sourceKey);
     if (session != null) {
-      cleanSession(session);
+      sessionListener.sessionDeleted(session);
     }
   }
 
@@ -123,14 +135,6 @@ public class RespServerContext implements ServerContext {
 
   protected <T> Observable<T> executeOn(Observable<T> observable) {
     return observable.observeOn(scheduler);
-  }
-
-  protected void cleanSession(Session session) {
-
-  }
-
-  protected void createSession(Session session) {
-
   }
 
   private void processResponse(Request request, RedisToken token) {

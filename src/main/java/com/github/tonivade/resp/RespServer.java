@@ -194,9 +194,6 @@ public class RespServer implements Resp {
   }
 
   private Session newSession(ChannelHandlerContext ctx, String key) {
-    DefaultSession session = new DefaultSession(key, ctx);
-    // FIXME: move this to servletContext
-    serverContext.createSession(session);
-    return session;
+    return new DefaultSession(key, ctx);
   }
 }
