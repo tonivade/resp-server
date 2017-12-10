@@ -37,18 +37,13 @@ public class RespClient implements Resp {
   private static final int BUFFER_SIZE = 1024 * 1024;
   private static final int MAX_FRAME_SIZE = BUFFER_SIZE * 100;
 
+  private Bootstrap bootstrap;
+  private EventLoopGroup workerGroup;
+  private ChannelFuture future;
+  private ChannelHandlerContext context;
+
   private final int port;
   private final String host;
-
-  private EventLoopGroup workerGroup;
-  private Bootstrap bootstrap;
-
-  private ChannelFuture future;
-
-  private ChannelHandlerContext context;
-  private RespInitializerHandler initHandler;
-  private RespConnectionHandler connectionHandler;
-
   private final RespCallback callback;
 
   public RespClient(String host, int port, RespCallback callback) {
@@ -59,8 +54,6 @@ public class RespClient implements Resp {
 
   public void start() {
     workerGroup = new NioEventLoopGroup(Runtime.getRuntime().availableProcessors());
-    initHandler = new RespInitializerHandler(this);
-    connectionHandler = new RespConnectionHandler(this);
 
     bootstrap = new Bootstrap().group(workerGroup)
         .channel(NioSocketChannel.class)
@@ -68,7 +61,7 @@ public class RespClient implements Resp {
         .option(ChannelOption.SO_RCVBUF, BUFFER_SIZE)
         .option(ChannelOption.SO_SNDBUF, BUFFER_SIZE)
         .option(ChannelOption.SO_KEEPALIVE, true)
-        .handler(initHandler);
+        .handler(new RespInitializerHandler(this));
 
     future = connect().addListener(new ConnectionListener(this));
   }
@@ -93,7 +86,7 @@ public class RespClient implements Resp {
     channel.pipeline().addLast("redisEncoder", new RedisEncoder());
     channel.pipeline().addLast("stringEncoder", new StringEncoder(CharsetUtil.UTF_8));
     channel.pipeline().addLast("linDelimiter", new RedisDecoder(MAX_FRAME_SIZE));
-    channel.pipeline().addLast(connectionHandler);
+    channel.pipeline().addLast(new RespConnectionHandler(this));
   }
 
   @Override

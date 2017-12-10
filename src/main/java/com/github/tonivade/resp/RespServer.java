@@ -43,6 +43,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.util.concurrent.Future;
 
 public class RespServer implements Resp {
 
@@ -53,9 +54,6 @@ public class RespServer implements Resp {
 
   private EventLoopGroup bossGroup;
   private EventLoopGroup workerGroup;
-  private ServerBootstrap bootstrap;
-  private RespInitializerHandler acceptHandler;
-  private RespConnectionHandler connectionHandler;
   private ChannelFuture future;
   
   private final RespServerContext serverContext;
@@ -67,13 +65,11 @@ public class RespServer implements Resp {
   public void start() {
     bossGroup = new NioEventLoopGroup();
     workerGroup = new NioEventLoopGroup(Runtime.getRuntime().availableProcessors() * 2);
-    acceptHandler = new RespInitializerHandler(this);
-    connectionHandler = new RespConnectionHandler(this);
 
-    bootstrap = new ServerBootstrap();
+    ServerBootstrap bootstrap = new ServerBootstrap();
     bootstrap.group(bossGroup, workerGroup)
         .channel(NioServerSocketChannel.class)
-        .childHandler(acceptHandler)
+        .childHandler(new RespInitializerHandler(this))
         .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
         .option(ChannelOption.SO_RCVBUF, BUFFER_SIZE)
         .option(ChannelOption.SO_SNDBUF, BUFFER_SIZE)
@@ -92,24 +88,12 @@ public class RespServer implements Resp {
   public void stop() {
     try {
       if (future != null) {
-        LOGGER.debug("closing future");
-        future.channel().close().syncUninterruptibly();
-        LOGGER.debug("future closed");
-        future = null;
+        closeFuture(future.channel().close());
       }
+      future = null;
     } finally {
-      if (workerGroup != null) {
-        LOGGER.debug("workerGroup future");
-        workerGroup.shutdownGracefully().syncUninterruptibly();
-        LOGGER.debug("workerGroup closed");
-        workerGroup = null;
-      }
-      if (bossGroup != null) {
-        LOGGER.debug("bossgroup future");
-        bossGroup.shutdownGracefully().syncUninterruptibly();
-        LOGGER.debug("bossGroup closed");
-        bossGroup = null;
-      }
+      workerGroup = closeWorker(workerGroup);
+      bossGroup = closeWorker(bossGroup);
     }
 
     serverContext.stop();
@@ -123,7 +107,7 @@ public class RespServer implements Resp {
 
     channel.pipeline().addLast("redisEncoder", new RedisEncoder());
     channel.pipeline().addLast("linDelimiter", new RedisDecoder(MAX_FRAME_SIZE));
-    channel.pipeline().addLast(connectionHandler);
+    channel.pipeline().addLast(new RespConnectionHandler(this));
   }
 
   @Override
@@ -195,5 +179,18 @@ public class RespServer implements Resp {
 
   private Session newSession(ChannelHandlerContext ctx, String key) {
     return new DefaultSession(key, ctx);
+  }
+
+  private EventLoopGroup closeWorker(EventLoopGroup worker) {
+    if (worker != null) {
+      closeFuture(worker.shutdownGracefully());
+    }
+    return null;
+  }
+  
+  private void closeFuture(Future<?> future) {
+    LOGGER.debug("closing future");
+    future.syncUninterruptibly();
+    LOGGER.debug("future closed");
   }
 }
