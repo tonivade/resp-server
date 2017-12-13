@@ -6,7 +6,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.EventLoop;
 
-public class ConnectionListener implements ChannelFutureListener {
+class ConnectionListener implements ChannelFutureListener {
   private final RespClient client;
   
   public ConnectionListener(RespClient client) {

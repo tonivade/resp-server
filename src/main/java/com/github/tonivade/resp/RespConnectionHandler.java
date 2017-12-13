@@ -16,7 +16,7 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.ReferenceCountUtil;
 
 @Sharable
-public class RespConnectionHandler extends ChannelInboundHandlerAdapter {
+class RespConnectionHandler extends ChannelInboundHandlerAdapter {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RespConnectionHandler.class);
 

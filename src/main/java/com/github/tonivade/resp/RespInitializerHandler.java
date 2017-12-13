@@ -8,7 +8,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 
-public class RespInitializerHandler extends ChannelInitializer<SocketChannel> {
+class RespInitializerHandler extends ChannelInitializer<SocketChannel> {
 
   private final Resp impl;
 
