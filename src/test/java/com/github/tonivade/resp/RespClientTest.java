@@ -9,32 +9,31 @@ import static com.github.tonivade.resp.protocol.RedisToken.status;
 import static com.github.tonivade.resp.protocol.RedisToken.string;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 import com.github.tonivade.resp.protocol.RedisToken;
 import com.github.tonivade.resp.protocol.RedisTokenType;
 
+@ExtendWith(RespServerExtension.class)
 public class RespClientTest {
 
   private static final String HOST = "localhost";
   private static final int PORT = 12345;
   private static final int TIMEOUT = 2000;
 
-  @Rule
-  public RedisServerRule redisServerRule = new RedisServerRule(HOST, PORT);
-
   private RespClient redisClient;
 
   private RespCallback callback = mock(RespCallback.class);
 
-  @Before
+  @BeforeEach
   public void setUp() {
     redisClient = new RespClient(HOST, PORT, callback);
   }
@@ -92,23 +91,23 @@ public class RespClientTest {
     verify(callback, timeout(TIMEOUT)).onDisconnect();
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test
   public void requireHost() {
-    new RespClient(null, 0, callback);
+    assertThrows(NullPointerException.class, () -> new RespClient(null, 0, callback));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void requirePortLowerThan1024() {
-    new RespClient("localshot", 0, callback);
+    assertThrows(IllegalArgumentException.class, () -> new RespClient("localshot", 0, callback));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void requirePortGreaterThan65535() {
-    new RespClient("localshot", 987654321, callback);
+    assertThrows(IllegalArgumentException.class, () -> new RespClient("localshot", 987654321, callback));
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test
   public void requireCallback() {
-    new RespClient("localhost", 12345, null);
+    assertThrows(NullPointerException.class, () -> new RespClient("localhost", 12345, null));
   }
 }
