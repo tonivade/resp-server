@@ -11,7 +11,7 @@ import static java.util.Collections.singletonMap;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.github.tonivade.resp.protocol.test.Data;
 

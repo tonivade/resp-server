@@ -10,6 +10,7 @@ import static java.util.Collections.emptyList;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.timeout;
@@ -19,11 +20,10 @@ import static org.mockito.Mockito.when;
 
 import java.util.function.Function;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.MockitoAnnotations;
 
 import com.github.tonivade.resp.command.CommandSuite;
 import com.github.tonivade.resp.command.DefaultRequest;
@@ -31,7 +31,6 @@ import com.github.tonivade.resp.command.Request;
 import com.github.tonivade.resp.command.RespCommand;
 import com.github.tonivade.resp.command.Session;
 
-@RunWith(MockitoJUnitRunner.class)
 public class RespServerContextTest {
   
   private static final String HOST = "localhost";
@@ -48,8 +47,9 @@ public class RespServerContextTest {
   
   private RespServerContext serverContext;
 
-  @Before
+  @BeforeEach
   public void setUp() {
+    MockitoAnnotations.initMocks(this);
     serverContext = new RespServerContext(HOST, PORT, commands);
   }
   
@@ -127,24 +127,24 @@ public class RespServerContextTest {
     assertThat(serverContext.getSession("key"), nullValue());
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test
   public void requireHost() {
-    new RespServerContext(null, PORT, commands);
+    assertThrows(NullPointerException.class, () -> new RespServerContext(null, 0, commands));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void requirePortLowerThan1024() {
-    new RespServerContext(HOST, 0, commands);
+    assertThrows(IllegalArgumentException.class, () -> new RespServerContext(HOST, 0, commands));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void requirePortGreaterThan65535() {
-    new RespServerContext(HOST, 91231231, commands);
+    assertThrows(IllegalArgumentException.class, () -> new RespServerContext(HOST, 91231231, commands));
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test
   public void requireCallback() {
-    new RespServerContext(HOST, PORT, null);
+    assertThrows(NullPointerException.class, () -> new RespServerContext(HOST, PORT, null));
   }
 
   private Request newRequest(String command) {

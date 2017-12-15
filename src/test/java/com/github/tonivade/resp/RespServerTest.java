@@ -12,9 +12,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import com.github.tonivade.resp.command.CommandSuite;
@@ -26,19 +26,17 @@ public class RespServerTest {
   private static final int PORT = 12345;
   private static final int TIMEOUT = 3000;
 
-  private RespServer redisServer;
-
-  private CommandSuite commands = new CommandSuite();
+  private final RespServer redisServer = 
+      new RespServer(new RespServerContext(HOST, PORT, new CommandSuite()));
 
   private RespCallback callback = mock(RespCallback.class);
 
-  @Before
+  @BeforeEach
   public void setUp() {
-    redisServer = new RespServer(new RespServerContext(HOST, PORT, commands));
     redisServer.start();
   }
 
-  @After
+  @AfterEach
   public void tearDown() {
     redisServer.stop();
   }

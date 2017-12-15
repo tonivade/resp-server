@@ -9,17 +9,14 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import com.github.tonivade.resp.protocol.RedisToken;
 
-@RunWith(MockitoJUnitRunner.class)
 public class NullCommandTest {
-  @Mock
-  private Request request;
+
+  private Request request = Mockito.mock(Request.class);
 
   private final NullCommand nullCommand = new NullCommand();
 

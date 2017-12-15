@@ -12,8 +12,8 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.github.tonivade.resp.annotation.Command;
 import com.github.tonivade.resp.annotation.ParamLength;
@@ -23,7 +23,7 @@ public class CommandSuiteTest {
 
   private CommandSuite commandSuite;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     commandSuite = new CommandSuite();
   }
