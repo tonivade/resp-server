@@ -9,45 +9,48 @@ import static org.junit.Assert.assertThat;
 
 import java.util.Optional;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class StateHolderTest {
   
+  private static final String VALUE = "value";
+  private static final String KEY = "key";
+
   private StateHolder state = new StateHolder();
   
-  @Before
+  @BeforeEach
   public void setUp() {
     state.clear();
   }
   
   @Test
   public void exists() {
-    state.putValue("key", "value");
+    state.putValue(KEY, VALUE);
 
-    assertThat(state.getValue("key"), equalTo(Optional.of("value")));
+    assertThat(state.getValue(KEY), equalTo(Optional.of(VALUE)));
   }
   
   @Test
   public void notExists() {
-    assertThat(state.getValue("key"), equalTo(Optional.empty()));
+    assertThat(state.getValue(KEY), equalTo(Optional.empty()));
   }
   
   @Test
   public void remove() {
-    state.putValue("key", "value");
+    state.putValue(KEY, VALUE);
 
-    assertThat(state.removeValue("key"), equalTo(Optional.of("value")));
-    assertThat(state.getValue("key"), equalTo(Optional.empty()));
+    assertThat(state.removeValue(KEY), equalTo(Optional.of(VALUE)));
+    assertThat(state.getValue(KEY), equalTo(Optional.empty()));
   }
   
   @Test
   public void clear() {
-    state.putValue("key", "value");
-    assertThat(state.getValue("key"), equalTo(Optional.of("value")));
+    state.putValue(KEY, VALUE);
+    assertThat(state.getValue(KEY), equalTo(Optional.of(VALUE)));
 
     state.clear();
-    assertThat(state.getValue("key"), equalTo(Optional.empty()));
+    assertThat(state.getValue(KEY), equalTo(Optional.empty()));
   }
 
 }
