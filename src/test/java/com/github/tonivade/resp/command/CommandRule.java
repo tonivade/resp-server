@@ -14,9 +14,7 @@ import static org.mockito.Mockito.when;
 import java.util.Optional;
 
 import org.junit.Assert;
-import org.junit.rules.TestRule;
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
+import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
@@ -25,19 +23,13 @@ import org.mockito.stubbing.Answer;
 import com.github.tonivade.resp.protocol.RedisToken;
 import com.github.tonivade.resp.protocol.SafeString;
 
-public class CommandRule implements TestRule {
-
+public class CommandRule {
   private Request request;
-
   private ServerContext server;
-
   private Session session;
-
-  private final Object target;
-
   private RespCommand command;
-
   private RedisToken response;
+  private final Object target;
 
   public CommandRule(Object target) {
     this.target = target;
@@ -51,26 +43,22 @@ public class CommandRule implements TestRule {
     return response;
   }
 
-  @Override
-  public Statement apply(final Statement base, final Description description) {
-    return new Statement() {
-      @Override
-      public void evaluate() throws Throwable {
-        server = mock(ServerContext.class);
-        request = mock(Request.class);
-        session = mock(Session.class);
+  public void init() throws ParameterResolutionException {
+    server = mock(ServerContext.class);
+    request = mock(Request.class);
+    session = mock(Session.class);
 
-        when(request.getServerContext()).thenReturn(server);
-        when(request.getSession()).thenReturn(session);
-        when(session.getId()).thenReturn("localhost:12345");
+    when(request.getServerContext()).thenReturn(server);
+    when(request.getSession()).thenReturn(session);
+    when(session.getId()).thenReturn("localhost:12345");
 
-        MockitoAnnotations.initMocks(target);
+    MockitoAnnotations.initMocks(target);
 
-        command = target.getClass().getAnnotation(CommandUnderTest.class).value().newInstance();
-
-        base.evaluate();
-      }
-    };
+    try {
+      command = target.getClass().getAnnotation(CommandUnderTest.class).value().newInstance();
+    } catch (InstantiationException | IllegalAccessException e) {
+      throw new ParameterResolutionException("error", e);
+    }
   }
 
   public CommandRule execute() {
@@ -113,5 +101,4 @@ public class CommandRule implements TestRule {
     }
     throw new IllegalArgumentException();
   }
-
 }

@@ -6,19 +6,19 @@ package com.github.tonivade.resp.command.server;
 
 import static com.github.tonivade.resp.protocol.RedisToken.string;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+import com.github.tonivade.resp.command.CommandRuleExtension;
 import com.github.tonivade.resp.command.CommandRule;
 import com.github.tonivade.resp.command.CommandUnderTest;
 
+@ExtendWith(CommandRuleExtension.class)
 @CommandUnderTest(EchoCommand.class)
 public class EchoCommandTest {
-  @Rule
-  public final CommandRule rule = new CommandRule(this);
 
   @Test
-  public void testExecute() {
+  public void testExecute(CommandRule rule) {
     rule.withParams("test")
         .execute()
         .assertThat(string("test"));
