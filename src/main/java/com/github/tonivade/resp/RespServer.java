@@ -21,6 +21,7 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.tonivade.resp.command.CommandSuite;
 import com.github.tonivade.resp.command.DefaultRequest;
 import com.github.tonivade.resp.command.DefaultSession;
 import com.github.tonivade.resp.command.Request;
@@ -52,6 +53,9 @@ public class RespServer implements Resp {
   private static final int BUFFER_SIZE = 1024 * 1024;
   private static final int MAX_FRAME_SIZE = BUFFER_SIZE * 100;
 
+  private static final String DEFAULT_HOST = "localhost";
+  private static final int DEFAULT_PORT = 12345;
+
   private EventLoopGroup bossGroup;
   private EventLoopGroup workerGroup;
   private ChannelFuture future;
@@ -60,6 +64,10 @@ public class RespServer implements Resp {
 
   public RespServer(RespServerContext serverContext) {
     this.serverContext = requireNonNull(serverContext);
+  }
+  
+  public static Builder builder() {
+    return new Builder();
   }
 
   public void start() {
@@ -192,5 +200,30 @@ public class RespServer implements Resp {
     LOGGER.debug("closing future");
     future.syncUninterruptibly();
     LOGGER.debug("future closed");
+  }
+  
+  public static class Builder {
+    private String host = DEFAULT_HOST;
+    private int port = DEFAULT_PORT;
+    private CommandSuite commands = new CommandSuite();
+    
+    public Builder host(String host) {
+      this.host = host;
+      return this;
+    }
+    
+    public Builder port(int port) {
+      this.port = port;
+      return this;
+    }
+    
+    public Builder commands(CommandSuite commands) {
+      this.commands = commands;
+      return this;
+    }
+    
+    public RespServer build() {
+      return new RespServer(new RespServerContext(host, port, commands));
+    }
   }
 }

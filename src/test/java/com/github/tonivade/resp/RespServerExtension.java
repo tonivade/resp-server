@@ -8,21 +8,12 @@ import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
-import com.github.tonivade.resp.command.CommandSuite;
-
 public class RespServerExtension implements BeforeEachCallback, AfterEachCallback {
-
-  private static final String DEFAULT_HOST = "localhost";
-  private static final int DEFAULT_PORT = 12345;
 
   private final RespServer server;
 
   public RespServerExtension() {
-    this(DEFAULT_HOST, DEFAULT_PORT);
-  }
-
-  public RespServerExtension(String host, int port) {
-    this.server = new RespServer(new RespServerContext(host, port, new CommandSuite()));
+    this.server = RespServer.builder().build();
   }
   
   @Override
