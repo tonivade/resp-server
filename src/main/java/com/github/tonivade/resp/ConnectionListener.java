@@ -9,7 +9,7 @@ import io.netty.channel.EventLoop;
 class ConnectionListener implements ChannelFutureListener {
   private final RespClient client;
   
-  public ConnectionListener(RespClient client) {
+  ConnectionListener(RespClient client) {
     this.client = client;
   }
   

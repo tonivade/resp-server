@@ -22,7 +22,7 @@ class RespConnectionHandler extends ChannelInboundHandlerAdapter {
 
   private final Resp impl;
 
-  public RespConnectionHandler(Resp impl) {
+  RespConnectionHandler(Resp impl) {
     this.impl = impl;
   }
 

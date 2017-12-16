@@ -12,7 +12,7 @@ class RespInitializerHandler extends ChannelInitializer<SocketChannel> {
 
   private final Resp impl;
 
-  public RespInitializerHandler(Resp impl) {
+  RespInitializerHandler(Resp impl) {
     this.impl = impl;
   }
 
