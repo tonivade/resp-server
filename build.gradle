@@ -6,7 +6,7 @@ apply plugin: 'org.junit.platform.gradle.plugin'
 
 group = 'com.github.tonivade'
 archivesBaseName = 'resp-server'
-version = '0.9.0'
+version = '0.10.0-SNAPSHOT'
 
 configurations {
   codacy
