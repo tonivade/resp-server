@@ -72,7 +72,8 @@ issues at all, the same way as REDIS works.
 It's very easy, you only need 2 lines of code to start the server
 
 ```java
-    RespServer server = new RespServer(new RespServerContext("localhost", 12345, new CommandSuite()));
+    RespServer server = new RespServer.builder()
+      .host("localhost").port(12345).commands(new CommandSuite()).build();
     server.start();
 ```
 
@@ -135,12 +136,12 @@ is rejected with an error.
     <dependency>
         <groupId>com.github.tonivade</groupId>
         <artifactId>resp-server</artifactId>
-        <version>0.8.0</version>
+        <version>0.9.0</version>
     </dependency>
 
 ## Gradle
 
-    compile 'com.github.tonivade:resp-server:0.8.0'
+    compile 'com.github.tonivade:resp-server:0.9.0'
 
 ## Continuous Integration
 
