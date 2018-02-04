@@ -56,8 +56,7 @@ public class RedisDecoder extends ReplayingDecoder<Void> {
     return token;
   }
 
-  private RedisParser createParser(ByteBuf buffer)
-  {
+  private RedisParser createParser(ByteBuf buffer) {
     return new RedisParser(maxLength, new NettyRedisSource(this, buffer));
   }
 
