@@ -86,14 +86,14 @@ What a command looks like?
     @Command("ping")
     public class PingCommand implements RespCommand {
         @Override
-        public RedisToken execute(IRequest request) {
+        public RedisToken execute(Request request) {
             return RedisToken.status("PONG");
         }
     }
 ```
     
 A command must implement the interface `RespCommand`. This interface only defines
-the method `execute`, who receives a request object and returns a `RedisToken`.
+the method `execute`, who receives a `Request` object and returns a `RedisToken`.
 
 You can get the parameter of the command like this
 
@@ -106,7 +106,6 @@ we said that RESP is binary-safe, so, it means that you can receive anything. `S
 wraps the bytes received, but, don't worry, it's not going to be a problem, trust me.
 
 And you can response to a request this way:
-
 ```java
     return RedisToken.status("PONG");
 ```
@@ -122,7 +121,7 @@ the number of the parameter accepted for this command
     @ParamLength(1)
     public class EchoCommand implements RespCommand {
         @Override
-        public RedisToken execute(IRequest request) {
+        public RedisToken execute(Request request) {
             return RedisToken.string(request.getParam(0));
         }
     }
