@@ -62,7 +62,7 @@ repositories {
 
 dependencies {
     compile 'io.vavr:vavr:0.9.2'
-    compile 'io.netty:netty-all:4.1.20.Final'
+    compile 'io.netty:netty-all:4.1.21.Final'
     compile 'io.reactivex.rxjava2:rxjava:2.1.9'
     compile 'org.slf4j:slf4j-api:1.7.25'
     runtime 'ch.qos.logback:logback-classic:1.2.3'
