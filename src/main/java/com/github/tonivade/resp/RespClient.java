@@ -102,7 +102,9 @@ public class RespClient implements Resp {
     if (this.context != null) {
       callback.onDisconnect();
       this.context = null;
-      future.channel().eventLoop().schedule(this::start, 1L, TimeUnit.SECONDS);
+      if (future != null) {
+        future.channel().eventLoop().schedule(this::start, 1L, TimeUnit.SECONDS);
+      }
     }
   }
 
