@@ -16,7 +16,7 @@ buildscript {
 
     dependencies {
         classpath 'com.bmuschko:gradle-nexus-plugin:2.3.1'
-        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.1.0'
+        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.2.0'
     }
 }
 
@@ -63,9 +63,9 @@ dependencies {
     compile 'org.slf4j:slf4j-api:1.7.25'
     runtime 'ch.qos.logback:logback-classic:1.2.3'
     compile 'com.github.tonivade:equalizer:0.2.0'
-    testCompile 'org.junit.jupiter:junit-jupiter-engine:5.1.0'
-    testCompile 'org.junit.platform:junit-platform-runner:1.1.0'
-    testCompile 'org.mockito:mockito-core:2.17.0'
+    testCompile 'org.junit.jupiter:junit-jupiter-engine:5.2.0'
+    testCompile 'org.junit.platform:junit-platform-runner:1.2.0'
+    testCompile 'org.mockito:mockito-core:2.18.3'
     testCompile 'org.hamcrest:hamcrest-library:1.3'
 }
 
