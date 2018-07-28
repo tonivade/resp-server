@@ -4,7 +4,8 @@
  */
 package com.github.tonivade.resp.protocol.test;
 
-import static tonivade.equalizer.Equalizer.equalizer;
+import static com.github.tonivade.equalizer.Equalizer.comparing;
+import static com.github.tonivade.equalizer.Equalizer.equalizer;
 
 import java.util.Objects;
 
@@ -33,8 +34,8 @@ public class Data {
   @Override
   public boolean equals(Object obj) {
     return equalizer(this)
-        .append((a, b) -> Objects.equals(a.id, b.id))
-        .append((a, b) -> Objects.equals(a.value, b.value))
+        .append(comparing(Data::getId))
+        .append(comparing(Data::getValue))
         .applyTo(obj);
   }
 

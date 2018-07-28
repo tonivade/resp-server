@@ -4,9 +4,10 @@
  */
 package com.github.tonivade.resp.protocol;
 
+import static com.github.tonivade.equalizer.Equalizer.comparing;
+import static com.github.tonivade.equalizer.Equalizer.equalizer;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Objects.requireNonNull;
-import static tonivade.equalizer.Equalizer.equalizer;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -41,7 +42,7 @@ public abstract class AbstractRedisToken<T> implements RedisToken {
   @Override
   public boolean equals(Object obj) {
     return equalizer(this)
-        .append((one, other) -> Objects.equals(one.value, other.value))
+        .append(comparing(AbstractRedisToken::getValue))
         .applyTo(obj);
   }
 
@@ -54,7 +55,7 @@ public abstract class AbstractRedisToken<T> implements RedisToken {
     UnknownRedisToken(SafeString value) {
       super(RedisTokenType.UNKNOWN, value);
     }
-    
+
     @Override
     public <T> T accept(RedisTokenVisitor<T> visitor) {
       return visitor.unknown(this);
@@ -65,7 +66,7 @@ public abstract class AbstractRedisToken<T> implements RedisToken {
     StringRedisToken(SafeString value) {
       super(RedisTokenType.STRING, value);
     }
-    
+
     @Override
     public <T> T accept(RedisTokenVisitor<T> visitor) {
       return visitor.string(this);
@@ -76,7 +77,7 @@ public abstract class AbstractRedisToken<T> implements RedisToken {
     StatusRedisToken(String value) {
       super(RedisTokenType.STATUS, value);
     }
-    
+
     @Override
     public <T> T accept(RedisTokenVisitor<T> visitor) {
       return visitor.status(this);
@@ -87,7 +88,7 @@ public abstract class AbstractRedisToken<T> implements RedisToken {
     ErrorRedisToken(String value) {
       super(RedisTokenType.ERROR, value);
     }
-    
+
     @Override
     public <T> T accept(RedisTokenVisitor<T> visitor) {
       return visitor.error(this);
@@ -98,7 +99,7 @@ public abstract class AbstractRedisToken<T> implements RedisToken {
     IntegerRedisToken(Integer value) {
       super(RedisTokenType.INTEGER, value);
     }
-    
+
     @Override
     public <T> T accept(RedisTokenVisitor<T> visitor) {
       return visitor.integer(this);
@@ -109,7 +110,7 @@ public abstract class AbstractRedisToken<T> implements RedisToken {
     ArrayRedisToken(Collection<RedisToken> value) {
       super(RedisTokenType.ARRAY, unmodifiableList(new ArrayList<>(value)));
     }
-    
+
     @Override
     public <T> T accept(RedisTokenVisitor<T> visitor) {
       return visitor.array(this);

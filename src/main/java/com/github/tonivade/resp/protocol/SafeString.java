@@ -4,9 +4,9 @@
  */
 package com.github.tonivade.resp.protocol;
 
+import static com.github.tonivade.equalizer.Equalizer.equalizer;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
-import static tonivade.equalizer.Equalizer.equalizer;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -63,8 +63,8 @@ public class SafeString implements Comparable<SafeString>, Serializable {
   }
 
   @Override
-  public int compareTo(SafeString o) {
-    return compare(getBytes(), o.getBytes());
+  public int compareTo(SafeString other) {
+    return compare(this.getBytes(), other.getBytes());
   }
 
   @Override
