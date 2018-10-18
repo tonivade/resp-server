@@ -5,15 +5,15 @@
 package com.github.tonivade.resp.command;
 
 import java.util.List;
-import java.util.Optional;
 
+import com.github.tonivade.purefun.type.Option;
 import com.github.tonivade.resp.protocol.SafeString;
 
 public interface Request {
   String getCommand();
   List<SafeString> getParams();
   SafeString getParam(int i);
-  Optional<SafeString> getOptionalParam(int i);
+  Option<SafeString> getOptionalParam(int i);
   int getLength();
   boolean isEmpty();
   Session getSession();

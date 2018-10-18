@@ -4,8 +4,7 @@
  */
 package com.github.tonivade.resp.command;
 
-import java.util.Optional;
-
+import com.github.tonivade.purefun.type.Option;
 import com.github.tonivade.resp.StateHolder;
 import com.github.tonivade.resp.protocol.RedisToken;
 
@@ -45,12 +44,12 @@ public class DefaultSession implements Session {
   }
 
   @Override
-  public <T> Optional<T> getValue(String key) {
+  public <T> Option<T> getValue(String key) {
     return state.getValue(key);
   }
 
   @Override
-  public <T> Optional<T> removeValue(String key) {
+  public <T> Option<T> removeValue(String key) {
     return state.removeValue(key);
   }
 

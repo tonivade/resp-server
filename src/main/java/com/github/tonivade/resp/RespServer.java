@@ -11,7 +11,6 @@ import static java.util.stream.Collectors.toList;
 
 import java.net.InetSocketAddress;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.slf4j.Logger;
@@ -19,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.tonivade.purefun.Matcher1;
 import com.github.tonivade.purefun.Pattern1;
+import com.github.tonivade.purefun.type.Option;
 import com.github.tonivade.resp.command.CommandSuite;
 import com.github.tonivade.resp.command.DefaultRequest;
 import com.github.tonivade.resp.command.DefaultSession;
@@ -142,14 +142,14 @@ public class RespServer implements Resp {
       .ifPresent(serverContext::processCommand);
   }
 
-  private Optional<Request> parseMessage(RedisToken message, Session session) {
-    return Pattern1.<RedisToken, Optional<Request>>build()
+  private Option<Request> parseMessage(RedisToken message, Session session) {
+    return Pattern1.<RedisToken, Option<Request>>build()
         .when(Matcher1.instanceOf(ArrayRedisToken.class))
-          .then(token -> Optional.of(parseArray((ArrayRedisToken) token, session)))
+          .then(token -> Option.some(parseArray((ArrayRedisToken) token, session)))
         .when(Matcher1.instanceOf(UnknownRedisToken.class))
-          .then(token -> Optional.of(parseLine((UnknownRedisToken) token, session)))
+          .then(token -> Option.some(parseLine((UnknownRedisToken) token, session)))
         .otherwise()
-          .then(token -> Optional.empty())
+          .then(token -> Option.none())
         .apply(message);
   }
 

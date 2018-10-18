@@ -7,10 +7,10 @@ package com.github.tonivade.resp;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 
-import java.util.Optional;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import com.github.tonivade.purefun.type.Option;
 
 public class StateHolderTest {
   
@@ -28,29 +28,29 @@ public class StateHolderTest {
   public void exists() {
     state.putValue(KEY, VALUE);
 
-    assertThat(state.getValue(KEY), equalTo(Optional.of(VALUE)));
+    assertThat(state.getValue(KEY), equalTo(Option.some(VALUE)));
   }
   
   @Test
   public void notExists() {
-    assertThat(state.getValue(KEY), equalTo(Optional.empty()));
+    assertThat(state.getValue(KEY), equalTo(Option.none()));
   }
   
   @Test
   public void remove() {
     state.putValue(KEY, VALUE);
 
-    assertThat(state.removeValue(KEY), equalTo(Optional.of(VALUE)));
-    assertThat(state.getValue(KEY), equalTo(Optional.empty()));
+    assertThat(state.removeValue(KEY), equalTo(Option.some(VALUE)));
+    assertThat(state.getValue(KEY), equalTo(Option.none()));
   }
   
   @Test
   public void clear() {
     state.putValue(KEY, VALUE);
-    assertThat(state.getValue(KEY), equalTo(Optional.of(VALUE)));
+    assertThat(state.getValue(KEY), equalTo(Option.some(VALUE)));
 
     state.clear();
-    assertThat(state.getValue(KEY), equalTo(Optional.empty()));
+    assertThat(state.getValue(KEY), equalTo(Option.none()));
   }
 
 }

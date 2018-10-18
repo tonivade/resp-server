@@ -8,8 +8,8 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
+import com.github.tonivade.purefun.type.Option;
 import com.github.tonivade.resp.protocol.SafeString;
 
 public class DefaultRequest implements Request {
@@ -48,8 +48,8 @@ public class DefaultRequest implements Request {
   }
 
   @Override
-  public Optional<SafeString> getOptionalParam(int i) {
-    return Optional.ofNullable(getParam(i));
+  public Option<SafeString> getOptionalParam(int i) {
+    return Option.of(() -> getParam(i));
   }
 
   @Override

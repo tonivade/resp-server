@@ -7,7 +7,6 @@ package com.github.tonivade.resp;
 import static com.github.tonivade.resp.SessionListener.nullListener;
 import static java.util.Objects.requireNonNull;
 
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.function.Function;
@@ -15,6 +14,7 @@ import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.tonivade.purefun.type.Option;
 import com.github.tonivade.resp.command.CommandSuite;
 import com.github.tonivade.resp.command.Request;
 import com.github.tonivade.resp.command.RespCommand;
@@ -69,12 +69,12 @@ public class RespServerContext implements ServerContext {
   }
 
   @Override
-  public <T> Optional<T> getValue(String key) {
+  public <T> Option<T> getValue(String key) {
     return state.getValue(key);
   }
 
   @Override
-  public <T> Optional<T> removeValue(String key) {
+  public <T> Option<T> removeValue(String key) {
     return state.removeValue(key);
   }
 

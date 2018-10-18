@@ -4,8 +4,7 @@
  */
 package com.github.tonivade.resp.command;
 
-import java.util.Optional;
-
+import com.github.tonivade.purefun.type.Option;
 import com.github.tonivade.resp.protocol.RedisToken;
 
 public interface Session {
@@ -13,7 +12,7 @@ public interface Session {
   void publish(RedisToken msg);
   void close();
   void destroy();
-  <T> Optional<T> getValue(String key);
+  <T> Option<T> getValue(String key);
   void putValue(String key, Object value);
-  <T> Optional<T> removeValue(String key);
+  <T> Option<T> removeValue(String key);
 }
