@@ -4,32 +4,38 @@
  */
 package com.github.tonivade.resp.protocol;
 
+import static com.github.tonivade.purefun.Matcher1.instanceOf;
 import static com.github.tonivade.resp.protocol.RedisToken.string;
-import static io.vavr.API.$;
-import static io.vavr.API.Case;
-import static io.vavr.API.Match;
-import static io.vavr.Predicates.instanceOf;
 import static java.util.stream.Collectors.toList;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Map;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import io.vavr.control.Try;
+import com.github.tonivade.purefun.Matcher1;
+import com.github.tonivade.purefun.Pattern1;
+import com.github.tonivade.purefun.type.Try;
 
 public class RespSerializer {
 
   public RedisToken getValue(Object object) {
-    return Match(object).of(
-        Case($(isPrimitive()), this::getStringValue),
-        Case($(instanceOf(Object[].class)), this::getArrayValue),
-        Case($(instanceOf(Number.class)), this::getStringValue),
-        Case($(instanceOf(String.class)), this::getStringValue),
-        Case($(instanceOf(Collection.class)), this::getCollectionValue),
-        Case($(instanceOf(Map.class)), this::getMapValue),
-        Case($(), this::getObjectValue));
+    return Pattern1.<Object, RedisToken>build()
+        .when(isPrimitive())
+          .then(this::getStringValue)
+        .when(instanceOf(Object[].class))
+          .then(array -> getArrayValue((Object[]) array))
+        .when(instanceOf(Number.class))
+          .then(this::getStringValue)
+        .when(instanceOf(String.class))
+          .then(this::getStringValue)
+        .when(instanceOf(Collection.class))
+          .then(collection -> getCollectionValue((Collection<?>) collection))
+        .when(instanceOf(Map.class))
+          .then(map -> getMapValue((Map<?, ?>) map))
+        .otherwise()
+          .then(this::getObjectValue)
+        .apply(object);
   }
 
   private RedisToken getMapValue(Map<?, ?> map) {
@@ -54,7 +60,7 @@ public class RespSerializer {
   }
 
   private Object tryGetFieldValue(Object object, Field field) {
-    return Try.of(() -> getFieldValue(object, field)).get();
+    return Try.of(() -> getFieldValue(object, field)).orElse(null);
   }
 
   private Object getFieldValue(Object object, Field field) 
@@ -67,7 +73,7 @@ public class RespSerializer {
     return string(String.valueOf(value));
   }
 
-  private Predicate<? super Object> isPrimitive() {
+  private Matcher1<Object> isPrimitive() {
     return object -> object.getClass().isPrimitive();
   }
 }

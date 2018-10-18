@@ -6,10 +6,6 @@ package com.github.tonivade.resp;
 
 import static com.github.tonivade.resp.protocol.SafeString.safeAsList;
 import static com.github.tonivade.resp.protocol.SafeString.safeString;
-import static io.vavr.API.$;
-import static io.vavr.API.Case;
-import static io.vavr.API.Match;
-import static io.vavr.Predicates.instanceOf;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 
@@ -21,6 +17,8 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.tonivade.purefun.Matcher1;
+import com.github.tonivade.purefun.Pattern1;
 import com.github.tonivade.resp.command.CommandSuite;
 import com.github.tonivade.resp.command.DefaultRequest;
 import com.github.tonivade.resp.command.DefaultSession;
@@ -145,10 +143,14 @@ public class RespServer implements Resp {
   }
 
   private Optional<Request> parseMessage(RedisToken message, Session session) {
-    return Match(message)
-        .of(Case($(instanceOf(ArrayRedisToken.class)), token -> Optional.of(parseArray(token, session))),
-            Case($(instanceOf(UnknownRedisToken.class)), token -> Optional.of(parseLine(token, session))),
-            Case($(), token -> Optional.empty()));
+    return Pattern1.<RedisToken, Optional<Request>>build()
+        .when(Matcher1.instanceOf(ArrayRedisToken.class))
+          .then(token -> Optional.of(parseArray((ArrayRedisToken) token, session)))
+        .when(Matcher1.instanceOf(UnknownRedisToken.class))
+          .then(token -> Optional.of(parseLine((UnknownRedisToken) token, session)))
+        .otherwise()
+          .then(token -> Optional.empty())
+        .apply(message);
   }
 
   private Request parseLine(UnknownRedisToken message, Session session) {
@@ -171,9 +173,12 @@ public class RespServer implements Resp {
   }
 
   private Stream<SafeString> toSafeStrings(RedisToken token) {
-    return Match(token)
-             .of(Case($(instanceOf(StringRedisToken.class)), string -> Stream.of(string.getValue())),
-                 Case($(), Stream.empty()));
+    return Pattern1.<RedisToken, Stream<SafeString>>build()
+        .when(Matcher1.instanceOf(StringRedisToken.class))
+          .then(string -> Stream.of(((StringRedisToken) string).getValue()))
+        .otherwise()
+          .returns(Stream.empty())
+        .apply(token);
   }
 
   private String sourceKey(Channel channel) {

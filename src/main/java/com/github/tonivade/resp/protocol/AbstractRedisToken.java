@@ -4,14 +4,15 @@
  */
 package com.github.tonivade.resp.protocol;
 
-import static com.github.tonivade.equalizer.Equalizer.comparing;
-import static com.github.tonivade.equalizer.Equalizer.equalizer;
+import static com.github.tonivade.purefun.typeclasses.Equal.comparing;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
+
+import com.github.tonivade.purefun.typeclasses.Equal;
 
 public abstract class AbstractRedisToken<T> implements RedisToken {
 
@@ -41,7 +42,7 @@ public abstract class AbstractRedisToken<T> implements RedisToken {
 
   @Override
   public boolean equals(Object obj) {
-    return equalizer(this)
+    return Equal.of(this)
         .append(comparing(AbstractRedisToken::getValue))
         .applyTo(obj);
   }

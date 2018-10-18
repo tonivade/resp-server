@@ -11,13 +11,12 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.tonivade.purefun.type.Try;
 import com.github.tonivade.resp.annotation.Command;
 import com.github.tonivade.resp.command.server.EchoCommand;
 import com.github.tonivade.resp.command.server.PingCommand;
 import com.github.tonivade.resp.command.server.QuitCommand;
 import com.github.tonivade.resp.command.server.TimeCommand;
-
-import io.vavr.control.Try;
 
 public class CommandSuite {
 

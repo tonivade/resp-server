@@ -4,7 +4,6 @@
  */
 package com.github.tonivade.resp.protocol;
 
-import static com.github.tonivade.equalizer.Equalizer.equalizer;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 
@@ -17,6 +16,8 @@ import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
+
+import com.github.tonivade.purefun.typeclasses.Equal;
 
 public class SafeString implements Comparable<SafeString>, Serializable {
 
@@ -59,7 +60,7 @@ public class SafeString implements Comparable<SafeString>, Serializable {
 
   @Override
   public boolean equals(Object obj) {
-    return equalizer(this).append((one, other) -> Objects.equals(one.buffer, other.buffer)).applyTo(obj);
+    return Equal.of(this).append((one, other) -> Objects.equals(one.buffer, other.buffer)).applyTo(obj);
   }
 
   @Override

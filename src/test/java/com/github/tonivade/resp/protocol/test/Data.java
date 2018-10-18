@@ -4,10 +4,11 @@
  */
 package com.github.tonivade.resp.protocol.test;
 
-import static com.github.tonivade.equalizer.Equalizer.comparing;
-import static com.github.tonivade.equalizer.Equalizer.equalizer;
+import static com.github.tonivade.purefun.typeclasses.Equal.comparing;
 
 import java.util.Objects;
+
+import com.github.tonivade.purefun.typeclasses.Equal;
 
 public class Data {
   private final int id;
@@ -33,7 +34,7 @@ public class Data {
 
   @Override
   public boolean equals(Object obj) {
-    return equalizer(this)
+    return Equal.of(this)
         .append(comparing(Data::getId))
         .append(comparing(Data::getValue))
         .applyTo(obj);
