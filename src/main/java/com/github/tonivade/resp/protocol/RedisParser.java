@@ -4,13 +4,14 @@
  */
 package com.github.tonivade.resp.protocol;
 
+import static com.github.tonivade.resp.protocol.RedisToken.array;
 import static com.github.tonivade.resp.protocol.RedisToken.error;
 import static com.github.tonivade.resp.protocol.RedisToken.status;
+import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.github.tonivade.resp.protocol.AbstractRedisToken.ArrayRedisToken;
 import com.github.tonivade.resp.protocol.AbstractRedisToken.IntegerRedisToken;
 import com.github.tonivade.resp.protocol.AbstractRedisToken.StringRedisToken;
 import com.github.tonivade.resp.protocol.AbstractRedisToken.UnknownRedisToken;
@@ -28,7 +29,7 @@ public class RedisParser {
 
   public RedisParser(int maxLength, RedisSource source) {
     this.maxLength = maxLength;
-    this.source = source;
+    this.source = requireNonNull(source);
   }
 
   public RedisToken parse() {
@@ -56,12 +57,12 @@ public class RedisParser {
     return token;
   }
 
-  private IntegerRedisToken parseIntegerToken(SafeString line) {
+  private RedisToken parseIntegerToken(SafeString line) {
     Integer value = Integer.valueOf(line.substring(1));
     return new IntegerRedisToken(value);
   }
 
-  private StringRedisToken parseStringToken(SafeString line) {
+  private RedisToken parseStringToken(SafeString line) {
     StringRedisToken token;
     int length = Integer.parseInt(line.substring(1));
     if (length > 0 && length < maxLength) {
@@ -72,14 +73,13 @@ public class RedisParser {
     return token;
   }
 
-  private ArrayRedisToken parseArray(int size) {
+  private RedisToken parseArray(int size) {
     List<RedisToken> array = new ArrayList<>(size);
 
     for (int i = 0; i < size; i++) {
       array.add(parseToken(source.readLine()));
     }
 
-    return new ArrayRedisToken(array);
+    return array(array);
   }
-
 }

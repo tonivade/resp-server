@@ -5,10 +5,12 @@
 package com.github.tonivade.resp.protocol;
 
 import static com.github.tonivade.resp.protocol.SafeString.safeString;
-import static java.util.Arrays.asList;
+
 import java.util.Collection;
 import java.util.stream.Stream;
 
+import com.github.tonivade.purefun.data.ImmutableList;
+import com.github.tonivade.purefun.data.Sequence;
 import com.github.tonivade.resp.protocol.AbstractRedisToken.ArrayRedisToken;
 import com.github.tonivade.resp.protocol.AbstractRedisToken.ErrorRedisToken;
 import com.github.tonivade.resp.protocol.AbstractRedisToken.IntegerRedisToken;
@@ -56,15 +58,18 @@ public interface RedisToken {
   }
 
   static RedisToken array(RedisToken... redisTokens) {
-    return new ArrayRedisToken(asList(redisTokens));
+    return new ArrayRedisToken(ImmutableList.of(redisTokens));
   }
 
   static RedisToken array(Collection<RedisToken> redisTokens) {
-    return new ArrayRedisToken(redisTokens);
+    return new ArrayRedisToken(ImmutableList.from(redisTokens));
   }
 
-  public static <T> Stream<T> visit(Stream<RedisToken> tokens, RedisTokenVisitor<T> visitor)
-  {
+  static RedisToken array(Sequence<RedisToken> redisTokens) {
+    return new ArrayRedisToken(redisTokens.asArray());
+  }
+
+  static <T> Stream<T> visit(Stream<RedisToken> tokens, RedisTokenVisitor<T> visitor) {
     return tokens.map(token -> token.accept(visitor));
   }
 }

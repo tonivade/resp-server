@@ -6,8 +6,8 @@ package com.github.tonivade.resp.protocol;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-import java.util.Collection;
 
+import com.github.tonivade.purefun.data.Sequence;
 import com.github.tonivade.resp.protocol.AbstractRedisToken.ArrayRedisToken;
 import com.github.tonivade.resp.protocol.AbstractRedisToken.ErrorRedisToken;
 import com.github.tonivade.resp.protocol.AbstractRedisToken.IntegerRedisToken;
@@ -82,7 +82,7 @@ public class RedisSerializer {
     builder.append(ERROR).append(str.getBytes()).append(DELIMITER);
   }
 
-  private void addArray(Collection<RedisToken> array) {
+  private void addArray(Sequence<RedisToken> array) {
     if (array != null) {
       builder.append(ARRAY).append(array.size()).append(DELIMITER);
       for (RedisToken token : array) {
