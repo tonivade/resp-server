@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.tonivade.purefun.Matcher1;
 import com.github.tonivade.purefun.Pattern1;
+import com.github.tonivade.purefun.data.ImmutableArray;
 import com.github.tonivade.purefun.type.Option;
 import com.github.tonivade.resp.command.CommandSuite;
 import com.github.tonivade.resp.command.DefaultRequest;
@@ -57,13 +58,13 @@ public class RespServer implements Resp {
   private EventLoopGroup bossGroup;
   private EventLoopGroup workerGroup;
   private ChannelFuture future;
-  
+
   private final RespServerContext serverContext;
 
   public RespServer(RespServerContext serverContext) {
     this.serverContext = requireNonNull(serverContext);
   }
-  
+
   public static Builder builder() {
     return new Builder();
   }
@@ -85,7 +86,7 @@ public class RespServer implements Resp {
     future = bootstrap.bind(serverContext.getHost(), serverContext.getPort());
     // Bind and start to accept incoming connections.
     future.syncUninterruptibly();
-    
+
     serverContext.start();
 
     LOGGER.info("server started: {}:{}", serverContext.getHost(), serverContext.getPort());
@@ -158,12 +159,12 @@ public class RespServer implements Resp {
     String[] params = command.toString().split(" ");
     String[] array = new String[params.length - 1];
     System.arraycopy(params, 1, array, 0, array.length);
-    return new DefaultRequest(serverContext, session, safeString(params[0]), safeAsList(array));
+    return new DefaultRequest(serverContext, session, safeString(params[0]), ImmutableArray.from(safeAsList(array)));
   }
 
   private Request parseArray(ArrayRedisToken message, Session session) {
     List<SafeString> params = toParams(message);
-    return new DefaultRequest(serverContext, session, params.remove(0), params);
+    return new DefaultRequest(serverContext, session, params.remove(0), ImmutableArray.from(params));
   }
 
   private List<SafeString> toParams(ArrayRedisToken message) {
@@ -200,33 +201,33 @@ public class RespServer implements Resp {
     }
     return null;
   }
-  
+
   private void closeFuture(Future<?> future) {
     LOGGER.debug("closing future");
     future.syncUninterruptibly();
     LOGGER.debug("future closed");
   }
-  
+
   public static class Builder {
     private String host = DEFAULT_HOST;
     private int port = DEFAULT_PORT;
     private CommandSuite commands = new CommandSuite();
-    
+
     public Builder host(String host) {
       this.host = host;
       return this;
     }
-    
+
     public Builder port(int port) {
       this.port = port;
       return this;
     }
-    
+
     public Builder commands(CommandSuite commands) {
       this.commands = commands;
       return this;
     }
-    
+
     public RespServer build() {
       return new RespServer(new RespServerContext(host, port, commands));
     }

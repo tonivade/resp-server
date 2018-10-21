@@ -4,14 +4,13 @@
  */
 package com.github.tonivade.resp.command;
 
-import java.util.List;
-
+import com.github.tonivade.purefun.data.ImmutableArray;
 import com.github.tonivade.purefun.type.Option;
 import com.github.tonivade.resp.protocol.SafeString;
 
 public interface Request {
   String getCommand();
-  List<SafeString> getParams();
+  ImmutableArray<SafeString> getParams();
   SafeString getParam(int i);
   Option<SafeString> getOptionalParam(int i);
   int getLength();

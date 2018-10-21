@@ -20,6 +20,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
+import com.github.tonivade.purefun.data.ImmutableArray;
 import com.github.tonivade.resp.protocol.RedisToken;
 import com.github.tonivade.resp.protocol.SafeString;
 
@@ -68,7 +69,7 @@ public class CommandRule {
 
   public CommandRule withParams(String... params) {
     if (params != null) {
-      when(request.getParams()).thenReturn(safeAsList(params));
+      when(request.getParams()).thenReturn(ImmutableArray.from(safeAsList(params)));
       int i = 0;
       for (String param : params) {
         when(request.getParam(i++)).thenReturn(safeString(param));

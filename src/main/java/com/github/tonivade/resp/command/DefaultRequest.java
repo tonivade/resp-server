@@ -6,9 +6,7 @@ package com.github.tonivade.resp.command;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.Collections;
-import java.util.List;
-
+import com.github.tonivade.purefun.data.ImmutableArray;
 import com.github.tonivade.purefun.type.Option;
 import com.github.tonivade.resp.protocol.SafeString;
 
@@ -16,13 +14,13 @@ public class DefaultRequest implements Request {
 
   private final SafeString command;
 
-  private final List<SafeString> params;
+  private final ImmutableArray<SafeString> params;
 
   private final Session session;
 
   private final ServerContext server;
 
-  public DefaultRequest(ServerContext server, Session session, SafeString command, List<SafeString> params) {
+  public DefaultRequest(ServerContext server, Session session, SafeString command, ImmutableArray<SafeString> params) {
     this.server = server;
     this.session = session;
     this.command = requireNonNull(command);
@@ -35,8 +33,8 @@ public class DefaultRequest implements Request {
   }
 
   @Override
-  public List<SafeString> getParams() {
-    return Collections.unmodifiableList(params);
+  public ImmutableArray<SafeString> getParams() {
+    return params;
   }
 
   @Override
