@@ -4,6 +4,7 @@
  */
 package com.github.tonivade.resp.protocol;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 
@@ -12,7 +13,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -25,7 +25,6 @@ public class SafeString implements Comparable<SafeString>, Serializable {
 
   public static final SafeString EMPTY_STRING = new SafeString(new byte[] {});
 
-  private static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
   private static final char[] CHARS = "0123456789ABCDEF".toCharArray();
 
   private transient ByteBuffer buffer;
@@ -60,7 +59,9 @@ public class SafeString implements Comparable<SafeString>, Serializable {
 
   @Override
   public boolean equals(Object obj) {
-    return Equal.of(this).append((one, other) -> Objects.equals(one.buffer, other.buffer)).applyTo(obj);
+    return Equal.of(this)
+        .append((one, other) -> Objects.equals(one.buffer, other.buffer))
+        .applyTo(obj);
   }
 
   @Override
@@ -70,7 +71,7 @@ public class SafeString implements Comparable<SafeString>, Serializable {
 
   @Override
   public String toString() {
-    return DEFAULT_CHARSET.decode(buffer.duplicate()).toString();
+    return UTF_8.decode(buffer.duplicate()).toString();
   }
 
   public String toHexString() {
@@ -84,7 +85,7 @@ public class SafeString implements Comparable<SafeString>, Serializable {
   }
 
   public static SafeString safeString(String str) {
-    return new SafeString(DEFAULT_CHARSET.encode(requireNonNull(str)));
+    return new SafeString(UTF_8.encode(requireNonNull(str)));
   }
 
   public static SafeString fromHexString(String string) {

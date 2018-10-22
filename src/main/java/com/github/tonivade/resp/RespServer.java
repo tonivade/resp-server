@@ -150,7 +150,7 @@ public class RespServer implements Resp {
         .when(Matcher1.instanceOf(UnknownRedisToken.class))
           .then(token -> Option.some(parseLine((UnknownRedisToken) token, session)))
         .otherwise()
-          .then(token -> Option.none())
+          .returns(Option.none())
         .apply(message);
   }
 
