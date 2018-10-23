@@ -57,7 +57,7 @@ repositories {
 
 dependencies {
   compile 'io.netty:netty-all:4.1.30.Final'
-  compile 'io.reactivex.rxjava2:rxjava:2.2.2'
+  compile 'io.reactivex.rxjava2:rxjava:2.2.3'
   compile 'org.slf4j:slf4j-api:1.7.25'
   runtime 'ch.qos.logback:logback-classic:1.2.3'
   compile 'com.github.tonivade:purefun:0.6.0-SNAPSHOT'
