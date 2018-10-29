@@ -24,7 +24,7 @@ public class SafeStringTest {
 
     assertThat(new SafeString(str.getBuffer()), is(str));
     assertThat(str.length(), is(11));
-    assertThat(str.toHexString(), is("486F6C61204D756E646F21"));
+    assertThat(str.toHexString(), is("486f6c61204d756e646f21"));
     assertThat(str.toString(), is("Hola Mundo!"));
   }
 

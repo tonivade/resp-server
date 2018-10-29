@@ -25,7 +25,7 @@ public class SafeString implements Comparable<SafeString>, Serializable {
 
   public static final SafeString EMPTY_STRING = new SafeString(new byte[] {});
 
-  private static final char[] CHARS = "0123456789ABCDEF".toCharArray();
+  private static final char[] CHARS = "0123456789abcdef".toCharArray();
 
   private transient ByteBuffer buffer;
 
