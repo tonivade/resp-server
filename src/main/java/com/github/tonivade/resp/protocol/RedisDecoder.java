@@ -51,7 +51,7 @@ public class RedisDecoder extends ReplayingDecoder<Void> {
   }
 
   private RedisToken parseResponse(ByteBuf buffer) {
-    RedisToken token = createParser(buffer).parse();
+    RedisToken token = createParser(buffer).next();
     checkpoint();
     return token;
   }
@@ -67,6 +67,11 @@ public class RedisDecoder extends ReplayingDecoder<Void> {
     public NettyRedisSource(RedisDecoder decoder, ByteBuf buffer) {
       this.decoder = decoder;
       this.buffer = buffer;
+    }
+
+    @Override
+    public int available() {
+      return decoder.actualReadableBytes();
     }
 
     @Override

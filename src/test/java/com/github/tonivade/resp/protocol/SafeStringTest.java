@@ -4,6 +4,7 @@
  */
 package com.github.tonivade.resp.protocol;
 
+import static com.github.tonivade.resp.protocol.SafeString.fromHexString;
 import static com.github.tonivade.resp.protocol.SafeString.safeAsList;
 import static com.github.tonivade.resp.protocol.SafeString.safeString;
 import static org.hamcrest.CoreMatchers.is;
@@ -26,6 +27,7 @@ public class SafeStringTest {
     assertThat(str.length(), is(11));
     assertThat(str.toHexString(), is("486f6c61204d756e646f21"));
     assertThat(str.toString(), is("Hola Mundo!"));
+    assertThat(fromHexString(str.toHexString()), is(str));
   }
 
   @Test

@@ -8,15 +8,20 @@ import static com.github.tonivade.resp.protocol.RedisToken.array;
 import static com.github.tonivade.resp.protocol.RedisToken.error;
 import static com.github.tonivade.resp.protocol.RedisToken.status;
 import static java.util.Objects.requireNonNull;
+import static java.util.Spliterators.spliteratorUnknownSize;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Spliterator;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import com.github.tonivade.resp.protocol.AbstractRedisToken.IntegerRedisToken;
 import com.github.tonivade.resp.protocol.AbstractRedisToken.StringRedisToken;
 import com.github.tonivade.resp.protocol.AbstractRedisToken.UnknownRedisToken;
 
-public class RedisParser {
+public class RedisParser implements Iterator<RedisToken> {
 
   private static final byte STRING_PREFIX = '$';
   private static final byte INTEGER_PREFIX = ':';
@@ -32,8 +37,18 @@ public class RedisParser {
     this.source = requireNonNull(source);
   }
 
-  public RedisToken parse() {
+  @Override
+  public boolean hasNext() {
+    return source.available() > 0;
+  }
+
+  @Override
+  public RedisToken next() {
     return parseToken(source.readLine());
+  }
+
+  public <T> Stream<T> stream(Iterator<T> iterator) {
+    return StreamSupport.stream(spliteratorUnknownSize(iterator, Spliterator.ORDERED), false);
   }
 
   private RedisToken parseToken(SafeString line) {
