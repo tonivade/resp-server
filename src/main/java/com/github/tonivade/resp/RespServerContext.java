@@ -37,25 +37,26 @@ public class RespServerContext implements ServerContext {
   private final int port;
   private final CommandSuite commands;
   private SessionListener sessionListener;
-  
+
   public RespServerContext(String host, int port, CommandSuite commands) {
     this(host, port, commands, nullListener());
   }
-  
-  public RespServerContext(String host, int port, CommandSuite commands, 
+
+  public RespServerContext(String host, int port, CommandSuite commands,
                            SessionListener sessionListener) {
     this.host = requireNonNull(host);
     this.port = requireRange(port, 1024, 65535);
     this.commands = requireNonNull(commands);
     this.sessionListener = sessionListener;
   }
-  
+
   public void start() {
-    
+
   }
-  
+
   public void stop() {
     clear();
+    scheduler.shutdown();
   }
 
   @Override
@@ -82,7 +83,7 @@ public class RespServerContext implements ServerContext {
   public void putValue(String key, Object value) {
     state.putValue(key, value);
   }
-  
+
   @Override
   public String getHost() {
     return host;

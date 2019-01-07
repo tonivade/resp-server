@@ -5,7 +5,7 @@ apply plugin: 'com.bmuschko.nexus'
 
 group = 'com.github.tonivade'
 archivesBaseName = 'resp-server'
-version = '0.14.0-SNAPSHOP'
+version = '0.14.0-SNAPSHOT'
 
 buildscript {
   repositories {
