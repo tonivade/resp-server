@@ -60,10 +60,10 @@ public class RespSerializer {
   }
 
   private Object tryGetFieldValue(Object object, Field field) {
-    return Try.of(() -> getFieldValue(object, field)).orElse(null);
+    return Try.of(() -> getFieldValue(object, field)).getOrElse(null);
   }
 
-  private Object getFieldValue(Object object, Field field) 
+  private Object getFieldValue(Object object, Field field)
       throws IllegalArgumentException, IllegalAccessException {
     field.setAccessible(true);
     return field.get(object);
