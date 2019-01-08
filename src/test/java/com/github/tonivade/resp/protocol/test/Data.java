@@ -4,7 +4,7 @@
  */
 package com.github.tonivade.resp.protocol.test;
 
-import static com.github.tonivade.purefun.typeclasses.Equal.comparing;
+import static com.github.tonivade.purefun.typeclasses.Eq.comparing;
 
 import java.util.Objects;
 
