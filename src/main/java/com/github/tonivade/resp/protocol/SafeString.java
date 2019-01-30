@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import com.github.tonivade.purefun.typeclasses.Equal;
+import com.github.tonivade.purefun.Equal;
 
 public class SafeString implements Comparable<SafeString>, Serializable {
 

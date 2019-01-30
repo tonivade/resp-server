@@ -4,11 +4,9 @@
  */
 package com.github.tonivade.resp.protocol.test;
 
-import static com.github.tonivade.purefun.typeclasses.Eq.comparing;
-
 import java.util.Objects;
 
-import com.github.tonivade.purefun.typeclasses.Equal;
+import com.github.tonivade.purefun.Equal;
 
 public class Data {
   private final int id;
@@ -35,8 +33,8 @@ public class Data {
   @Override
   public boolean equals(Object obj) {
     return Equal.of(this)
-        .append(comparing(Data::getId))
-        .append(comparing(Data::getValue))
+        .comparing(Data::getId)
+        .comparing(Data::getValue)
         .applyTo(obj);
   }
 

@@ -4,13 +4,12 @@
  */
 package com.github.tonivade.resp.protocol;
 
-import static com.github.tonivade.purefun.typeclasses.Eq.comparing;
 import static java.util.Objects.requireNonNull;
 
 import java.util.Objects;
 
+import com.github.tonivade.purefun.Equal;
 import com.github.tonivade.purefun.data.Sequence;
-import com.github.tonivade.purefun.typeclasses.Equal;
 
 public abstract class AbstractRedisToken<T> implements RedisToken {
 
@@ -41,7 +40,7 @@ public abstract class AbstractRedisToken<T> implements RedisToken {
   @Override
   public boolean equals(Object obj) {
     return Equal.of(this)
-        .append(comparing(AbstractRedisToken::getValue))
+        .comparing(AbstractRedisToken::getValue)
         .applyTo(obj);
   }
 
