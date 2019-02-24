@@ -4,6 +4,8 @@
  */
 package com.github.tonivade.resp.protocol;
 
+import static com.github.tonivade.purefun.Function1.cons;
+import static com.github.tonivade.purefun.Function1.identity;
 import static com.github.tonivade.purefun.Matcher1.instanceOf;
 import static com.github.tonivade.resp.protocol.RedisToken.string;
 import static java.util.stream.Collectors.toList;
@@ -60,7 +62,7 @@ public class RespSerializer {
   }
 
   private Object tryGetFieldValue(Object object, Field field) {
-    return Try.of(() -> getFieldValue(object, field)).getOrElse(null);
+    return Try.of(() -> getFieldValue(object, field)).fold(cons(null), identity());
   }
 
   private Object getFieldValue(Object object, Field field)
