@@ -72,7 +72,7 @@ issues at all, the same way as REDIS works.
 It's very easy, you only need 2 lines of code to start the server
 
 ```java
-    RespServer server = new RespServer.builder()
+    RespServer server = RespServer.builder()
       .host("localhost").port(12345).commands(new CommandSuite()).build();
     server.start();
 ```
