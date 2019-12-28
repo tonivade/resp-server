@@ -32,10 +32,10 @@ public class Data {
 
   @Override
   public boolean equals(Object obj) {
-    return Equal.of(this)
+    return Equal.<Data>of()
         .comparing(Data::getId)
         .comparing(Data::getValue)
-        .applyTo(obj);
+        .applyTo(this, obj);
   }
 
   @Override

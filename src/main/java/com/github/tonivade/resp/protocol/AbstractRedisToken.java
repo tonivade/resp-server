@@ -39,9 +39,9 @@ public abstract class AbstractRedisToken<T> implements RedisToken {
 
   @Override
   public boolean equals(Object obj) {
-    return Equal.of(this)
+    return Equal.<AbstractRedisToken<?>>of()
         .comparing(AbstractRedisToken::getValue)
-        .applyTo(obj);
+        .applyTo(this, obj);
   }
 
   @Override

@@ -59,9 +59,9 @@ public class SafeString implements Comparable<SafeString>, Serializable {
 
   @Override
   public boolean equals(Object obj) {
-    return Equal.of(this)
+    return Equal.<SafeString>of()
         .append((one, other) -> Objects.equals(one.buffer, other.buffer))
-        .applyTo(obj);
+        .applyTo(this, obj);
   }
 
   @Override
