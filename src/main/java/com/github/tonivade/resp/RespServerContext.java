@@ -4,16 +4,6 @@
  */
 package com.github.tonivade.resp;
 
-import static com.github.tonivade.resp.SessionListener.nullListener;
-import static java.util.Objects.requireNonNull;
-
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.function.Function;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.tonivade.purefun.type.Option;
 import com.github.tonivade.resp.command.CommandSuite;
 import com.github.tonivade.resp.command.Request;
@@ -21,10 +11,18 @@ import com.github.tonivade.resp.command.RespCommand;
 import com.github.tonivade.resp.command.ServerContext;
 import com.github.tonivade.resp.command.Session;
 import com.github.tonivade.resp.protocol.RedisToken;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Scheduler;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import io.reactivex.Observable;
-import io.reactivex.Scheduler;
-import io.reactivex.schedulers.Schedulers;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.function.Function;
+
+import static com.github.tonivade.resp.SessionListener.nullListener;
+import static java.util.Objects.requireNonNull;
 
 public class RespServerContext implements ServerContext {
   private static final Logger LOGGER = LoggerFactory.getLogger(RespServerContext.class);
