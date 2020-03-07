@@ -13,6 +13,9 @@ import com.github.tonivade.resp.protocol.AbstractRedisToken.StatusRedisToken;
 import com.github.tonivade.resp.protocol.AbstractRedisToken.StringRedisToken;
 import com.github.tonivade.resp.protocol.AbstractRedisToken.UnknownRedisToken;
 
+import static java.util.Objects.nonNull;
+import static java.util.Objects.requireNonNull;
+
 class LambdaRedisTokenVisitor<T> implements RedisTokenVisitor<T> {
 
   private Function<ArrayRedisToken, T> onArray;
@@ -22,9 +25,13 @@ class LambdaRedisTokenVisitor<T> implements RedisTokenVisitor<T> {
   private Function<IntegerRedisToken, T> onInteger;
   private Function<UnknownRedisToken, T> onUnknown;
 
-  LambdaRedisTokenVisitor(Function<ArrayRedisToken, T> onArray, Function<StatusRedisToken, T> onStatus,
-      Function<StringRedisToken, T> onString, Function<ErrorRedisToken, T> onError,
-      Function<IntegerRedisToken, T> onInteger, Function<UnknownRedisToken, T> onUnknown) {
+  LambdaRedisTokenVisitor(
+      Function<ArrayRedisToken, T> onArray,
+      Function<StatusRedisToken, T> onStatus,
+      Function<StringRedisToken, T> onString,
+      Function<ErrorRedisToken, T> onError,
+      Function<IntegerRedisToken, T> onInteger,
+      Function<UnknownRedisToken, T> onUnknown) {
     this.onArray = onArray;
     this.onStatus = onStatus;
     this.onString = onString;
@@ -72,42 +79,43 @@ class LambdaRedisTokenVisitor<T> implements RedisTokenVisitor<T> {
     private Function<UnknownRedisToken, T> onUnknown;
 
     public Builder<T> onArray(Function<ArrayRedisToken, T> onArray) {
-      this.onArray = onArray;
+      this.onArray = requireNonNull(onArray);
       return this;
     }
 
     public Builder<T> onStatus(Function<StatusRedisToken, T> onStatus) {
-      this.onStatus = onStatus;
+      this.onStatus = requireNonNull(onStatus);
       return this;
     }
 
     public Builder<T> onString(Function<StringRedisToken, T> onString) {
-      this.onString = onString;
+      this.onString = requireNonNull(onString);
       return this;
     }
 
     public Builder<T> onError(Function<ErrorRedisToken, T> onError) {
-      this.onError = onError;
+      this.onError = requireNonNull(onError);
       return this;
     }
 
     public Builder<T> onInteger(Function<IntegerRedisToken, T> onInteger) {
-      this.onInteger = onInteger;
+      this.onInteger = requireNonNull(onInteger);
       return this;
     }
 
     public Builder<T> onUnknown(Function<UnknownRedisToken, T> onUnknown) {
-      this.onUnknown = onUnknown;
+      this.onUnknown = requireNonNull(onUnknown);
       return this;
     }
 
     public RedisTokenVisitor<T> build() {
-      return new LambdaRedisTokenVisitor<>(safe(onArray), safe(onStatus), safe(onString),
+      return new LambdaRedisTokenVisitor<>(
+          safe(onArray), safe(onStatus), safe(onString),
           safe(onError), safe(onInteger), safe(onUnknown));
     }
 
     private <X> Function<X, T> safe(Function<X, T> function) {
-      return function != null ? function : x -> null;
+      return nonNull(function) ? function : x -> null;
     }
   }
 }

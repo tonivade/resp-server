@@ -25,6 +25,7 @@ public class SafeString implements Comparable<SafeString>, Serializable {
 
   public static final SafeString EMPTY_STRING = new SafeString(new byte[] {});
 
+  private static final Equal<SafeString> EQUAL = Equal.<SafeString>of().comparing(x -> x.buffer);
   private static final char[] CHARS = "0123456789abcdef".toCharArray();
 
   private transient ByteBuffer buffer;
@@ -59,9 +60,7 @@ public class SafeString implements Comparable<SafeString>, Serializable {
 
   @Override
   public boolean equals(Object obj) {
-    return Equal.<SafeString>of()
-        .append((one, other) -> Objects.equals(one.buffer, other.buffer))
-        .applyTo(this, obj);
+    return EQUAL.applyTo(this, obj);
   }
 
   @Override
@@ -108,17 +107,6 @@ public class SafeString implements Comparable<SafeString>, Serializable {
     return new SafeString(byteBuffer);
   }
 
-  private int compare(byte[] left, byte[] right) {
-    for (int i = 0, j = 0; i < left.length && j < right.length; i++, j++) {
-      int a = (left[i] & 0xff);
-      int b = (right[j] & 0xff);
-      if (a != b) {
-        return a - b;
-      }
-    }
-    return left.length - right.length;
-  }
-
   public boolean isEmpty() {
     return length() == 0;
   }
@@ -130,6 +118,17 @@ public class SafeString implements Comparable<SafeString>, Serializable {
 
   public String substring(int i) {
     return toString().substring(i);
+  }
+
+  private int compare(byte[] left, byte[] right) {
+    for (int i = 0, j = 0; i < left.length && j < right.length; i++, j++) {
+      int a = (left[i] & 0xff);
+      int b = (right[j] & 0xff);
+      if (a != b) {
+        return a - b;
+      }
+    }
+    return left.length - right.length;
   }
 
   private void writeObject(ObjectOutputStream out) throws IOException {

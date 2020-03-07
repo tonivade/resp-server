@@ -15,9 +15,9 @@ public interface RedisTokenVisitor<T> {
   T array(ArrayRedisToken token);
   T status(StatusRedisToken token);
   T string(StringRedisToken token);
+  T integer(IntegerRedisToken token);
   T error(ErrorRedisToken token);
   T unknown(UnknownRedisToken token);
-  T integer(IntegerRedisToken token);
 
   static <T> LambdaRedisTokenVisitor.Builder<T> builder() {
     return new LambdaRedisTokenVisitor.Builder<>();

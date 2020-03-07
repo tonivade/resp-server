@@ -14,6 +14,10 @@ import com.github.tonivade.purefun.data.Sequence;
 public abstract class AbstractRedisToken<T> implements RedisToken {
 
   private static final String SEPARATOR = "=>";
+  private static final Equal<AbstractRedisToken<?>> EQUAL =
+      Equal.<AbstractRedisToken<?>>of()
+          .comparing(AbstractRedisToken::getType)
+          .comparing(AbstractRedisToken::getValue);
 
   private final RedisTokenType type;
   private final T value;
@@ -34,14 +38,12 @@ public abstract class AbstractRedisToken<T> implements RedisToken {
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(value);
+    return Objects.hash(type, value);
   }
 
   @Override
   public boolean equals(Object obj) {
-    return Equal.<AbstractRedisToken<?>>of()
-        .comparing(AbstractRedisToken::getValue)
-        .applyTo(this, obj);
+    return EQUAL.applyTo(this, obj);
   }
 
   @Override
@@ -50,6 +52,7 @@ public abstract class AbstractRedisToken<T> implements RedisToken {
   }
 
   public static final class UnknownRedisToken extends AbstractRedisToken<SafeString> {
+
     UnknownRedisToken(SafeString value) {
       super(RedisTokenType.UNKNOWN, value);
     }
@@ -61,6 +64,7 @@ public abstract class AbstractRedisToken<T> implements RedisToken {
   }
 
   public static final class StringRedisToken extends AbstractRedisToken<SafeString> {
+
     StringRedisToken(SafeString value) {
       super(RedisTokenType.STRING, value);
     }
@@ -72,6 +76,7 @@ public abstract class AbstractRedisToken<T> implements RedisToken {
   }
 
   public static final class StatusRedisToken extends AbstractRedisToken<String> {
+
     StatusRedisToken(String value) {
       super(RedisTokenType.STATUS, value);
     }
@@ -83,6 +88,7 @@ public abstract class AbstractRedisToken<T> implements RedisToken {
   }
 
   public static final class ErrorRedisToken extends AbstractRedisToken<String> {
+
     ErrorRedisToken(String value) {
       super(RedisTokenType.ERROR, value);
     }
@@ -94,6 +100,7 @@ public abstract class AbstractRedisToken<T> implements RedisToken {
   }
 
   public static final class IntegerRedisToken extends AbstractRedisToken<Integer> {
+
     IntegerRedisToken(Integer value) {
       super(RedisTokenType.INTEGER, value);
     }
@@ -105,6 +112,7 @@ public abstract class AbstractRedisToken<T> implements RedisToken {
   }
 
   public static final class ArrayRedisToken extends AbstractRedisToken<Sequence<RedisToken>> {
+
     ArrayRedisToken(Sequence<RedisToken> value) {
       super(RedisTokenType.ARRAY, requireNonNull(value).asArray());
     }
