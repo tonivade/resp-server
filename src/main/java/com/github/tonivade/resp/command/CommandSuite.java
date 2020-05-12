@@ -8,6 +8,7 @@ import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.github.tonivade.purefun.Producer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,10 +36,10 @@ public class CommandSuite {
 
   public CommandSuite(CommandWrapperFactory factory) {
     this.factory = factory;
-    addCommand(PingCommand.class);
-    addCommand(EchoCommand.class);
-    addCommand(QuitCommand.class);
-    addCommand(TimeCommand.class);
+    addCommand(PingCommand::new);
+    addCommand(EchoCommand::new);
+    addCommand(QuitCommand::new);
+    addCommand(TimeCommand::new);
   }
 
   public RespCommand getCommand(String name) {
@@ -53,10 +54,15 @@ public class CommandSuite {
     return commands.get(name) != null;
   }
 
+  @Deprecated
   protected void addCommand(Class<?> clazz) {
-    Try.of(clazz::newInstance)
+    addCommand(clazz::newInstance);
+  }
+
+  protected void addCommand(Producer<?> newInstance) {
+    Try.of(newInstance)
        .onSuccess(this::processCommand)
-       .onFailure(e -> LOGGER.error("error loading command: " + clazz.getName(), e));
+       .onFailure(e -> LOGGER.error("error loading command", e));
   }
 
   protected void addCommand(String name, RespCommand command) {
