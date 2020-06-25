@@ -10,16 +10,13 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 import java.util.Optional;
-
-import org.junit.Assert;
+import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-
 import com.github.tonivade.purefun.data.ImmutableArray;
 import com.github.tonivade.resp.protocol.RedisToken;
 import com.github.tonivade.resp.protocol.SafeString;
@@ -90,7 +87,7 @@ public class CommandRule {
   }
 
   public void assertThat(RedisToken token) {
-    Assert.assertThat(response, equalTo(token));
+    MatcherAssert.assertThat(response, equalTo(token));
   }
 
   @SuppressWarnings("unchecked")

@@ -6,7 +6,7 @@ package com.github.tonivade.resp.protocol;
 
 import static com.github.tonivade.resp.protocol.SafeString.safeString;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
