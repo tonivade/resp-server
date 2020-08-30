@@ -23,7 +23,7 @@ public class DefaultSession implements Session {
 
   public DefaultSession(String id, ChannelHandlerContext ctx) {
     this.id = checkNonEmpty(id);
-    this.ctx = checkNonNull(ctx);
+    this.ctx = ctx;
   }
 
   @Override
