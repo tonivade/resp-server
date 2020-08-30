@@ -1,4 +1,4 @@
-apply plugin: 'java'
+apply plugin: 'java-library'
 apply plugin: 'eclipse'
 apply plugin: 'jacoco'
 apply plugin: 'com.bmuschko.nexus'
@@ -56,15 +56,15 @@ repositories {
 }
 
 dependencies {
-  compile 'io.netty:netty-all:4.1.51.Final'
-  compile 'io.reactivex.rxjava3:rxjava:3.0.6'
-  compile 'org.slf4j:slf4j-api:1.7.30'
-  runtime 'ch.qos.logback:logback-classic:1.2.3'
-  compile 'com.github.tonivade:purefun-core:2.0'
-  testCompile 'junit:junit:4.13'
-  testCompile 'org.junit.jupiter:junit-jupiter-engine:5.6.2'
-  testCompile 'org.mockito:mockito-core:3.5.7'
-  testCompile 'org.hamcrest:hamcrest-library:2.2'
+  api 'io.netty:netty-all:4.1.51.Final'
+  api 'io.reactivex.rxjava3:rxjava:3.0.6'
+  api 'com.github.tonivade:purefun-core:2.1'
+  implementation 'org.slf4j:slf4j-api:1.7.30'
+  implementation 'ch.qos.logback:logback-classic:1.2.3'
+  testImplementation 'junit:junit:4.13'
+  testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.6.2'
+  testImplementation 'org.mockito:mockito-core:3.5.7'
+  testImplementation 'org.hamcrest:hamcrest-library:2.2'
 }
 
 modifyPom {
