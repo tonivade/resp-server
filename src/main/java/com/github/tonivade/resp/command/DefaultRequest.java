@@ -4,7 +4,7 @@
  */
 package com.github.tonivade.resp.command;
 
-import static java.util.Objects.requireNonNull;
+import static com.github.tonivade.purefun.Precondition.checkNonNull;
 
 import com.github.tonivade.purefun.data.ImmutableArray;
 import com.github.tonivade.purefun.type.Option;
@@ -23,8 +23,8 @@ public class DefaultRequest implements Request {
   public DefaultRequest(ServerContext server, Session session, SafeString command, ImmutableArray<SafeString> params) {
     this.server = server;
     this.session = session;
-    this.command = requireNonNull(command);
-    this.params = requireNonNull(params);
+    this.command = checkNonNull(command);
+    this.params = checkNonNull(params);
   }
 
   @Override

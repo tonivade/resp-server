@@ -6,9 +6,9 @@ package com.github.tonivade.resp;
 
 import static com.github.tonivade.resp.protocol.RedisToken.nullString;
 import static com.github.tonivade.resp.protocol.SafeString.safeString;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
@@ -17,13 +17,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.function.Function;
-
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import com.github.tonivade.purefun.Function1;
 import com.github.tonivade.purefun.data.ImmutableArray;
 import com.github.tonivade.resp.command.CommandSuite;
 import com.github.tonivade.resp.command.DefaultRequest;
@@ -39,41 +39,47 @@ public class RespServerContextTest {
   @Mock
   private CommandSuite commands;
   @Mock
-  private RespCommand command;
+  private RespCommand respCommand;
   @Mock
   private Session session;
   @Mock
-  private Function<String, Session> factory;
+  private Function1<String, Session> factory;
 
   private RespServerContext serverContext;
+  private AutoCloseable openMocks;
 
   @BeforeEach
   public void setUp() {
-    MockitoAnnotations.initMocks(this);
+    openMocks = MockitoAnnotations.openMocks(this);
     serverContext = new RespServerContext(HOST, PORT, commands);
+  }
+  
+  @AfterEach
+  public void tearDown() throws Exception {
+    openMocks.close();
   }
 
   @Test
   public void processCommand() {
     Request request = newRequest("test");
-    when(commands.getCommand(request.getCommand())).thenReturn(command);
-    when(command.execute(request)).thenReturn(nullString());
+    when(commands.getCommand(request.getCommand())).thenReturn(respCommand);
+    when(respCommand.execute(request)).thenReturn(nullString());
 
     serverContext.processCommand(request);
 
-    verify(command, timeout(1000)).execute(request);
+    verify(respCommand, timeout(1000)).execute(request);
     verify(session, timeout(1000)).publish(nullString());
   }
 
   @Test
   public void processCommandException() {
     Request request = newRequest("test");
-    when(commands.getCommand(request.getCommand())).thenReturn(command);
-    doThrow(RuntimeException.class).when(command).execute(request);
+    when(commands.getCommand(request.getCommand())).thenReturn(respCommand);
+    doThrow(RuntimeException.class).when(respCommand).execute(request);
 
     serverContext.processCommand(request);
 
-    verify(command, timeout(1000)).execute(request);
+    verify(respCommand, timeout(1000)).execute(request);
     verify(session, timeout(1000).atLeast(0)).publish(any());
   }
 
@@ -128,8 +134,13 @@ public class RespServerContextTest {
   }
 
   @Test
-  public void requireHost() {
+  public void requireHostNonNull() {
     assertThrows(NullPointerException.class, () -> new RespServerContext(null, 0, commands));
+  }
+
+  @Test
+  public void requireHostNonEmpty() {
+    assertThrows(IllegalArgumentException.class, () -> new RespServerContext("", 0, commands));
   }
 
   @Test
@@ -144,7 +155,7 @@ public class RespServerContextTest {
 
   @Test
   public void requireCallback() {
-    assertThrows(NullPointerException.class, () -> new RespServerContext(HOST, PORT, null));
+    assertThrows(IllegalArgumentException.class, () -> new RespServerContext(HOST, PORT, null));
   }
 
   private Request newRequest(String command) {

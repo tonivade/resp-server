@@ -4,12 +4,16 @@
  */
 package com.github.tonivade.resp.command;
 
+import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 
-public class CommandRuleExtension implements ParameterResolver {
+public class CommandRuleExtension implements ParameterResolver, AfterEachCallback {
+
+  private final static Namespace RESPSERVER = Namespace.create("com.github.tonivade.resp-server");
 
   @Override
   public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
@@ -22,7 +26,13 @@ public class CommandRuleExtension implements ParameterResolver {
       throws ParameterResolutionException {
     CommandRule commandRule = new CommandRule(
             parameterContext.getTarget().orElseThrow(() -> new ParameterResolutionException("no target")));
+    extensionContext.getStore(RESPSERVER).put(CommandRule.class, commandRule);
     commandRule.init();
     return commandRule;
+  }
+  
+  @Override
+  public void afterEach(ExtensionContext context) throws Exception {
+    context.getStore(RESPSERVER).remove(CommandRule.class, CommandRule.class).close();
   }
 }

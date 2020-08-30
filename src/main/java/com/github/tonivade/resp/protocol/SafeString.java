@@ -4,8 +4,8 @@
  */
 package com.github.tonivade.resp.protocol;
 
+import static com.github.tonivade.purefun.Precondition.checkNonNull;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 
 import java.io.IOException;
@@ -31,11 +31,11 @@ public class SafeString implements Comparable<SafeString>, Serializable {
   private transient ByteBuffer buffer;
 
   public SafeString(byte[] bytes) {
-    this.buffer = ByteBuffer.wrap(requireNonNull(bytes));
+    this.buffer = ByteBuffer.wrap(checkNonNull(bytes));
   }
 
   public SafeString(ByteBuffer buffer) {
-    this.buffer = requireNonNull(buffer);
+    this.buffer = checkNonNull(buffer);
   }
 
   public byte[] getBytes() {
@@ -84,7 +84,7 @@ public class SafeString implements Comparable<SafeString>, Serializable {
   }
 
   public static SafeString safeString(String str) {
-    return new SafeString(UTF_8.encode(requireNonNull(str)));
+    return new SafeString(UTF_8.encode(checkNonNull(str)));
   }
 
   public static SafeString fromHexString(String string) {
@@ -95,12 +95,12 @@ public class SafeString implements Comparable<SafeString>, Serializable {
     return new SafeString(array);
   }
 
-  public static List<SafeString> safeAsList(String... strs) {
-    return Stream.of(requireNonNull(strs)).map(SafeString::safeString).collect(toList());
+  public static List<SafeString> safeAsList(String... strings) {
+    return Stream.of(checkNonNull(strings)).map(SafeString::safeString).collect(toList());
   }
 
   public static SafeString append(SafeString stringA, SafeString stringB) {
-    ByteBuffer byteBuffer = ByteBuffer.allocate(requireNonNull(stringA).length() + requireNonNull(stringB).length());
+    ByteBuffer byteBuffer = ByteBuffer.allocate(checkNonNull(stringA).length() + checkNonNull(stringB).length());
     byteBuffer.put(stringA.getBytes());
     byteBuffer.put(stringB.getBytes());
     byteBuffer.rewind();
@@ -120,7 +120,7 @@ public class SafeString implements Comparable<SafeString>, Serializable {
     return toString().substring(i);
   }
 
-  private int compare(byte[] left, byte[] right) {
+  private static int compare(byte[] left, byte[] right) {
     for (int i = 0, j = 0; i < left.length && j < right.length; i++, j++) {
       int a = (left[i] & 0xff);
       int b = (right[j] & 0xff);

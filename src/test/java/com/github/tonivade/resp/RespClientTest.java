@@ -92,8 +92,13 @@ public class RespClientTest {
   }
 
   @Test
-  public void requireHost() {
+  public void requireHostNonNull() {
     assertThrows(NullPointerException.class, () -> new RespClient(null, 0, callback));
+  }
+
+  @Test
+  public void requireHostNonEmpty() {
+    assertThrows(IllegalArgumentException.class, () -> new RespClient("", 0, callback));
   }
 
   @Test
@@ -108,6 +113,6 @@ public class RespClientTest {
 
   @Test
   public void requireCallback() {
-    assertThrows(NullPointerException.class, () -> new RespClient("localhost", 12345, null));
+    assertThrows(IllegalArgumentException.class, () -> new RespClient("localhost", 12345, null));
   }
 }

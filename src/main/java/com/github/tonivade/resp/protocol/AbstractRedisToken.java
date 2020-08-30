@@ -4,7 +4,7 @@
  */
 package com.github.tonivade.resp.protocol;
 
-import static java.util.Objects.requireNonNull;
+import static com.github.tonivade.purefun.Precondition.checkNonNull;
 
 import java.util.Objects;
 
@@ -23,7 +23,7 @@ public abstract class AbstractRedisToken<T> implements RedisToken {
   private final T value;
 
   private AbstractRedisToken(RedisTokenType type, T value) {
-    this.type = requireNonNull(type);
+    this.type = checkNonNull(type);
     this.value = value;
   }
 
@@ -114,7 +114,7 @@ public abstract class AbstractRedisToken<T> implements RedisToken {
   public static final class ArrayRedisToken extends AbstractRedisToken<Sequence<RedisToken>> {
 
     ArrayRedisToken(Sequence<RedisToken> value) {
-      super(RedisTokenType.ARRAY, requireNonNull(value).asArray());
+      super(RedisTokenType.ARRAY, checkNonNull(value).asArray());
     }
 
     @Override

@@ -4,6 +4,9 @@
  */
 package com.github.tonivade.resp.protocol;
 
+import static com.github.tonivade.purefun.Precondition.checkNonNull;
+import static java.util.Objects.nonNull;
+
 import java.util.function.Function;
 
 import com.github.tonivade.resp.protocol.AbstractRedisToken.ArrayRedisToken;
@@ -12,9 +15,6 @@ import com.github.tonivade.resp.protocol.AbstractRedisToken.IntegerRedisToken;
 import com.github.tonivade.resp.protocol.AbstractRedisToken.StatusRedisToken;
 import com.github.tonivade.resp.protocol.AbstractRedisToken.StringRedisToken;
 import com.github.tonivade.resp.protocol.AbstractRedisToken.UnknownRedisToken;
-
-import static java.util.Objects.nonNull;
-import static java.util.Objects.requireNonNull;
 
 class LambdaRedisTokenVisitor<T> implements RedisTokenVisitor<T> {
 
@@ -79,32 +79,32 @@ class LambdaRedisTokenVisitor<T> implements RedisTokenVisitor<T> {
     private Function<UnknownRedisToken, T> onUnknown;
 
     public Builder<T> onArray(Function<ArrayRedisToken, T> onArray) {
-      this.onArray = requireNonNull(onArray);
+      this.onArray = checkNonNull(onArray);
       return this;
     }
 
     public Builder<T> onStatus(Function<StatusRedisToken, T> onStatus) {
-      this.onStatus = requireNonNull(onStatus);
+      this.onStatus = checkNonNull(onStatus);
       return this;
     }
 
     public Builder<T> onString(Function<StringRedisToken, T> onString) {
-      this.onString = requireNonNull(onString);
+      this.onString = checkNonNull(onString);
       return this;
     }
 
     public Builder<T> onError(Function<ErrorRedisToken, T> onError) {
-      this.onError = requireNonNull(onError);
+      this.onError = checkNonNull(onError);
       return this;
     }
 
     public Builder<T> onInteger(Function<IntegerRedisToken, T> onInteger) {
-      this.onInteger = requireNonNull(onInteger);
+      this.onInteger = checkNonNull(onInteger);
       return this;
     }
 
     public Builder<T> onUnknown(Function<UnknownRedisToken, T> onUnknown) {
-      this.onUnknown = requireNonNull(onUnknown);
+      this.onUnknown = checkNonNull(onUnknown);
       return this;
     }
 

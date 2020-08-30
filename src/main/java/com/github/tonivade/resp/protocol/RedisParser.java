@@ -4,10 +4,10 @@
  */
 package com.github.tonivade.resp.protocol;
 
+import static com.github.tonivade.purefun.Precondition.checkNonNull;
 import static com.github.tonivade.resp.protocol.RedisToken.array;
 import static com.github.tonivade.resp.protocol.RedisToken.error;
 import static com.github.tonivade.resp.protocol.RedisToken.status;
-import static java.util.Objects.requireNonNull;
 import static java.util.Spliterators.spliteratorUnknownSize;
 
 import java.util.ArrayList;
@@ -34,7 +34,7 @@ public class RedisParser implements Iterator<RedisToken> {
 
   public RedisParser(int maxLength, RedisSource source) {
     this.maxLength = maxLength;
-    this.source = requireNonNull(source);
+    this.source = checkNonNull(source);
   }
 
   @Override

@@ -4,9 +4,9 @@
  */
 package com.github.tonivade.resp;
 
+import static com.github.tonivade.purefun.Precondition.checkNonNull;
 import static com.github.tonivade.resp.protocol.SafeString.safeAsList;
 import static com.github.tonivade.resp.protocol.SafeString.safeString;
-import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 
 import java.net.InetSocketAddress;
@@ -62,7 +62,7 @@ public class RespServer implements Resp {
   private final RespServerContext serverContext;
 
   public RespServer(RespServerContext serverContext) {
-    this.serverContext = requireNonNull(serverContext);
+    this.serverContext = checkNonNull(serverContext);
   }
 
   public static Builder builder() {
@@ -195,14 +195,14 @@ public class RespServer implements Resp {
     return new DefaultSession(key, ctx);
   }
 
-  private EventLoopGroup closeWorker(EventLoopGroup worker) {
+  private static EventLoopGroup closeWorker(EventLoopGroup worker) {
     if (worker != null) {
       closeFuture(worker.shutdownGracefully());
     }
     return null;
   }
 
-  private void closeFuture(Future<?> future) {
+  private static void closeFuture(Future<?> future) {
     LOGGER.debug("closing future");
     future.syncUninterruptibly();
     LOGGER.debug("future closed");

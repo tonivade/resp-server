@@ -4,6 +4,7 @@
  */
 package com.github.tonivade.resp.command;
 
+import static com.github.tonivade.purefun.Precondition.checkNonNull;
 import static com.github.tonivade.resp.protocol.RedisToken.error;
 
 import com.github.tonivade.resp.annotation.ParamLength;
@@ -16,7 +17,7 @@ public class CommandWrapper implements RespCommand {
   private final RespCommand command;
 
   public CommandWrapper(RespCommand command) {
-    this.command = command;
+    this.command = checkNonNull(command);
     ParamLength length = command.getClass().getAnnotation(ParamLength.class);
     if (length != null) {
       this.params = length.value();

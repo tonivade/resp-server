@@ -22,11 +22,14 @@ import com.github.tonivade.resp.protocol.RedisToken;
 import com.github.tonivade.resp.protocol.SafeString;
 
 public class CommandRule {
+
   private Request request;
   private ServerContext server;
   private Session session;
   private RespCommand command;
   private RedisToken response;
+  private AutoCloseable openMocks;
+
   private final Object target;
 
   public CommandRule(Object target) {
@@ -50,13 +53,17 @@ public class CommandRule {
     when(request.getSession()).thenReturn(session);
     when(session.getId()).thenReturn("localhost:12345");
 
-    MockitoAnnotations.initMocks(target);
+    openMocks = MockitoAnnotations.openMocks(target);
 
     try {
       command = target.getClass().getAnnotation(CommandUnderTest.class).value().newInstance();
     } catch (InstantiationException | IllegalAccessException e) {
       throw new ParameterResolutionException("error", e);
     }
+  }
+  
+  public void close() throws Exception {
+    openMocks.close();
   }
 
   public CommandRule execute() {

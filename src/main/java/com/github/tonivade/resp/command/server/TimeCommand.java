@@ -25,12 +25,12 @@ public class TimeCommand implements RespCommand {
     return array(string(seconds(currentTimeMillis)), string(microseconds(currentTimeMillis)));
   }
 
-  private String seconds(long currentTimeMillis) {
+  private static String seconds(long currentTimeMillis) {
     return String.valueOf(currentTimeMillis / SCALE);
   }
 
   // XXX: Java doesn't have microsecond accuracy
-  private String microseconds(long currentTimeMillis) {
+  private static String microseconds(long currentTimeMillis) {
     return String.valueOf((currentTimeMillis % SCALE) * SCALE);
   }
 }

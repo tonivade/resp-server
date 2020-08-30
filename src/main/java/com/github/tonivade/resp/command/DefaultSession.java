@@ -4,6 +4,9 @@
  */
 package com.github.tonivade.resp.command;
 
+import static com.github.tonivade.purefun.Precondition.checkNonEmpty;
+import static com.github.tonivade.purefun.Precondition.checkNonNull;
+
 import com.github.tonivade.purefun.type.Option;
 import com.github.tonivade.resp.StateHolder;
 import com.github.tonivade.resp.protocol.RedisToken;
@@ -19,8 +22,8 @@ public class DefaultSession implements Session {
   private final StateHolder state = new StateHolder();
 
   public DefaultSession(String id, ChannelHandlerContext ctx) {
-    this.id = id;
-    this.ctx = ctx;
+    this.id = checkNonEmpty(id);
+    this.ctx = checkNonNull(ctx);
   }
 
   @Override

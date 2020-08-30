@@ -4,14 +4,16 @@
  */
 package com.github.tonivade.resp.command;
 
+import static com.github.tonivade.purefun.Precondition.checkNonNull;
+
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.github.tonivade.purefun.Producer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.tonivade.purefun.Producer;
 import com.github.tonivade.purefun.type.Try;
 import com.github.tonivade.resp.annotation.Command;
 import com.github.tonivade.resp.command.server.EchoCommand;
@@ -35,7 +37,7 @@ public class CommandSuite {
   }
 
   public CommandSuite(CommandWrapperFactory factory) {
-    this.factory = factory;
+    this.factory = checkNonNull(factory);
     addCommand(PingCommand::new);
     addCommand(EchoCommand::new);
     addCommand(QuitCommand::new);
