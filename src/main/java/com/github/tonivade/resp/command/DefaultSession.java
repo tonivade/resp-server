@@ -5,7 +5,6 @@
 package com.github.tonivade.resp.command;
 
 import static com.github.tonivade.purefun.Precondition.checkNonEmpty;
-import static com.github.tonivade.purefun.Precondition.checkNonNull;
 
 import com.github.tonivade.purefun.type.Option;
 import com.github.tonivade.resp.StateHolder;
@@ -23,7 +22,9 @@ public class DefaultSession implements Session {
 
   public DefaultSession(String id, ChannelHandlerContext ctx) {
     this.id = checkNonEmpty(id);
-    this.ctx = checkNonNull(ctx);
+    // it should be non null, but it seems that in some places it creates
+    // a dummy session with a ctx null.
+    this.ctx = ctx;
   }
 
   @Override
