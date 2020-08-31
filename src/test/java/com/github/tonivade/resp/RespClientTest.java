@@ -93,7 +93,7 @@ public class RespClientTest {
 
   @Test
   public void requireHostNonNull() {
-    assertThrows(NullPointerException.class, () -> new RespClient(null, 0, callback));
+    assertThrows(IllegalArgumentException.class, () -> new RespClient(null, 0, callback));
   }
 
   @Test

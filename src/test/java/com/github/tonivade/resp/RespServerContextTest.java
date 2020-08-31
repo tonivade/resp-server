@@ -129,13 +129,14 @@ public class RespServerContextTest {
     serverContext.removeSession("key");
   }
 
+  @Test
   public void getSessionNull() {
     assertThat(serverContext.getSession("key"), nullValue());
   }
 
   @Test
   public void requireHostNonNull() {
-    assertThrows(NullPointerException.class, () -> new RespServerContext(null, 0, commands));
+    assertThrows(IllegalArgumentException.class, () -> new RespServerContext(null, 0, commands));
   }
 
   @Test
