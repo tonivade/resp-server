@@ -63,7 +63,7 @@ dependencies {
   implementation 'ch.qos.logback:logback-classic:1.2.3'
   testImplementation 'junit:junit:4.13'
   testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
-  testImplementation 'org.mockito:mockito-core:3.5.10'
+  testImplementation 'org.mockito:mockito-core:3.5.11'
   testImplementation 'org.hamcrest:hamcrest-library:2.2'
 }
 
