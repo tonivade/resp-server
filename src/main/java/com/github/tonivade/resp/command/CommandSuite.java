@@ -56,11 +56,6 @@ public class CommandSuite {
     return commands.get(name) != null;
   }
 
-  @Deprecated
-  protected void addCommand(Class<?> clazz) {
-    addCommand(clazz::newInstance);
-  }
-
   protected void addCommand(Producer<?> newInstance) {
     Try.of(newInstance)
        .onSuccess(this::processCommand)

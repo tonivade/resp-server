@@ -39,29 +39,22 @@ public class CommandSuiteTest {
   }
 
   @Test
-  public void addCommandClassGood() {
-    commandSuite.addCommand(GoodCommand.class);
+  public void addCommand() {
+    commandSuite.addCommand(GoodCommand::new);
 
     assertThat(commandSuite.contains("good"), is(true));
   }
 
   @Test
-  public void addCommandClassBad() {
-    commandSuite.addCommand(BadCommand.class);
-
-    assertThat(commandSuite.contains("bad"), is(false));
-  }
-
-  @Test
   public void isPresent() {
-    commandSuite.addCommand(GoodCommand.class);
+    commandSuite.addCommand(GoodCommand::new);
 
     assertThat(commandSuite.isPresent("good", Command.class), is(true));
   }
 
   @Test
   public void notPresent() {
-    commandSuite.addCommand(GoodCommand.class);
+    commandSuite.addCommand(GoodCommand::new);
 
     assertThat(commandSuite.isPresent("good", ParamLength.class), is(false));
   }
@@ -82,20 +75,6 @@ public class CommandSuiteTest {
     @Override
     public RedisToken execute(Request request) {
       return RedisToken.responseOk();
-    }
-  }
-
-  @Command("bad")
-  static class BadCommand implements RespCommand {
-    private String string;
-
-    public BadCommand(String string) {
-      this.string = string;
-    }
-
-    @Override
-    public RedisToken execute(Request request) {
-      return string(string);
     }
   }
 }
