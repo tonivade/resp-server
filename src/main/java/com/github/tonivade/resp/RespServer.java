@@ -78,8 +78,8 @@ public class RespServer implements Resp {
         .channel(NioServerSocketChannel.class)
         .childHandler(new RespInitializerHandler(this))
         .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
-        .option(ChannelOption.SO_RCVBUF, BUFFER_SIZE)
-        .option(ChannelOption.SO_SNDBUF, BUFFER_SIZE)
+        .childOption(ChannelOption.SO_RCVBUF, BUFFER_SIZE)
+        .childOption(ChannelOption.SO_SNDBUF, BUFFER_SIZE)
         .childOption(ChannelOption.SO_KEEPALIVE, true)
         .childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);
 
