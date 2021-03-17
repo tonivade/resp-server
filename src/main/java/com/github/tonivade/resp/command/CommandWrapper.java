@@ -12,9 +12,9 @@ import com.github.tonivade.resp.protocol.RedisToken;
 
 public class CommandWrapper implements RespCommand {
 
-  private int params;
+  private Integer params;
 
-  private int optionParams;
+  private Integer optionParams;
 
   private final RespCommand command;
 
@@ -29,8 +29,10 @@ public class CommandWrapper implements RespCommand {
 
   @Override
   public RedisToken execute(Request request) {
-    if (request.getLength() < params || request.getLength() > optionParams) {
-      return error("ERR wrong number of arguments for '" + request.getCommand() + "' command");
+    if (params != null && optionParams != null) {
+      if (request.getLength() < params || request.getLength() > optionParams) {
+        return error("ERR wrong number of arguments for '" + request.getCommand() + "' command");
+      }
     }
     return command.execute(request);
   }
