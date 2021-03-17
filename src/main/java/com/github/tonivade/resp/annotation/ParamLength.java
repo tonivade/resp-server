@@ -15,4 +15,5 @@ import java.lang.annotation.Target;
 @Documented
 public @interface ParamLength {
   int value();
+  int option() default 0;
 }
