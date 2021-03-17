@@ -14,6 +14,8 @@ public class CommandWrapper implements RespCommand {
 
   private int params;
 
+  private int optionParams;
+
   private final RespCommand command;
 
   public CommandWrapper(RespCommand command) {
@@ -21,12 +23,13 @@ public class CommandWrapper implements RespCommand {
     ParamLength length = command.getClass().getAnnotation(ParamLength.class);
     if (length != null) {
       this.params = length.value();
+      this.optionParams = length.value() + length.option();
     }
   }
 
   @Override
   public RedisToken execute(Request request) {
-    if (request.getLength() < params) {
+    if (request.getLength() < params || request.getLength() > optionParams) {
       return error("ERR wrong number of arguments for '" + request.getCommand() + "' command");
     }
     return command.execute(request);
