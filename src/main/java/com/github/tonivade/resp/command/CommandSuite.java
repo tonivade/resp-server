@@ -70,8 +70,8 @@ public class CommandSuite {
     Class<?> clazz = command.getClass();
     Command annotation = clazz.getAnnotation(Command.class);
     if (annotation != null) {
-      commands.put(annotation.value(), factory.wrap(command));
-      metadata.put(annotation.value(), clazz);
+      commands.put(annotation.value().toLowerCase(), factory.wrap(command));
+      metadata.put(annotation.value().toLowerCase(), clazz);
     } else {
       LOGGER.warn("annotation not present at {}", clazz.getName());
     }
