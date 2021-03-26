@@ -142,6 +142,10 @@ is rejected with an error.
 ## Gradle
 
     compile 'com.github.tonivade:resp-server:0.16.0'
+    
+## Stargazers over time
+
+[![Stargazers over time](https://starchart.cc/tonivade/resp-server.svg)](https://starchart.cc/tonivade/resp-server)
 
 ## Continuous Integration
 
