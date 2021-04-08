@@ -7,6 +7,8 @@ package com.github.tonivade.resp.command;
 import com.github.tonivade.purefun.type.Option;
 import com.github.tonivade.resp.protocol.RedisToken;
 
+import java.net.InetSocketAddress;
+
 public interface Session {
   String getId();
   void publish(RedisToken msg);
@@ -15,4 +17,6 @@ public interface Session {
   <T> Option<T> getValue(String key);
   void putValue(String key, Object value);
   <T> Option<T> removeValue(String key);
+  InetSocketAddress getRemoteAddress();
+  InetSocketAddress getLocalAddress();
 }
