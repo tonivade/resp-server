@@ -12,6 +12,8 @@ import com.github.tonivade.resp.protocol.RedisToken;
 
 import io.netty.channel.ChannelHandlerContext;
 
+import java.net.InetSocketAddress;
+
 public class DefaultSession implements Session {
 
   private final String id;
@@ -55,6 +57,14 @@ public class DefaultSession implements Session {
   @Override
   public <T> Option<T> removeValue(String key) {
     return state.removeValue(key);
+  }
+
+  @Override public InetSocketAddress getRemoteAddress() {
+    return (InetSocketAddress) ctx.channel().remoteAddress();
+  }
+
+  @Override public InetSocketAddress getLocalAddress() {
+    return (InetSocketAddress) ctx.channel().localAddress();
   }
 
   @Override
