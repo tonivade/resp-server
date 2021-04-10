@@ -29,28 +29,28 @@ public class RespClientTest {
   private static final int PORT = 12345;
   private static final int TIMEOUT = 2000;
 
-  private RespClient redisClient;
+  private RespClient client;
 
   private RespCallback callback = mock(RespCallback.class);
 
   @BeforeEach
   public void setUp() {
-    redisClient = new RespClient(HOST, PORT, callback);
+    client = new RespClient(HOST, PORT, callback);
   }
 
   @Test
   public void onConnect() {
-    redisClient.start();
+    client.start();
 
     verify(callback, timeout(1000)).onConnect();
   }
 
   @Test
   public void onMessage() {
-    redisClient.start();
+    client.start();
     verify(callback, timeout(TIMEOUT)).onConnect();
 
-    redisClient.send(array(string("PING")));
+    client.send(array(string("PING")));
 
     ArgumentCaptor<RedisToken> captor = ArgumentCaptor.forClass(RedisToken.class);
 
@@ -61,10 +61,10 @@ public class RespClientTest {
 
   @Test
   public void onBigMessage() {
-    redisClient.start();
+    client.start();
     verify(callback, timeout(TIMEOUT)).onConnect();
 
-    redisClient.send(array(string("PING"), string(readBigFile())));
+    client.send(array(string("PING"), string(readBigFile())));
 
     ArgumentCaptor<RedisToken> captor = ArgumentCaptor.forClass(RedisToken.class);
 
@@ -84,10 +84,10 @@ public class RespClientTest {
 
   @Test
   public void onClientDisconnect() {
-    redisClient.start();
+    client.start();
     verify(callback, timeout(TIMEOUT)).onConnect();
 
-    redisClient.stop();
+    client.stop();
     verify(callback, timeout(TIMEOUT)).onDisconnect();
   }
 
