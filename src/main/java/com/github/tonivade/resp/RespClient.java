@@ -87,7 +87,7 @@ public class RespClient implements Resp {
     LOGGER.info("connected to server: {}:{}", host, port);
     channel.pipeline().addLast("redisEncoder", new RedisEncoder());
     channel.pipeline().addLast("stringEncoder", new StringEncoder(CharsetUtil.UTF_8));
-    channel.pipeline().addLast("linDelimiter", new RedisDecoder(MAX_FRAME_SIZE));
+    channel.pipeline().addLast("lineDelimiter", new RedisDecoder(MAX_FRAME_SIZE));
     channel.pipeline().addLast(new RespConnectionHandler(this));
   }
 
