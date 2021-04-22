@@ -62,8 +62,8 @@ In this sample, `ECHO` is the command and `Hello world!` is the parameter.
 
 ## How is implemented?
 
-The protocol is implemented in Java8, using asynchronous IO (netty), and using the
-reactive programming paradigm (rxjava). What that means? It means that is single
+The protocol is implemented in Java8, using asynchronous IO ([netty](https://netty.io/)), and using the
+reactive programming paradigm ([rxjava](http://www.rxjava.com/)). What that means? It means that is single
 thread, every request is managed inside the same thread, so there's no concurrency
 issues at all, the same way as REDIS works.
 
