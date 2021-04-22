@@ -34,7 +34,7 @@ or compressed data, a picture, etc...
 
 Arrays can hold any data types inside, also other arrays.
 
-And use \r\n as delimiter, that means you can open a `telnet/netcat/nc` against
+And use `\r\n` as delimiter, that means you can open a `telnet/netcat/nc` against
 the server port and send whatever you want.
 
 So, what provide this project in addition to the protocol implementation? Well,
