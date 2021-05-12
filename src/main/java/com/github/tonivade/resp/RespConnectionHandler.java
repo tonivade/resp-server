@@ -4,6 +4,8 @@
  */
 package com.github.tonivade.resp;
 
+import io.netty.channel.Channel;
+import io.netty.handler.timeout.IdleStateEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +46,18 @@ class RespConnectionHandler extends ChannelInboundHandlerAdapter {
     LOGGER.debug("channel inactive");
     impl.disconnected(ctx);
     ctx.close();
+  }
+
+  @Override
+  public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+    if (evt instanceof IdleStateEvent) {
+      Channel channel = ctx.channel();
+      LOGGER.info("IdleStateEvent triggered, close channel " + channel);
+      impl.disconnected(ctx);
+      ctx.close();
+    } else {
+      super.userEventTriggered(ctx, evt);
+    }
   }
 
   @Override
