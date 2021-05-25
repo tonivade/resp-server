@@ -62,7 +62,7 @@ dependencies {
   api 'org.slf4j:slf4j-api:1.7.30'
   testImplementation 'junit:junit:4.13.2'
   testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.7.1'
-  testImplementation 'org.mockito:mockito-core:3.9.0'
+  testImplementation 'org.mockito:mockito-core:3.10.0'
   testImplementation 'org.hamcrest:hamcrest-library:2.2'
 }
 
