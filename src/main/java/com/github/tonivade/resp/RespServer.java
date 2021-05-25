@@ -9,6 +9,7 @@ import static com.github.tonivade.resp.protocol.SafeString.safeAsList;
 import static com.github.tonivade.resp.protocol.SafeString.safeString;
 import static java.util.stream.Collectors.toList;
 
+import io.netty.handler.timeout.IdleStateHandler;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.stream.Stream;
@@ -114,6 +115,7 @@ public class RespServer implements Resp {
 
     channel.pipeline().addLast("redisEncoder", new RedisEncoder());
     channel.pipeline().addLast("linDelimiter", new RedisDecoder(MAX_FRAME_SIZE));
+    channel.pipeline().addLast(new IdleStateHandler(0, 0, 5 * 60));
     channel.pipeline().addLast(new RespConnectionHandler(this));
   }
 
