@@ -27,7 +27,7 @@ public class SessionTest {
   private static final String RADDR = "raddr";
   private static final String HOST = "localhost";
   private static final int PORT = 12345;
-  private static final int TIMEOUT = 2000;
+  private static final int TIMEOUT = 5000;
 
   private RespServer server;
 
