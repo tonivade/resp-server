@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Objects;
@@ -103,7 +104,7 @@ public class SafeString implements Comparable<SafeString>, Serializable {
     ByteBuffer byteBuffer = ByteBuffer.allocate(checkNonNull(stringA).length() + checkNonNull(stringB).length());
     byteBuffer.put(stringA.getBytes());
     byteBuffer.put(stringB.getBytes());
-    byteBuffer.rewind();
+    ((Buffer) byteBuffer).rewind();
     return new SafeString(byteBuffer);
   }
 

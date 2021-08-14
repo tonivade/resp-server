@@ -4,8 +4,10 @@
  */
 package com.github.tonivade.resp.protocol;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
 
 import com.github.tonivade.purefun.data.Sequence;
 import com.github.tonivade.resp.protocol.AbstractRedisToken.ArrayRedisToken;
@@ -15,6 +17,7 @@ import com.github.tonivade.resp.protocol.AbstractRedisToken.StatusRedisToken;
 import com.github.tonivade.resp.protocol.AbstractRedisToken.StringRedisToken;
 
 public class RedisSerializer {
+  
   private static final byte ARRAY = '*';
   private static final byte ERROR = '-';
   private static final byte INTEGER = ':';
@@ -22,7 +25,6 @@ public class RedisSerializer {
   private static final byte BULK_STRING = '$';
 
   private static final byte[] DELIMITER = new byte[] { '\r', '\n' };
-  private static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
   private ByteBufferBuilder builder = new ByteBufferBuilder();
 
@@ -104,7 +106,7 @@ public class RedisSerializer {
     }
 
     private ByteBufferBuilder append(String str) {
-      append(str.getBytes(DEFAULT_CHARSET));
+      append(str.getBytes(UTF_8));
       return this;
     }
 
@@ -138,7 +140,7 @@ public class RedisSerializer {
 
     public byte[] build() {
       byte[] array = new byte[buffer.position()];
-      buffer.rewind();
+      ((Buffer) buffer).rewind();
       buffer.get(array);
       return array;
     }

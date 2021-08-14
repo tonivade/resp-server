@@ -8,6 +8,7 @@ import static com.github.tonivade.purefun.Precondition.checkNonEmpty;
 import static com.github.tonivade.purefun.Precondition.checkNonNull;
 import static com.github.tonivade.purefun.Precondition.checkRange;
 import static com.github.tonivade.resp.protocol.RedisToken.array;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 
@@ -30,7 +31,6 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.string.StringEncoder;
-import io.netty.util.CharsetUtil;
 
 public class RespClient implements Resp {
 
@@ -86,7 +86,7 @@ public class RespClient implements Resp {
   public void channel(SocketChannel channel) {
     LOGGER.info("connected to server: {}:{}", host, port);
     channel.pipeline().addLast("redisEncoder", new RedisEncoder());
-    channel.pipeline().addLast("stringEncoder", new StringEncoder(CharsetUtil.UTF_8));
+    channel.pipeline().addLast("stringEncoder", new StringEncoder(UTF_8));
     channel.pipeline().addLast("lineDelimiter", new RedisDecoder(MAX_FRAME_SIZE));
     channel.pipeline().addLast(new RespConnectionHandler(this));
   }
