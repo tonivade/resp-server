@@ -56,7 +56,7 @@ repositories {
 }
 
 dependencies {
-  api 'io.netty:netty-all:4.1.66.Final'
+  api 'io.netty:netty-all:4.1.67.Final'
   api 'io.reactivex.rxjava3:rxjava:3.1.0'
   api 'com.github.tonivade:purefun-core:2.2'
   api 'org.slf4j:slf4j-api:1.7.32'
