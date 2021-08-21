@@ -8,9 +8,10 @@ import static com.github.tonivade.purefun.Precondition.checkNonNull;
 import static com.github.tonivade.resp.protocol.SafeString.safeAsList;
 import static com.github.tonivade.resp.protocol.SafeString.safeString;
 import static java.util.stream.Collectors.toList;
-
+import java.io.IOException;
 import io.netty.handler.timeout.IdleStateHandler;
 import java.net.InetSocketAddress;
+import java.net.ServerSocket;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -19,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.tonivade.purefun.Matcher1;
 import com.github.tonivade.purefun.Pattern1;
+import com.github.tonivade.purefun.Recoverable;
 import com.github.tonivade.purefun.data.ImmutableArray;
 import com.github.tonivade.purefun.type.Option;
 import com.github.tonivade.resp.command.CommandSuite;
@@ -91,6 +93,14 @@ public class RespServer implements Resp {
     serverContext.start();
 
     LOGGER.info("server started: {}:{}", serverContext.getHost(), serverContext.getPort());
+  }
+  
+  public String getHost() {
+    return serverContext.getHost();
+  }
+  
+  public int getPort() {
+    return serverContext.getPort();
   }
 
   public void stop() {
@@ -210,7 +220,7 @@ public class RespServer implements Resp {
     LOGGER.debug("future closed");
   }
 
-  public static class Builder {
+  public static class Builder implements Recoverable {
     private String host = DEFAULT_HOST;
     private int port = DEFAULT_PORT;
     private CommandSuite commands = new CommandSuite();
@@ -222,6 +232,16 @@ public class RespServer implements Resp {
 
     public Builder port(int port) {
       this.port = port;
+      return this;
+    }
+    
+    public Builder randomPort() {
+      try (ServerSocket socket = new ServerSocket(0)) {
+        socket.setReuseAddress(true);
+        this.port = socket.getLocalPort();
+      } catch (IOException e) {
+        return sneakyThrow(e);
+      }
       return this;
     }
 

@@ -7,6 +7,7 @@ package com.github.tonivade.resp;
 import static com.github.tonivade.resp.protocol.RedisToken.array;
 import static com.github.tonivade.resp.protocol.RedisToken.string;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.timeout;
@@ -26,19 +27,19 @@ public class RespServerTest {
   private static final int PORT = 12345;
   private static final int TIMEOUT = 3000;
 
-  private final RespServer redisServer = 
+  private final RespServer respServer = 
       new RespServer(new RespServerContext(HOST, PORT, new CommandSuite()));
 
   private RespCallback callback = mock(RespCallback.class);
 
   @BeforeEach
   public void setUp() {
-    redisServer.start();
+    respServer.start();
   }
 
   @AfterEach
   public void tearDown() {
-    redisServer.stop();
+    respServer.stop();
   }
 
   @Test
@@ -63,11 +64,20 @@ public class RespServerTest {
   public void serverDisconects() {
     RespClient redisClient = createClient();
 
-    redisServer.stop();
+    respServer.stop();
 
     verify(callback, timeout(TIMEOUT)).onDisconnect();
 
     redisClient.stop();
+  }
+  
+  @Test
+  public void serverStartsOnRandomPort() {
+    RespServer server = RespServer.builder().randomPort().build();
+    
+    server.start();
+    
+    assertTrue(server.getPort() != 0);
   }
 
   private RespClient createClient() {
