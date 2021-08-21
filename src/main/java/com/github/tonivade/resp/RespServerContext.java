@@ -47,7 +47,7 @@ public class RespServerContext implements ServerContext {
   public RespServerContext(String host, int port, CommandSuite commands,
                            SessionListener sessionListener) {
     this.host = checkNonEmpty(host);
-    this.port = checkRange(port, 0, 65535);
+    this.port = checkRange(port, 1024, 65535);
     this.commands = checkNonNull(commands);
     this.sessionListener = sessionListener;
   }
