@@ -4,7 +4,6 @@
  */
 package com.github.tonivade.resp;
 
-import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 
@@ -19,10 +18,5 @@ class RespInitializerHandler extends ChannelInitializer<SocketChannel> {
   @Override
   protected void initChannel(SocketChannel channel) throws Exception {
     impl.channel(channel);
-  }
-
-  @Override
-  public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-    impl.disconnected(ctx);
   }
 }
