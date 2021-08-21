@@ -1,22 +1,16 @@
-apply plugin: 'java-library'
-apply plugin: 'eclipse'
-apply plugin: 'jacoco'
-apply plugin: 'com.bmuschko.nexus'
+plugins {
+  id 'java-library'
+  id 'jacoco'
+  id 'maven-publish'
+  id 'signing'
+  id 'io.github.gradle-nexus.publish-plugin' version '1.1.0'
+}
 
 group = 'com.github.tonivade'
 archivesBaseName = 'resp-server'
 version = '0.19.0-SNAPSHOT'
-
-buildscript {
-  repositories {
-    mavenCentral()
-    jcenter()
-  }
-
-  dependencies {
-    classpath 'com.bmuschko:gradle-nexus-plugin:2.3.1'
-  }
-}
+  
+ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
 jacoco {
   toolVersion = '0.8.5'
@@ -32,8 +26,8 @@ test {
 
 jacocoTestReport {
   reports {
-    xml.enabled = true
-    html.enabled = true
+    xml.required = true
+    html.required = true
     xml.destination file("${buildDir}/reports/jacoco/report.xml")
   }
 }
@@ -46,12 +40,6 @@ repositories {
   mavenCentral()
   maven {
     url = 'https://oss.sonatype.org/content/repositories/snapshots'
-  }
-  maven {
-    url = "http://dl.bintray.com/typesafe/maven-releases" 
-  }
-  maven { 
-    url = "https://jitpack.io"
   }
 }
 
@@ -66,45 +54,68 @@ dependencies {
   testImplementation 'org.hamcrest:hamcrest-library:2.2'
 }
 
-modifyPom {
-  project {
-    name 'RESP Server'
-    description 'Netty implementation of REdis Serialization Protocol, and a simple framework to implement command based protocols'
-    url 'https://github.com/tonivade/resp-server'
-    inceptionYear '2015'
+publishing {
+  publications {
+    mavenJava(MavenPublication) {
+      
+      from components.java
 
-    scm {
-      url 'https://github.com/tonivade/resp-server'
-      connection 'scm:https://github.com/tonivade/resp-server.git'
-      developerConnection 'scm:git://github.com/tonivade/resp-server.git'
-    }
+      pom {
+        name = 'RESP Server'
+        description = 'Netty implementation of REdis Serialization Protocol, and a simple framework to implement command based protocols'
+        url = 'https://github.com/tonivade/resp-server'
+        inceptionYear = '2015'
 
-    licenses {
-      license {
-        name 'The MIT License (MIT)'
-        url 'https://github.com/tonivade/resp-server/blob/master/LICENSE'
-        distribution 'repo'
-      }
-    }
+        scm {
+          url = 'https://github.com/tonivade/resp-server'
+          connection = 'scm:https://github.com/tonivade/resp-server.git'
+          developerConnection = 'scm:git://github.com/tonivade/resp-server.git'
+        }
 
-    developers {
-      developer {
-        id 'tonivade'
-        name 'Antonio Muñoz'
-        email 'antoniogmc@gmail.com'
+        licenses {
+          license {
+            name = 'The MIT License (MIT)'
+            url = 'https://github.com/tonivade/resp-server/blob/master/LICENSE'
+            distribution = 'repo'
+          }
+        }
+
+        developers {
+          developer {
+            id = 'tonivade'
+            name = 'Antonio Muñoz'
+            email = 'antoniogmc@gmail.com'
+          }
+        }
       }
     }
   }
 }
 
-extraArchive {
-  sources = true
-  tests = false
-  javadoc = true
+signing {
+  sign publishing.publications.mavenJava
 }
 
-nexus {
-  sign = true
-  repositoryUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2'
-  snapshotRepositoryUrl = 'https://oss.sonatype.org/content/repositories/snapshots'
+tasks.withType(Sign) {
+  onlyIf { isReleaseVersion }
+}
+
+nexusPublishing {
+  repositories {
+    sonatype {
+      
+      stagingProfileId = '19a96b937cdb5'
+      
+      username = project.findProperty('nexusUsername')  
+      password = project.findProperty('nexusPassword')
+    }
+  }
+  
+  clientTimeout = Duration.ofSeconds(300)
+  connectTimeout = Duration.ofSeconds(60)
+
+  transitionCheckOptions {
+    maxRetries.set(40)
+    delayBetween.set(java.time.Duration.ofMillis(3000))
+  }
 }
