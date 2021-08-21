@@ -58,6 +58,8 @@ dependencies {
 publishing {
   publications {
     mavenJava(MavenPublication) {
+
+      artifactId = 'resp-server'
       
       from components.java
 
