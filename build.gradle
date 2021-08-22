@@ -12,6 +12,11 @@ version = '0.19.0'
   
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
+java {
+  withJavadocJar()
+  withSourcesJar()
+}
+
 jacoco {
   toolVersion = '0.8.5'
 }
