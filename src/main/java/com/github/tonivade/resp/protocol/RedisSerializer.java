@@ -26,76 +26,49 @@ public class RedisSerializer {
 
   private static final byte[] DELIMITER = new byte[] { '\r', '\n' };
 
-  private ByteBufferBuilder builder = new ByteBufferBuilder();
-
   public byte[] encodeToken(RedisToken msg) {
-    msg.accept(new AbstractRedisTokenVisitor<Void>() {
-      @Override
-      public Void string(StringRedisToken token) {
-        addBulkStr(token.getValue());
-        return null;
+    ByteBufferBuilder builder = new ByteBufferBuilder();
+    switch (msg.getType()) {
+    case ARRAY:
+      Sequence<RedisToken> array = ((ArrayRedisToken) msg).getValue();
+      if (array != null) {
+        builder.append(ARRAY).append(array.size()).append(DELIMITER);
+        for (RedisToken token : array) {
+          builder.append(encodeToken(token));
+        }
+      } else {
+        builder.append(ARRAY).append(0).append(DELIMITER);
       }
-
-      @Override
-      public Void status(StatusRedisToken token) {
-        addSimpleStr(token.getValue());
-        return null;
+      break;
+    case STRING:
+      SafeString string = ((StringRedisToken) msg).getValue();
+      if (string != null) {
+        builder.append(BULK_STRING).append(string.length()).append(DELIMITER).append(string);
+      } else {
+        builder.append(BULK_STRING).append(-1);
       }
-
-      @Override
-      public Void integer(IntegerRedisToken token) {
-        addInt(token.getValue());
-        return null;
-      }
-
-      @Override
-      public Void error(ErrorRedisToken token) {
-        addError(token.getValue());
-        return null;
-      }
-
-      @Override
-      public Void array(ArrayRedisToken token) {
-        addArray(token.getValue());
-        return null;
-      }
-    });
+      builder.append(DELIMITER);
+      break;
+    case STATUS:
+      String status = ((StatusRedisToken) msg).getValue();
+      builder.append(SIMPLE_STRING).append(status).append(DELIMITER);
+      break;
+    case INTEGER:
+      Integer integer = ((IntegerRedisToken) msg).getValue();
+      builder.append(INTEGER).append(integer).append(DELIMITER);
+      break;
+    case ERROR:
+      String error = ((ErrorRedisToken) msg).getValue();
+      builder.append(ERROR).append(error).append(DELIMITER);
+      break;
+    case UNKNOWN:
+      throw new IllegalArgumentException(msg.toString());
+    }
     return builder.build();
   }
 
-  private void addBulkStr(SafeString str) {
-    if (str != null) {
-      builder.append(BULK_STRING).append(str.length()).append(DELIMITER).append(str);
-    } else {
-      builder.append(BULK_STRING).append(-1);
-    }
-    builder.append(DELIMITER);
-  }
-
-  private void addSimpleStr(String str) {
-    builder.append(SIMPLE_STRING).append(str.getBytes()).append(DELIMITER);
-  }
-
-  private void addInt(Integer value) {
-    builder.append(INTEGER).append(value).append(DELIMITER);
-  }
-
-  private void addError(String str) {
-    builder.append(ERROR).append(str.getBytes()).append(DELIMITER);
-  }
-
-  private void addArray(Sequence<RedisToken> array) {
-    if (array != null) {
-      builder.append(ARRAY).append(array.size()).append(DELIMITER);
-      for (RedisToken token : array) {
-        builder.append(new RedisSerializer().encodeToken(token));
-      }
-    } else {
-      builder.append(ARRAY).append(0).append(DELIMITER);
-    }
-  }
-
   private static class ByteBufferBuilder {
+    
     private static final int INITIAL_CAPACITY = 1024;
 
     private ByteBuffer buffer = ByteBuffer.allocate(INITIAL_CAPACITY);
