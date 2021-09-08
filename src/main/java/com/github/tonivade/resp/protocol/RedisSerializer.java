@@ -26,7 +26,7 @@ public class RedisSerializer {
 
   private static final byte[] DELIMITER = new byte[] { '\r', '\n' };
 
-  public byte[] encodeToken(RedisToken msg) {
+  public static byte[] encodeToken(RedisToken msg) {
     ByteBufferBuilder builder = new ByteBufferBuilder();
     switch (msg.getType()) {
     case ARRAY:
