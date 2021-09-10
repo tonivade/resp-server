@@ -85,12 +85,16 @@ public class RedisSerializer {
     
     private final Recycler.Handle<ByteBufferBuilder> handle;
 
-    public ByteBufferBuilder(Recycler.Handle<ByteBufferBuilder> handle) {
+    private ByteBufferBuilder(Recycler.Handle<ByteBufferBuilder> handle) {
       this.handle = checkNonNull(handle);
     }
 
-    public void recycle() {
-      buffer = ByteBuffer.allocate(INITIAL_CAPACITY);
+    private void recycle() {
+      if (buffer.capacity() > INITIAL_CAPACITY) {
+        buffer = ByteBuffer.allocate(INITIAL_CAPACITY);
+      } else {
+        buffer.clear();
+      }
       handle.recycle(this);
     }
 
