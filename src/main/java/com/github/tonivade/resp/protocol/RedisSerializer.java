@@ -135,7 +135,7 @@ public class RedisSerializer {
       byte[] array = new byte[buffer.position()];
       ((Buffer) buffer).rewind();
       buffer.get(array);
-      buffer.clear();
+      buffer = ByteBuffer.allocate(INITIAL_CAPACITY);
       return array;
     }
   }
