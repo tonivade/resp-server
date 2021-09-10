@@ -71,7 +71,7 @@ public class RedisSerializer {
         case UNKNOWN:
           throw new IllegalArgumentException(msg.toString());
       }
-      return builder.build();
+      return builder.toArray();
     } finally {
       builder.recycle();
     }
@@ -90,6 +90,7 @@ public class RedisSerializer {
     }
 
     public void recycle() {
+      buffer = ByteBuffer.allocate(INITIAL_CAPACITY);
       handle.recycle(this);
     }
 
@@ -128,14 +129,13 @@ public class RedisSerializer {
 
     private void growBuffer(int len) {
       int capacity = buffer.capacity() + Math.max(len, INITIAL_CAPACITY);
-      buffer = ByteBuffer.allocate(capacity).put(build());
+      buffer = ByteBuffer.allocate(capacity).put(toArray());
     }
 
-    public byte[] build() {
+    public byte[] toArray() {
       byte[] array = new byte[buffer.position()];
       ((Buffer) buffer).rewind();
       buffer.get(array);
-      buffer = ByteBuffer.allocate(INITIAL_CAPACITY);
       return array;
     }
   }
