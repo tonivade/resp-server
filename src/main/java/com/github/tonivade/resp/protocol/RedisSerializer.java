@@ -33,51 +33,52 @@ public class RedisSerializer {
   private static final byte[] DELIMITER = new byte[] { '\r', '\n' };
 
   public static byte[] encodeToken(RedisToken msg) {
-    ByteBufferBuilder builder = RECYCLER.get();
-    try {
-      switch (msg.getType()) {
-        case ARRAY:
-          Sequence<RedisToken> array = ((ArrayRedisToken) msg).getValue();
-          if (array != null) {
-            builder.append(ARRAY).append(array.size()).append(DELIMITER);
-            for (RedisToken token : array) {
-              builder.append(encodeToken(token));
-            }
-          } else {
-            builder.append(ARRAY).append(0).append(DELIMITER);
-          }
-          break;
-        case STRING:
-          SafeString string = ((StringRedisToken) msg).getValue();
-          if (string != null) {
-            builder.append(BULK_STRING).append(string.length()).append(DELIMITER).append(string);
-          } else {
-            builder.append(BULK_STRING).append(-1);
-          }
-          builder.append(DELIMITER);
-          break;
-        case STATUS:
-          String status = ((StatusRedisToken) msg).getValue();
-          builder.append(SIMPLE_STRING).append(status).append(DELIMITER);
-          break;
-        case INTEGER:
-          Integer integer = ((IntegerRedisToken) msg).getValue();
-          builder.append(INTEGER).append(integer).append(DELIMITER);
-          break;
-        case ERROR:
-          String error = ((ErrorRedisToken) msg).getValue();
-          builder.append(ERROR).append(error).append(DELIMITER);
-          break;
-        case UNKNOWN:
-          throw new IllegalArgumentException(msg.toString());
-      }
+    try (ByteBufferBuilder builder = RECYCLER.get()) {
+      encodeToken(builder, msg);
       return builder.toArray();
-    } finally {
-      builder.recycle();
     }
   }
 
-  private static class ByteBufferBuilder {
+  private static void encodeToken(ByteBufferBuilder builder, RedisToken msg) {
+    switch (msg.getType()) {
+      case ARRAY:
+        Sequence<RedisToken> array = ((ArrayRedisToken) msg).getValue();
+        if (array != null) {
+          builder.append(ARRAY).append(array.size()).append(DELIMITER);
+          for (RedisToken token : array) {
+            encodeToken(builder, token);
+          }
+        } else {
+          builder.append(ARRAY).append(0).append(DELIMITER);
+        }
+        break;
+      case STRING:
+        SafeString string = ((StringRedisToken) msg).getValue();
+        if (string != null) {
+          builder.append(BULK_STRING).append(string.length()).append(DELIMITER).append(string);
+        } else {
+          builder.append(BULK_STRING).append(-1);
+        }
+        builder.append(DELIMITER);
+        break;
+      case STATUS:
+        String status = ((StatusRedisToken) msg).getValue();
+        builder.append(SIMPLE_STRING).append(status).append(DELIMITER);
+        break;
+      case INTEGER:
+        Integer integer = ((IntegerRedisToken) msg).getValue();
+        builder.append(INTEGER).append(integer).append(DELIMITER);
+        break;
+      case ERROR:
+        String error = ((ErrorRedisToken) msg).getValue();
+        builder.append(ERROR).append(error).append(DELIMITER);
+        break;
+      case UNKNOWN:
+        throw new IllegalArgumentException(msg.toString());
+    }
+  }
+
+  private static class ByteBufferBuilder implements AutoCloseable {
     
     private static final int INITIAL_CAPACITY = 1024;
 
@@ -89,7 +90,7 @@ public class RedisSerializer {
       this.handle = checkNonNull(handle);
     }
 
-    private void recycle() {
+    public void close() {
       if (buffer.capacity() > INITIAL_CAPACITY) {
         buffer = ByteBuffer.allocate(INITIAL_CAPACITY);
       } else {
