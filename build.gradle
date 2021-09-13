@@ -51,7 +51,7 @@ repositories {
 dependencies {
   api 'io.netty:netty-all:4.1.68.Final'
   api 'io.reactivex.rxjava3:rxjava:3.1.1'
-  api 'com.github.tonivade:purefun-core:2.2'
+  api 'com.github.tonivade:purefun-core:3.0'
   api 'org.slf4j:slf4j-api:1.7.32'
   testImplementation 'junit:junit:4.13.2'
   testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.7.2'
