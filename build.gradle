@@ -3,12 +3,10 @@ plugins {
   id 'jacoco'
   id 'maven-publish'
   id 'signing'
-  id 'io.github.gradle-nexus.publish-plugin' version '1.1.0'
+  id 'io.github.gradle-nexus.publish-plugin' version "$nexusVersion"
 }
 
 group = 'com.github.tonivade'
-archivesBaseName = 'resp-server'
-version = '0.20.0-SNAPSHOT'
   
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
@@ -18,7 +16,7 @@ java {
 }
 
 jacoco {
-  toolVersion = '0.8.5'
+  toolVersion = jacocoVersion
 }
 
 test {
@@ -49,15 +47,15 @@ repositories {
 }
 
 dependencies {
-  api 'io.netty:netty-all:4.1.68.Final'
-  api 'io.reactivex.rxjava3:rxjava:3.1.1'
-  api 'com.github.tonivade:purefun-core:3.0'
-  api 'org.slf4j:slf4j-api:1.7.32'
-  testImplementation 'junit:junit:4.13.2'
-  testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.8.0'
-  testImplementation 'org.mockito:mockito-core:3.12.4'
-  testImplementation 'org.hamcrest:hamcrest-library:2.2'
-  testRuntimeOnly 'ch.qos.logback:logback-classic:1.2.6'
+  api "io.netty:netty-all:$nettyVersion"
+  api "io.reactivex.rxjava3:rxjava:$rxjavaVersion"
+  api "com.github.tonivade:purefun-core:$purefunVersion"
+  api "org.slf4j:slf4j-api:$slf4jVersion"
+  testImplementation "junit:junit:$junitVersion"
+  testImplementation "org.junit.jupiter:junit-jupiter-engine:$junitJupiter"
+  testImplementation "org.mockito:mockito-core:$mockitoVersion"
+  testImplementation "org.hamcrest:hamcrest-library:$hamcrestVersion"
+  testRuntimeOnly "ch.qos.logback:logback-classic:$logbackVersion"
 }
 
 publishing {
