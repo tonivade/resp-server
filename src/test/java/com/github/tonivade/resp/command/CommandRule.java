@@ -10,6 +10,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import java.lang.reflect.InvocationTargetException;
 import java.util.Optional;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
@@ -56,8 +58,8 @@ public class CommandRule {
     openMocks = MockitoAnnotations.openMocks(target);
 
     try {
-      command = target.getClass().getAnnotation(CommandUnderTest.class).value().newInstance();
-    } catch (InstantiationException | IllegalAccessException e) {
+      command = target.getClass().getAnnotation(CommandUnderTest.class).value().getDeclaredConstructor().newInstance();
+    } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
       throw new ParameterResolutionException("error", e);
     }
   }
