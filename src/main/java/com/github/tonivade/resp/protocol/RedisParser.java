@@ -13,6 +13,7 @@ import static java.util.Spliterators.spliteratorUnknownSize;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Spliterator;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -44,7 +45,11 @@ public class RedisParser implements Iterator<RedisToken> {
 
   @Override
   public RedisToken next() {
-    return parseToken(source.readLine());
+    SafeString line = source.readLine();
+    if (line != null) {
+      return parseToken(line);
+    }
+    throw new NoSuchElementException();
   }
 
   public <T> Stream<T> stream(Iterator<T> iterator) {

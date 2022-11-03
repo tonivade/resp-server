@@ -141,7 +141,10 @@ public class SafeString implements Comparable<SafeString>, Serializable {
   private void readObject(ObjectInputStream input) throws IOException {
     int length = input.readInt();
     byte[] bytes = new byte[length];
-    input.read(bytes);
+    int read = input.read(bytes);
+    if (read != length) {
+      throw new IOException();
+    }
     this.buffer = ByteBuffer.wrap(bytes);
   }
 }

@@ -54,7 +54,7 @@ public class RespServerContext implements ServerContext {
   }
 
   public void start() {
-
+    // nothing to do
   }
 
   public void stop() {
