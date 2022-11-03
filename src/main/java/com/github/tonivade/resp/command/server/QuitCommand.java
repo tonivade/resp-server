@@ -4,6 +4,7 @@
  */
 package com.github.tonivade.resp.command.server;
 
+import static com.github.tonivade.resp.protocol.RedisToken.responseOk;
 import com.github.tonivade.resp.annotation.Command;
 import com.github.tonivade.resp.command.RespCommand;
 import com.github.tonivade.resp.command.Request;
@@ -14,7 +15,6 @@ public class QuitCommand implements RespCommand {
 
   @Override
   public RedisToken execute(Request request) {
-    return RedisToken.responseOk();
+    return responseOk();
   }
-
 }

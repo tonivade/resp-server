@@ -52,7 +52,7 @@ class RespConnectionHandler extends ChannelInboundHandlerAdapter {
   public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
     if (evt instanceof IdleStateEvent) {
       Channel channel = ctx.channel();
-      LOGGER.info("IdleStateEvent triggered, close channel " + channel);
+      LOGGER.info("IdleStateEvent triggered, close channel {}", channel);
       impl.disconnected(ctx);
       ctx.close();
     } else {

@@ -94,11 +94,11 @@ public class RespServer implements Resp {
 
     LOGGER.info("server started: {}:{}", serverContext.getHost(), serverContext.getPort());
   }
-  
+
   public String getHost() {
     return serverContext.getHost();
   }
-  
+
   public int getPort() {
     return serverContext.getPort();
   }
@@ -121,7 +121,9 @@ public class RespServer implements Resp {
 
   @Override
   public void channel(SocketChannel channel) {
-    LOGGER.debug("new channel: {}", sourceKey(channel));
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("new channel: {}", sourceKey(channel));
+    }
 
     channel.pipeline().addLast("redisEncoder", new RedisEncoder());
     channel.pipeline().addLast("linDelimiter", new RedisDecoder(MAX_FRAME_SIZE));
@@ -234,7 +236,7 @@ public class RespServer implements Resp {
       this.port = port;
       return this;
     }
-    
+
     public Builder randomPort() {
       try (ServerSocket socket = new ServerSocket(0)) {
         socket.setReuseAddress(true);

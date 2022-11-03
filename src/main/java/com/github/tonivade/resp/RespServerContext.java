@@ -29,6 +29,7 @@ import io.reactivex.rxjava3.core.Scheduler;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class RespServerContext implements ServerContext {
+
   private static final Logger LOGGER = LoggerFactory.getLogger(RespServerContext.class);
 
   private final StateHolder state = new StateHolder();
