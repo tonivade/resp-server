@@ -18,7 +18,6 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.tonivade.purefun.Matcher1;
 import com.github.tonivade.purefun.Pattern1;
 import com.github.tonivade.purefun.Recoverable;
 import com.github.tonivade.purefun.data.ImmutableArray;
@@ -159,10 +158,10 @@ public class RespServer implements Resp {
 
   private Option<Request> parseMessage(RedisToken message, Session session) {
     return Pattern1.<RedisToken, Option<Request>>build()
-        .when(Matcher1.instanceOf(ArrayRedisToken.class))
-          .then(token -> Option.some(parseArray((ArrayRedisToken) token, session)))
-        .when(Matcher1.instanceOf(UnknownRedisToken.class))
-          .then(token -> Option.some(parseLine((UnknownRedisToken) token, session)))
+        .when(ArrayRedisToken.class)
+          .then(token -> Option.some(parseArray(token, session)))
+        .when(UnknownRedisToken.class)
+          .then(token -> Option.some(parseLine(token, session)))
         .otherwise()
           .returns(Option.none())
         .apply(message);
@@ -189,8 +188,8 @@ public class RespServer implements Resp {
 
   private Stream<SafeString> toSafeStrings(RedisToken token) {
     return Pattern1.<RedisToken, Stream<SafeString>>build()
-        .when(Matcher1.instanceOf(StringRedisToken.class))
-          .then(string -> Stream.of(((StringRedisToken) string).getValue()))
+        .when(StringRedisToken.class)
+          .then(string -> Stream.of(string.getValue()))
         .otherwise()
           .returns(Stream.empty())
         .apply(token);

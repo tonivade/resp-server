@@ -6,7 +6,6 @@ package com.github.tonivade.resp.protocol;
 
 import static com.github.tonivade.purefun.Function1.cons;
 import static com.github.tonivade.purefun.Function1.identity;
-import static com.github.tonivade.purefun.Matcher1.instanceOf;
 import static com.github.tonivade.resp.protocol.RedisToken.string;
 import static java.util.stream.Collectors.toList;
 
@@ -25,16 +24,16 @@ public class RespSerializer {
     return Pattern1.<Object, RedisToken>build()
         .when(isPrimitive())
           .then(this::getStringValue)
-        .when(instanceOf(Object[].class))
-          .then(array -> getArrayValue((Object[]) array))
-        .when(instanceOf(Number.class))
+        .when(Object[].class)
+          .then(this::getArrayValue)
+        .when(Number.class)
           .then(this::getStringValue)
-        .when(instanceOf(String.class))
+        .when(String.class)
           .then(this::getStringValue)
-        .when(instanceOf(Collection.class))
-          .then(collection -> getCollectionValue((Collection<?>) collection))
-        .when(instanceOf(Map.class))
-          .then(map -> getMapValue((Map<?, ?>) map))
+        .when(Collection.class)
+          .then(this::getCollectionValue)
+        .when(Map.class)
+          .then(this::getMapValue)
         .otherwise()
           .then(this::getObjectValue)
         .apply(object);
