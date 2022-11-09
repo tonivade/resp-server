@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 
 import com.github.tonivade.resp.protocol.test.Data;
 
-public class RespSerializerTest {
+class RespSerializerTest {
   private RespSerializer serializer = new RespSerializer();
 
   private final Data data = new Data(1, "value");
@@ -23,28 +23,28 @@ public class RespSerializerTest {
                                             string("value"), string("value"));
 
   @Test
-  public void getValue() {
+  void getValue() {
     RedisToken array = serializer.getValue(data);
 
     assertThat(array, equalTo(expected));
   }
 
   @Test
-  public void getValueCollection() {
+  void getValueCollection() {
     RedisToken array = serializer.getValue(asList(data, data, data));
 
     assertThat(array, equalTo(array(expected, expected, expected)));
   }
 
   @Test
-  public void getValueArray() {
+  void getValueArray() {
     RedisToken array = serializer.getValue(new Object[] { data, data, data });
 
     assertThat(array, equalTo(array(expected, expected, expected)));
   }
 
   @Test
-  public void getValueMap() {
+  void getValueMap() {
     RedisToken array = serializer.getValue(singletonMap("key", "value"));
 
     assertThat(array, equalTo(array(string("key"), string("value"))));

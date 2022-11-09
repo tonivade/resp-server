@@ -14,9 +14,10 @@ import org.junit.jupiter.api.Test;
 
 import com.github.tonivade.purefun.data.ImmutableArray;
 
-public class DefaultRequestTest {
+class DefaultRequestTest {
+
   @Test
-  public void testRequest() {
+  void testRequest() {
     DefaultRequest request = new DefaultRequest(null, null, safeString("a"),
                                                 ImmutableArray.from(safeAsList("1", "2", "3")));
 

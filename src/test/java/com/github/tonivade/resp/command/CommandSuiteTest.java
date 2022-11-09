@@ -19,17 +19,17 @@ import com.github.tonivade.resp.annotation.Command;
 import com.github.tonivade.resp.annotation.ParamLength;
 import com.github.tonivade.resp.protocol.RedisToken;
 
-public class CommandSuiteTest {
+class CommandSuiteTest {
 
   private CommandSuite commandSuite;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     commandSuite = new CommandSuite();
   }
 
   @Test
-  public void addCommandLambda() {
+  void addCommandLambda() {
     String command = "test";
     commandSuite.addCommand(command, request -> string(request.getCommand()));
 
@@ -39,28 +39,28 @@ public class CommandSuiteTest {
   }
 
   @Test
-  public void addCommand() {
+  void addCommand() {
     commandSuite.addCommand(GoodCommand::new);
 
     assertThat(commandSuite.contains("good"), is(true));
   }
 
   @Test
-  public void isPresent() {
+  void isPresent() {
     commandSuite.addCommand(GoodCommand::new);
 
     assertThat(commandSuite.isPresent("good", Command.class), is(true));
   }
 
   @Test
-  public void notPresent() {
+  void notPresent() {
     commandSuite.addCommand(GoodCommand::new);
 
     assertThat(commandSuite.isPresent("good", ParamLength.class), is(false));
   }
 
   @Test
-  public void getCommandNull() {
+  void getCommandNull() {
     RespCommand command = commandSuite.getCommand("notExists");
 
     assertThat(command, is(instanceOf(NullCommand.class)));

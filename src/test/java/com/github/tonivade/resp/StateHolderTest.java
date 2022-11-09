@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import com.github.tonivade.purefun.type.Option;
 
-public class StateHolderTest {
+class StateHolderTest {
   
   private static final String VALUE = "value";
   private static final String KEY = "key";
@@ -20,24 +20,24 @@ public class StateHolderTest {
   private StateHolder state = new StateHolder();
   
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     state.clear();
   }
   
   @Test
-  public void exists() {
+  void exists() {
     state.putValue(KEY, VALUE);
 
     assertThat(state.getValue(KEY), equalTo(Option.some(VALUE)));
   }
   
   @Test
-  public void notExists() {
+  void notExists() {
     assertThat(state.getValue(KEY), equalTo(Option.none()));
   }
   
   @Test
-  public void remove() {
+  void remove() {
     state.putValue(KEY, VALUE);
 
     assertThat(state.removeValue(KEY), equalTo(Option.some(VALUE)));
@@ -45,7 +45,7 @@ public class StateHolderTest {
   }
   
   @Test
-  public void clear() {
+  void clear() {
     state.putValue(KEY, VALUE);
     assertThat(state.getValue(KEY), equalTo(Option.some(VALUE)));
 

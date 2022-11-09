@@ -14,7 +14,7 @@ import org.mockito.Mockito;
 
 import com.github.tonivade.resp.protocol.AbstractRedisToken.UnknownRedisToken;
 
-public class RedisParserTest {
+class RedisParserTest {
 
   private RedisSource source = Mockito.mock(RedisSource.class);
 
@@ -28,7 +28,7 @@ public class RedisParserTest {
   private RedisToken unknownString = new UnknownRedisToken(safeString("what?"));
 
   @Test
-  public void testBulkString() {
+  void testBulkString() {
     when(source.readLine()).thenReturn(safeString("$3"));
     when(source.readString(3)).thenReturn(safeString("abc"));
 
@@ -38,7 +38,7 @@ public class RedisParserTest {
   }
 
   @Test
-  public void testSimpleString() {
+  void testSimpleString() {
     when(source.readLine()).thenReturn(safeString("+pong"));
 
     RedisToken token = parser.next();
@@ -47,7 +47,7 @@ public class RedisParserTest {
   }
 
   @Test
-  public void testInteger() {
+  void testInteger() {
     when(source.readLine()).thenReturn(safeString(":1"));
 
     RedisToken token = parser.next();
@@ -56,7 +56,7 @@ public class RedisParserTest {
   }
 
   @Test
-  public void testErrorString() {
+  void testErrorString() {
     when(source.readLine()).thenReturn(safeString("-ERR"));
 
     RedisToken token = parser.next();
@@ -65,7 +65,7 @@ public class RedisParserTest {
   }
 
   @Test
-  public void testUnknownString() {
+  void testUnknownString() {
     when(source.readLine()).thenReturn(safeString("what?"));
 
     RedisToken token = parser.next();
@@ -74,7 +74,7 @@ public class RedisParserTest {
   }
 
   @Test
-  public void testArray() {
+  void testArray() {
     when(source.readLine()).thenReturn(safeString("*2"), safeString(":1"), safeString("$3"));
     when(source.readString(3)).thenReturn(safeString("abc"));
 

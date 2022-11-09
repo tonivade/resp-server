@@ -16,16 +16,16 @@ import com.github.tonivade.resp.command.CommandUnderTest;
 
 @ExtendWith(CommandRuleExtension.class)
 @CommandUnderTest(PingCommand.class)
-public class PingCommandTest {
+class PingCommandTest {
 
   @Test
-  public void testExecute(CommandRule rule) {
+  void testExecute(CommandRule rule) {
     rule.execute()
         .assertThat(status("PONG"));
   }
 
   @Test
-  public void testExecuteWithParam(CommandRule rule) {
+  void testExecuteWithParam(CommandRule rule) {
     rule.withParams("Hi!")
         .execute()
         .assertThat(string("Hi!"));

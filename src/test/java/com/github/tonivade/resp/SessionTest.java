@@ -21,7 +21,7 @@ import org.mockito.ArgumentCaptor;
 import com.github.tonivade.resp.command.CommandSuite;
 import com.github.tonivade.resp.protocol.RedisToken;
 
-public class SessionTest {
+class SessionTest {
 
   private static final String LADDR = "laddr";
   private static final String RADDR = "raddr";

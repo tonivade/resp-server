@@ -11,7 +11,7 @@ import static com.github.tonivade.resp.protocol.RedisSerializer.encodeToken;
 
 import org.junit.jupiter.api.Test;
 
-public class RedisSerializerTest {
+class RedisSerializerTest {
 
   private RedisToken intToken = RedisToken.integer(1);
   private RedisToken abcString = RedisToken.string("abc");
@@ -21,32 +21,32 @@ public class RedisSerializerTest {
   private RedisToken arrayOfArraysToken = RedisToken.array(arrayToken, arrayToken);
 
   @Test
-  public void encodeString() {
+  void encodeString() {
     assertThat(encodeToken(abcString), equalTo("$3\r\nabc\r\n".getBytes(UTF_8)));
   }
 
   @Test
-  public void encodeStatus() {
+  void encodeStatus() {
     assertThat(encodeToken(pongString), equalTo("+pong\r\n".getBytes(UTF_8)));
   }
 
   @Test
-  public void encodeInteger() {
+  void encodeInteger() {
     assertThat(encodeToken(intToken), equalTo(":1\r\n".getBytes(UTF_8)));
   }
 
   @Test
-  public void encodeError() {
+  void encodeError() {
     assertThat(encodeToken(errorString), equalTo("-ERR\r\n".getBytes(UTF_8)));
   }
 
   @Test
-  public void encodeArray() {
+  void encodeArray() {
     assertThat(encodeToken(arrayToken), equalTo("*2\r\n:1\r\n$3\r\nabc\r\n".getBytes(UTF_8)));
   }
 
   @Test
-  public void encodeArrayOfArrays() {
+  void encodeArrayOfArrays() {
     assertThat(encodeToken(arrayOfArraysToken),
         equalTo("*2\r\n*2\r\n:1\r\n$3\r\nabc\r\n*2\r\n:1\r\n$3\r\nabc\r\n".getBytes(UTF_8)));
   }

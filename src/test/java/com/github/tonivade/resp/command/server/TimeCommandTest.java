@@ -14,9 +14,10 @@ import com.github.tonivade.resp.protocol.RedisToken;
 
 @ExtendWith(CommandRuleExtension.class)
 @CommandUnderTest(TimeCommand.class)
-public class TimeCommandTest {
+class TimeCommandTest {
+
   @Test
-  public void testExecute(CommandRule rule) {
+  void testExecute(CommandRule rule) {
     rule.execute();
 
     RedisToken array = rule.getResponse();

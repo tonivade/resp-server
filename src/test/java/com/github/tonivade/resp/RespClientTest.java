@@ -23,7 +23,7 @@ import com.github.tonivade.resp.protocol.RedisToken;
 import com.github.tonivade.resp.protocol.RedisTokenType;
 
 @ExtendWith(RespServerExtension.class)
-public class RespClientTest {
+class RespClientTest {
 
   private static final String HOST = "localhost";
   private static final int PORT = 12345;
@@ -34,19 +34,19 @@ public class RespClientTest {
   private RespCallback callback = mock(RespCallback.class);
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     client = new RespClient(HOST, PORT, callback);
   }
 
   @Test
-  public void onConnect() {
+  void onConnect() {
     client.start();
 
     verify(callback, timeout(1000)).onConnect();
   }
 
   @Test
-  public void onMessage() {
+  void onMessage() {
     client.start();
     verify(callback, timeout(TIMEOUT)).onConnect();
 
@@ -60,7 +60,7 @@ public class RespClientTest {
   }
 
   @Test
-  public void onBigMessage() {
+  void onBigMessage() {
     client.start();
     verify(callback, timeout(TIMEOUT)).onConnect();
 
@@ -83,7 +83,7 @@ public class RespClientTest {
   }
 
   @Test
-  public void onClientDisconnect() {
+  void onClientDisconnect() {
     client.start();
     verify(callback, timeout(TIMEOUT)).onConnect();
 
@@ -92,27 +92,27 @@ public class RespClientTest {
   }
 
   @Test
-  public void requireHostNonNull() {
+  void requireHostNonNull() {
     assertThrows(IllegalArgumentException.class, () -> new RespClient(null, 0, callback));
   }
 
   @Test
-  public void requireHostNonEmpty() {
+  void requireHostNonEmpty() {
     assertThrows(IllegalArgumentException.class, () -> new RespClient("", 0, callback));
   }
 
   @Test
-  public void requirePortLowerThan1024() {
+  void requirePortLowerThan1024() {
     assertThrows(IllegalArgumentException.class, () -> new RespClient("localshot", 0, callback));
   }
 
   @Test
-  public void requirePortGreaterThan65535() {
+  void requirePortGreaterThan65535() {
     assertThrows(IllegalArgumentException.class, () -> new RespClient("localshot", 987654321, callback));
   }
 
   @Test
-  public void requireCallback() {
+  void requireCallback() {
     assertThrows(IllegalArgumentException.class, () -> new RespClient("localhost", 12345, null));
   }
 }

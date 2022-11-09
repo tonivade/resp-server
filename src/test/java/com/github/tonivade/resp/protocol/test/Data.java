@@ -9,6 +9,7 @@ import java.util.Objects;
 import com.github.tonivade.purefun.Equal;
 
 public class Data {
+
   private final int id;
   private final String value;
 

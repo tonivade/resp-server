@@ -15,9 +15,10 @@ import com.github.tonivade.resp.command.CommandUnderTest;
 
 @ExtendWith(CommandRuleExtension.class)
 @CommandUnderTest(QuitCommand.class)
-public class QuitCommandTest {
+class QuitCommandTest {
+
   @Test
-  public void testExecute(CommandRule rule) {
+  void testExecute(CommandRule rule) {
     rule.withParams()
         .execute()
         .assertThat(responseOk());
