@@ -136,12 +136,12 @@ is rejected with an error.
     <dependency>
         <groupId>com.github.tonivade</groupId>
         <artifactId>resp-server</artifactId>
-        <version>0.19.0</version>
+        <version>0.21.0</version>
     </dependency>
 
 ## Gradle
 
-    compile 'com.github.tonivade:resp-server:0.19.0'
+    compile 'com.github.tonivade:resp-server:0.21.0'
     
 ## Stargazers over time
 
