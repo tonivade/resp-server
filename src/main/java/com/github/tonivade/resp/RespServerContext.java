@@ -39,7 +39,7 @@ public class RespServerContext implements ServerContext {
   private final String host;
   private final int port;
   private final CommandSuite commands;
-  private SessionListener sessionListener;
+  private final SessionListener sessionListener;
 
   public RespServerContext(String host, int port, CommandSuite commands) {
     this(host, port, commands, nullListener());
@@ -50,7 +50,7 @@ public class RespServerContext implements ServerContext {
     this.host = checkNonEmpty(host);
     this.port = checkRange(port, 1024, 65535);
     this.commands = checkNonNull(commands);
-    this.sessionListener = sessionListener;
+    this.sessionListener = checkNonNull(sessionListener);
   }
 
   public void start() {
