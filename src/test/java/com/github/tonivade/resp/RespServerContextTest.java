@@ -23,13 +23,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import com.github.tonivade.purefun.Function1;
-import com.github.tonivade.purefun.data.ImmutableArray;
 import com.github.tonivade.resp.command.CommandSuite;
 import com.github.tonivade.resp.command.DefaultRequest;
 import com.github.tonivade.resp.command.Request;
 import com.github.tonivade.resp.command.RespCommand;
 import com.github.tonivade.resp.command.Session;
+import java.util.Collections;
+import java.util.function.Function;
 
 public class RespServerContextTest {
 
@@ -43,7 +43,7 @@ public class RespServerContextTest {
   @Mock
   private Session session;
   @Mock
-  private Function1<String, Session> factory;
+  private Function<String, Session> factory;
 
   private RespServerContext serverContext;
   private AutoCloseable openMocks;
@@ -53,7 +53,7 @@ public class RespServerContextTest {
     openMocks = MockitoAnnotations.openMocks(this);
     serverContext = new RespServerContext(HOST, PORT, commands);
   }
-  
+
   @AfterEach
   public void tearDown() throws Exception {
     openMocks.close();
@@ -160,6 +160,6 @@ public class RespServerContextTest {
   }
 
   private Request newRequest(String command) {
-    return new DefaultRequest(serverContext, session, safeString(command), ImmutableArray.empty());
+    return new DefaultRequest(serverContext, session, safeString(command), Collections.emptyList());
   }
 }

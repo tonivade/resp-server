@@ -14,10 +14,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.github.tonivade.purefun.data.ImmutableArray;
 import com.github.tonivade.resp.annotation.Command;
 import com.github.tonivade.resp.annotation.ParamLength;
 import com.github.tonivade.resp.protocol.RedisToken;
+import java.util.Collections;
 
 class CommandSuiteTest {
 
@@ -67,7 +67,7 @@ class CommandSuiteTest {
   }
 
   private Request request(String command) {
-    return new DefaultRequest(null, null, safeString(command), ImmutableArray.empty());
+    return new DefaultRequest(null, null, safeString(command), Collections.emptyList());
   }
 
   @Command("good")

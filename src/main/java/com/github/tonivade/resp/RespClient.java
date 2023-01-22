@@ -4,9 +4,9 @@
  */
 package com.github.tonivade.resp;
 
-import static com.github.tonivade.purefun.Precondition.checkNonEmpty;
-import static com.github.tonivade.purefun.Precondition.checkNonNull;
-import static com.github.tonivade.purefun.Precondition.checkRange;
+import static com.github.tonivade.resp.util.Precondition.checkNonEmpty;
+import static com.github.tonivade.resp.util.Precondition.checkNonNull;
+import static com.github.tonivade.resp.util.Precondition.checkRange;
 import static com.github.tonivade.resp.protocol.RedisToken.array;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;

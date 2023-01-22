@@ -4,14 +4,14 @@
  */
 package com.github.tonivade.resp.command;
 
-import com.github.tonivade.purefun.type.Option;
+import java.util.Optional;
 
 public interface ServerContext {
   String getHost();
   int getPort();
   int getClients();
   RespCommand getCommand(String name);
-  <T> Option<T> getValue(String key);
+  <T> Optional<T> getValue(String key);
   void putValue(String key, Object value);
-  <T> Option<T> removeValue(String key);
+  <T> Optional<T> removeValue(String key);
 }

@@ -4,19 +4,17 @@
  */
 package com.github.tonivade.resp;
 
-import static com.github.tonivade.purefun.Precondition.checkNonEmpty;
-import static com.github.tonivade.purefun.Precondition.checkNonNull;
-import static com.github.tonivade.purefun.Precondition.checkRange;
+import static com.github.tonivade.resp.util.Precondition.checkNonEmpty;
+import static com.github.tonivade.resp.util.Precondition.checkNonNull;
+import static com.github.tonivade.resp.util.Precondition.checkRange;
 import static com.github.tonivade.resp.SessionListener.nullListener;
-
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
-
+import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.tonivade.purefun.Function1;
-import com.github.tonivade.purefun.type.Option;
 import com.github.tonivade.resp.command.CommandSuite;
 import com.github.tonivade.resp.command.Request;
 import com.github.tonivade.resp.command.RespCommand;
@@ -73,12 +71,12 @@ public class RespServerContext implements ServerContext {
   }
 
   @Override
-  public <T> Option<T> getValue(String key) {
+  public <T> Optional<T> getValue(String key) {
     return state.getValue(key);
   }
 
   @Override
-  public <T> Option<T> removeValue(String key) {
+  public <T> Optional<T> removeValue(String key) {
     return state.removeValue(key);
   }
 
@@ -97,7 +95,7 @@ public class RespServerContext implements ServerContext {
     return port;
   }
 
-  Session getSession(String sourceKey, Function1<String, Session> factory) {
+  Session getSession(String sourceKey, Function<String, Session> factory) {
     return clients.computeIfAbsent(sourceKey, key -> {
       Session session = factory.apply(key);
       sessionListener.sessionCreated(session);

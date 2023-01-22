@@ -4,15 +4,15 @@
  */
 package com.github.tonivade.resp.command;
 
-import static com.github.tonivade.purefun.Precondition.checkNonEmpty;
+import static com.github.tonivade.resp.util.Precondition.checkNonEmpty;
 
-import com.github.tonivade.purefun.type.Option;
 import com.github.tonivade.resp.StateHolder;
 import com.github.tonivade.resp.protocol.RedisToken;
 
 import io.netty.channel.ChannelHandlerContext;
 
 import java.net.InetSocketAddress;
+import java.util.Optional;
 
 public class DefaultSession implements Session {
 
@@ -50,12 +50,12 @@ public class DefaultSession implements Session {
   }
 
   @Override
-  public <T> Option<T> getValue(String key) {
+  public <T> Optional<T> getValue(String key) {
     return state.getValue(key);
   }
 
   @Override
-  public <T> Option<T> removeValue(String key) {
+  public <T> Optional<T> removeValue(String key) {
     return state.removeValue(key);
   }
 

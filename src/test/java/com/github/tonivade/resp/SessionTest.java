@@ -26,7 +26,6 @@ class SessionTest {
   private static final String LADDR = "laddr";
   private static final String RADDR = "raddr";
   private static final String HOST = "localhost";
-  private static final int PORT = 12345;
   private static final int TIMEOUT = 5000;
 
   private RespServer server;
@@ -36,8 +35,8 @@ class SessionTest {
 
   @BeforeEach
   void setUp() {
-    server = RespServer.builder().host(HOST).port(PORT).commands(testSuite()).build();
-    client = new RespClient(HOST, PORT, callback);
+    server = RespServer.builder().host(HOST).randomPort().commands(testSuite()).build();
+    client = new RespClient(HOST, server.getPort(), callback);
 
     server.start();
     client.start();
@@ -62,7 +61,7 @@ class SessionTest {
   void testLocalAddress() {
     client.send(LADDR);
 
-    assertThat(awaitResponse(), equalTo(string("12345")));
+    assertThat(awaitResponse(), equalTo(string(String.valueOf(server.getPort()))));
   }
 
   private RedisToken awaitResponse() {

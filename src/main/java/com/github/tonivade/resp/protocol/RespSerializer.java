@@ -4,39 +4,37 @@
  */
 package com.github.tonivade.resp.protocol;
 
-import static com.github.tonivade.purefun.Function1.cons;
-import static com.github.tonivade.purefun.Function1.identity;
 import static com.github.tonivade.resp.protocol.RedisToken.string;
 import static java.util.stream.Collectors.toList;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
-
-import com.github.tonivade.purefun.Matcher1;
-import com.github.tonivade.purefun.Pattern1;
-import com.github.tonivade.purefun.type.Try;
 
 public class RespSerializer {
 
   public RedisToken getValue(Object object) {
-    return Pattern1.<Object, RedisToken>build()
-        .when(isPrimitive())
-          .then(this::getStringValue)
-        .when(Object[].class)
-          .then(this::getArrayValue)
-        .when(Number.class)
-          .then(this::getStringValue)
-        .when(String.class)
-          .then(this::getStringValue)
-        .when(Collection.class)
-          .then(this::getCollectionValue)
-        .when(Map.class)
-          .then(this::getMapValue)
-        .otherwise()
-          .then(this::getObjectValue)
-        .apply(object);
+    if (isPrimitive().test(object)) {
+      return getStringValue(object);
+    }
+    if (object instanceof Object[]) {
+      return getArrayValue((Object[]) object);
+    }
+    if (object instanceof Number) {
+      return getStringValue(object);
+    }
+    if (object instanceof String) {
+      return getStringValue(object);
+    }
+    if (object instanceof Collection) {
+      return getCollectionValue((Collection<?>) object);
+    }
+    if (object instanceof Map) {
+      return getMapValue((Map<?, ?>) object);
+    }
+    return getObjectValue(object);
   }
 
   private RedisToken getMapValue(Map<?, ?> map) {
@@ -61,7 +59,11 @@ public class RespSerializer {
   }
 
   private Object tryGetFieldValue(Object object, Field field) {
-    return Try.of(() -> getFieldValue(object, field)).fold(cons(null), identity());
+    try {
+      return getFieldValue(object, field);
+    } catch (IllegalArgumentException | IllegalAccessException e) {
+      return null;
+    }
   }
 
   private Object getFieldValue(Object object, Field field)
@@ -74,7 +76,7 @@ public class RespSerializer {
     return string(String.valueOf(value));
   }
 
-  private Matcher1<Object> isPrimitive() {
+  private Predicate<Object> isPrimitive() {
     return object -> object.getClass().isPrimitive();
   }
 }
