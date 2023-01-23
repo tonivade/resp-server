@@ -6,6 +6,8 @@ package com.github.tonivade.resp.command;
 
 import com.github.tonivade.resp.protocol.SafeString;
 import java.util.Optional;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public interface Request {
   String getCommand();
@@ -17,4 +19,8 @@ public interface Request {
   Session getSession();
   ServerContext getServerContext();
   boolean isExit();
+
+  default Stream<SafeString> getParamsAsStream() {
+    return StreamSupport.stream(getParams().spliterator(), false);
+  }
 }
