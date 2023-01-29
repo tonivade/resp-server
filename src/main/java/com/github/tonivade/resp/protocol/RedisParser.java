@@ -4,7 +4,7 @@
  */
 package com.github.tonivade.resp.protocol;
 
-import static com.github.tonivade.purefun.Precondition.checkNonNull;
+import static com.github.tonivade.resp.util.Precondition.checkNonNull;
 import static com.github.tonivade.resp.protocol.RedisToken.array;
 import static com.github.tonivade.resp.protocol.RedisToken.error;
 import static com.github.tonivade.resp.protocol.RedisToken.status;

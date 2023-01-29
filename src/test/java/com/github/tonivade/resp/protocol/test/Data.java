@@ -4,9 +4,8 @@
  */
 package com.github.tonivade.resp.protocol.test;
 
+import com.github.tonivade.resp.util.Equal;
 import java.util.Objects;
-
-import com.github.tonivade.purefun.Equal;
 
 public class Data {
 

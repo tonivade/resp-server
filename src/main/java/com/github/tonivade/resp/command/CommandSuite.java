@@ -4,17 +4,15 @@
  */
 package com.github.tonivade.resp.command;
 
-import static com.github.tonivade.purefun.Precondition.checkNonNull;
+import static com.github.tonivade.resp.util.Precondition.checkNonNull;
 
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
-
+import java.util.function.Supplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.tonivade.purefun.Producer;
-import com.github.tonivade.purefun.type.Try;
 import com.github.tonivade.resp.annotation.Command;
 import com.github.tonivade.resp.command.server.EchoCommand;
 import com.github.tonivade.resp.command.server.PingCommand;
@@ -56,10 +54,12 @@ public class CommandSuite {
     return commands.get(name) != null;
   }
 
-  protected void addCommand(Producer<?> newInstance) {
-    Try.of(newInstance)
-       .onSuccess(this::processCommand)
-       .onFailure(e -> LOGGER.error("error loading command", e));
+  protected void addCommand(Supplier<?> newInstance) {
+    try {
+      processCommand(newInstance.get());
+    } catch(Exception e) {
+      LOGGER.error("error loading command", e);
+    }
   }
 
   protected void addCommand(String name, RespCommand command) {

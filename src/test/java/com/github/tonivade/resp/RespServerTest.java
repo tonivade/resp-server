@@ -27,8 +27,7 @@ public class RespServerTest {
   private static final int PORT = 12345;
   private static final int TIMEOUT = 3000;
 
-  private final RespServer respServer = 
-      new RespServer(new RespServerContext(HOST, PORT, new CommandSuite()));
+  private final RespServer respServer = RespServer.builder().host(HOST).port(12345).commands(new CommandSuite()).build();
 
   private RespCallback callback = mock(RespCallback.class);
 
@@ -70,13 +69,13 @@ public class RespServerTest {
 
     redisClient.stop();
   }
-  
+
   @Test
   public void serverStartsOnRandomPort() {
     RespServer server = RespServer.builder().randomPort().build();
-    
+
     server.start();
-    
+
     assertTrue(server.getPort() != 0);
   }
 

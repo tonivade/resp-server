@@ -4,23 +4,22 @@
  */
 package com.github.tonivade.resp.command;
 
-import static com.github.tonivade.purefun.Precondition.checkNonNull;
-
-import com.github.tonivade.purefun.data.ImmutableArray;
-import com.github.tonivade.purefun.type.Option;
+import static com.github.tonivade.resp.util.Precondition.checkNonNull;
 import com.github.tonivade.resp.protocol.SafeString;
+import java.util.List;
+import java.util.Optional;
 
 public class DefaultRequest implements Request {
 
   private final SafeString command;
 
-  private final ImmutableArray<SafeString> params;
+  private final List<SafeString> params;
 
   private final Session session;
 
   private final ServerContext server;
 
-  public DefaultRequest(ServerContext server, Session session, SafeString command, ImmutableArray<SafeString> params) {
+  public DefaultRequest(ServerContext server, Session session, SafeString command, List<SafeString> params) {
     this.server = server;
     this.session = session;
     this.command = checkNonNull(command);
@@ -33,7 +32,7 @@ public class DefaultRequest implements Request {
   }
 
   @Override
-  public ImmutableArray<SafeString> getParams() {
+  public List<SafeString> getParams() {
     return params;
   }
 
@@ -46,8 +45,8 @@ public class DefaultRequest implements Request {
   }
 
   @Override
-  public Option<SafeString> getOptionalParam(int i) {
-    return Option.of(() -> getParam(i));
+  public Optional<SafeString> getOptionalParam(int i) {
+    return Optional.ofNullable(getParam(i));
   }
 
   @Override

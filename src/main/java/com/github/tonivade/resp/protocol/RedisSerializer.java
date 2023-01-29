@@ -4,11 +4,11 @@
  */
 package com.github.tonivade.resp.protocol;
 
-import static com.github.tonivade.purefun.Precondition.checkNonNull;
+import static com.github.tonivade.resp.util.Precondition.checkNonNull;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
-import com.github.tonivade.purefun.data.Sequence;
+import java.util.Collection;
 import com.github.tonivade.resp.protocol.AbstractRedisToken.ArrayRedisToken;
 import com.github.tonivade.resp.protocol.AbstractRedisToken.ErrorRedisToken;
 import com.github.tonivade.resp.protocol.AbstractRedisToken.IntegerRedisToken;
@@ -17,13 +17,14 @@ import com.github.tonivade.resp.protocol.AbstractRedisToken.StringRedisToken;
 import io.netty.util.Recycler;
 
 public class RedisSerializer {
-  
+
   private static final Recycler<ByteBufferBuilder> RECYCLER = new Recycler<ByteBufferBuilder>() {
+    @Override
     protected ByteBufferBuilder newObject(Recycler.Handle<ByteBufferBuilder> handle) {
       return new ByteBufferBuilder(handle);
     }
   };
-  
+
   private static final byte ARRAY = '*';
   private static final byte ERROR = '-';
   private static final byte INTEGER = ':';
@@ -42,7 +43,7 @@ public class RedisSerializer {
   private static void encodeToken(ByteBufferBuilder builder, RedisToken msg) {
     switch (msg.getType()) {
       case ARRAY:
-        Sequence<RedisToken> array = ((ArrayRedisToken) msg).getValue();
+        Collection<RedisToken> array = ((ArrayRedisToken) msg).getValue();
         if (array != null) {
           builder.append(ARRAY).append(array.size()).append(DELIMITER);
           for (RedisToken token : array) {
@@ -79,17 +80,18 @@ public class RedisSerializer {
   }
 
   private static class ByteBufferBuilder implements AutoCloseable {
-    
+
     private static final int INITIAL_CAPACITY = 1024;
 
     private ByteBuffer buffer = ByteBuffer.allocate(INITIAL_CAPACITY);
-    
+
     private final Recycler.Handle<ByteBufferBuilder> handle;
 
     private ByteBufferBuilder(Recycler.Handle<ByteBufferBuilder> handle) {
       this.handle = checkNonNull(handle);
     }
 
+    @Override
     public void close() {
       if (buffer.capacity() > INITIAL_CAPACITY) {
         buffer = ByteBuffer.allocate(INITIAL_CAPACITY);

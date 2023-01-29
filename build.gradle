@@ -50,7 +50,6 @@ repositories {
 dependencies {
   api "io.netty:netty-all:$nettyVersion"
   api "io.reactivex.rxjava3:rxjava:$rxjavaVersion"
-  api "com.github.tonivade:purefun-core:$purefunVersion"
   api "org.slf4j:slf4j-api:$slf4jVersion"
   testImplementation "junit:junit:$junitVersion"
   testImplementation "org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion"

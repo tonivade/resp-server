@@ -4,19 +4,18 @@
  */
 package com.github.tonivade.resp.command;
 
-import com.github.tonivade.purefun.type.Option;
 import com.github.tonivade.resp.protocol.RedisToken;
-
 import java.net.InetSocketAddress;
+import java.util.Optional;
 
 public interface Session {
   String getId();
   void publish(RedisToken msg);
   void close();
   void destroy();
-  <T> Option<T> getValue(String key);
+  <T> Optional<T> getValue(String key);
   void putValue(String key, Object value);
-  <T> Option<T> removeValue(String key);
+  <T> Optional<T> removeValue(String key);
   InetSocketAddress getRemoteAddress();
   InetSocketAddress getLocalAddress();
 }

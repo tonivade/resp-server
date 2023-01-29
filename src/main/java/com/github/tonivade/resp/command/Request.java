@@ -4,18 +4,23 @@
  */
 package com.github.tonivade.resp.command;
 
-import com.github.tonivade.purefun.data.ImmutableArray;
-import com.github.tonivade.purefun.type.Option;
 import com.github.tonivade.resp.protocol.SafeString;
+import java.util.Optional;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public interface Request {
   String getCommand();
-  ImmutableArray<SafeString> getParams();
+  Iterable<SafeString> getParams();
   SafeString getParam(int i);
-  Option<SafeString> getOptionalParam(int i);
+  Optional<SafeString> getOptionalParam(int i);
   int getLength();
   boolean isEmpty();
   Session getSession();
   ServerContext getServerContext();
   boolean isExit();
+
+  default Stream<SafeString> getParamsAsStream() {
+    return StreamSupport.stream(getParams().spliterator(), false);
+  }
 }

@@ -4,24 +4,20 @@
  */
 package com.github.tonivade.resp;
 
-import static com.github.tonivade.purefun.Precondition.checkNonNull;
+import static com.github.tonivade.resp.util.Precondition.checkNonNull;
 import static com.github.tonivade.resp.protocol.SafeString.safeAsList;
 import static com.github.tonivade.resp.protocol.SafeString.safeString;
-import static java.util.stream.Collectors.toList;
 import java.io.IOException;
 import io.netty.handler.timeout.IdleStateHandler;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Stream;
-
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.tonivade.purefun.Pattern1;
-import com.github.tonivade.purefun.Recoverable;
-import com.github.tonivade.purefun.data.ImmutableArray;
-import com.github.tonivade.purefun.type.Option;
 import com.github.tonivade.resp.command.CommandSuite;
 import com.github.tonivade.resp.command.DefaultRequest;
 import com.github.tonivade.resp.command.DefaultSession;
@@ -34,7 +30,7 @@ import com.github.tonivade.resp.protocol.RedisDecoder;
 import com.github.tonivade.resp.protocol.RedisEncoder;
 import com.github.tonivade.resp.protocol.RedisToken;
 import com.github.tonivade.resp.protocol.SafeString;
-
+import com.github.tonivade.resp.util.Recoverable;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;
@@ -156,15 +152,13 @@ public class RespServer implements Resp {
       .ifPresent(serverContext::processCommand);
   }
 
-  private Option<Request> parseMessage(RedisToken message, Session session) {
-    return Pattern1.<RedisToken, Option<Request>>build()
-        .when(ArrayRedisToken.class)
-          .then(token -> Option.some(parseArray(token, session)))
-        .when(UnknownRedisToken.class)
-          .then(token -> Option.some(parseLine(token, session)))
-        .otherwise()
-          .returns(Option.none())
-        .apply(message);
+  private Optional<Request> parseMessage(RedisToken message, Session session) {
+    if (message instanceof ArrayRedisToken) {
+      return Optional.of(parseArray((ArrayRedisToken) message, session));
+    } else if (message instanceof UnknownRedisToken) {
+      return Optional.of(parseLine((UnknownRedisToken) message, session));
+    }
+    return Optional.empty();
   }
 
   private Request parseLine(UnknownRedisToken message, Session session) {
@@ -172,27 +166,27 @@ public class RespServer implements Resp {
     String[] params = command.toString().split(" ");
     String[] array = new String[params.length - 1];
     System.arraycopy(params, 1, array, 0, array.length);
-    return new DefaultRequest(serverContext, session, safeString(params[0]), ImmutableArray.from(safeAsList(array)));
+    return new DefaultRequest(serverContext, session, safeString(params[0]), safeAsList(array));
   }
 
   private Request parseArray(ArrayRedisToken message, Session session) {
     List<SafeString> params = toParams(message);
-    return new DefaultRequest(serverContext, session, params.remove(0), ImmutableArray.from(params));
+    return new DefaultRequest(serverContext, session, params.remove(0), params);
   }
 
   private List<SafeString> toParams(ArrayRedisToken message) {
-    return message.getValue().stream()
-        .flatMap(this::toSafeStrings)
-        .collect(toList());
+    List<SafeString> result = new ArrayList<>();
+    for (RedisToken token : message.getValue()) {
+      result.addAll(toSafeStrings(token));
+    }
+    return result;
   }
 
-  private Stream<SafeString> toSafeStrings(RedisToken token) {
-    return Pattern1.<RedisToken, Stream<SafeString>>build()
-        .when(StringRedisToken.class)
-          .then(string -> Stream.of(string.getValue()))
-        .otherwise()
-          .returns(Stream.empty())
-        .apply(token);
+  private List<SafeString> toSafeStrings(RedisToken token) {
+    if (token instanceof StringRedisToken) {
+      return Collections.singletonList(((StringRedisToken) token).getValue());
+    }
+    return Collections.emptyList();
   }
 
   private String sourceKey(Channel channel) {
@@ -222,6 +216,7 @@ public class RespServer implements Resp {
   }
 
   public static class Builder implements Recoverable {
+
     private String host = DEFAULT_HOST;
     private int port = DEFAULT_PORT;
     private CommandSuite commands = new CommandSuite();

@@ -4,12 +4,10 @@
  */
 package com.github.tonivade.resp.protocol;
 
-import static com.github.tonivade.purefun.Precondition.checkNonNull;
-
+import static com.github.tonivade.resp.util.Precondition.checkNonNull;
+import com.github.tonivade.resp.util.Equal;
+import java.util.Collection;
 import java.util.Objects;
-
-import com.github.tonivade.purefun.Equal;
-import com.github.tonivade.purefun.data.Sequence;
 
 public abstract class AbstractRedisToken<T> implements RedisToken {
 
@@ -111,10 +109,10 @@ public abstract class AbstractRedisToken<T> implements RedisToken {
     }
   }
 
-  public static final class ArrayRedisToken extends AbstractRedisToken<Sequence<RedisToken>> {
+  public static final class ArrayRedisToken extends AbstractRedisToken<Collection<RedisToken>> {
 
-    ArrayRedisToken(Sequence<RedisToken> value) {
-      super(RedisTokenType.ARRAY, checkNonNull(value).asArray());
+    ArrayRedisToken(Collection<RedisToken> value) {
+      super(RedisTokenType.ARRAY, checkNonNull(value));
     }
 
     @Override

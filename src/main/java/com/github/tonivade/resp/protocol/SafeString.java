@@ -4,10 +4,10 @@
  */
 package com.github.tonivade.resp.protocol;
 
-import static com.github.tonivade.purefun.Precondition.checkNonNull;
+import static com.github.tonivade.resp.util.Precondition.checkNonNull;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.toList;
-
+import com.github.tonivade.resp.util.Equal;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -17,8 +17,6 @@ import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
-
-import com.github.tonivade.purefun.Equal;
 
 public class SafeString implements Comparable<SafeString>, Serializable {
 
