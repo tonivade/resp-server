@@ -48,9 +48,17 @@ repositories {
 }
 
 dependencies {
-  api "io.netty:netty-all:$nettyVersion"
+  api "io.netty:netty-buffer:$nettyVersion"
+  api "io.netty:netty-common:$nettyVersion"
+  api "io.netty:netty-codec:$nettyVersion"
+  api "io.netty:netty-handler:$nettyVersion"
+  api "io.netty:netty-resolver:$nettyVersion"
+  api "io.netty:netty-transport:$nettyVersion"
+  api "io.netty:netty-transport-classes-epoll:$nettyVersion"
   api "io.reactivex.rxjava3:rxjava:$rxjavaVersion"
   api "org.slf4j:slf4j-api:$slf4jVersion"
+  implementation "io.netty:netty-transport-native-epoll:$nettyVersion:linux-aarch_64"
+  implementation "io.netty:netty-transport-native-epoll:$nettyVersion:linux-x86_64"
   testImplementation "junit:junit:$junitVersion"
   testImplementation "org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion"
   testImplementation "org.mockito:mockito-core:$mockitoVersion"
