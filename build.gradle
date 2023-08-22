@@ -12,6 +12,10 @@ group = 'com.github.tonivade'
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
 java {
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(8)
+  }
+
   withJavadocJar()
   withSourcesJar()
 }
