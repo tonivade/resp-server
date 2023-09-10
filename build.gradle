@@ -64,13 +64,13 @@ dependencies {
   runtimeOnly(libs.nettyTransportNativeEpoll) {
     artifact {
       classifier = 'linux-aarch_64'
-      type = 'jar'
+      extension = 'jar'
     }
   }
   runtimeOnly(libs.nettyTransportNativeEpoll) {
     artifact {
       classifier = 'linux-x86_64'
-      type = 'jar'
+      extension = 'jar'
     }
   }
   testImplementation libs.junit
