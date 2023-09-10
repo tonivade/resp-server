@@ -3,8 +3,8 @@ plugins {
   id 'jacoco'
   id 'maven-publish'
   id 'signing'
-  id 'io.github.gradle-nexus.publish-plugin' version "$nexusVersion"
-  id 'com.github.ben-manes.versions' version "$versionsVersion"
+  id 'io.github.gradle-nexus.publish-plugin' version "1.3.0"
+  id 'com.github.ben-manes.versions' version "0.48.0"
 }
 
 group = 'com.github.tonivade'
@@ -21,7 +21,7 @@ java {
 }
 
 jacoco {
-  toolVersion = jacocoVersion
+  toolVersion = "0.8.9"
 }
 
 test {
@@ -52,22 +52,30 @@ repositories {
 }
 
 dependencies {
-  api "io.netty:netty-buffer:$nettyVersion"
-  api "io.netty:netty-common:$nettyVersion"
-  api "io.netty:netty-codec:$nettyVersion"
-  api "io.netty:netty-handler:$nettyVersion"
-  api "io.netty:netty-resolver:$nettyVersion"
-  api "io.netty:netty-transport:$nettyVersion"
-  api "io.netty:netty-transport-classes-epoll:$nettyVersion"
-  api "io.reactivex.rxjava3:rxjava:$rxjavaVersion"
-  api "org.slf4j:slf4j-api:$slf4jVersion"
-  runtimeOnly "io.netty:netty-transport-native-epoll:$nettyVersion:linux-aarch_64"
-  runtimeOnly "io.netty:netty-transport-native-epoll:$nettyVersion:linux-x86_64"
-  testImplementation "junit:junit:$junitVersion"
-  testImplementation "org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion"
-  testImplementation "org.mockito:mockito-core:$mockitoVersion"
-  testImplementation "org.hamcrest:hamcrest-library:$hamcrestVersion"
-  testRuntimeOnly "ch.qos.logback:logback-classic:$logbackVersion"
+  api libs.nettyBuffer
+  api libs.nettyCommon
+  api libs.nettyCodec
+  api libs.nettyHandler
+  api libs.nettyResolver
+  api libs.nettyTransport
+  api libs.nettyTransportClassesEpoll
+  api libs.rxjava3
+  api libs.slf4j
+  runtimeOnly(libs.nettyTransportNativeEpoll) {
+    artifact {
+      classifier = 'linux-aarch_64'
+    }
+  }
+  runtimeOnly(libs.nettyTransportNativeEpoll) {
+    artifact {
+      classifier = 'linux-x86_64'
+    }
+  }
+  testImplementation libs.junit
+  testImplementation libs.junitJupiterEngine 
+  testImplementation libs.mockitoCore
+  testImplementation libs.hamcrestLibrary
+  testRuntimeOnly libs.logbackClassic
 }
 
 publishing {
