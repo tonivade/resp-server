@@ -20,12 +20,23 @@ java {
   withSourcesJar()
 }
 
+jar {
+  manifest {
+    attributes('Automatic-Module-Name': 'org.gradle.sample')
+  }
+}
+
+
 jacoco {
   toolVersion = "0.8.9"
 }
 
 test {
   useJUnitPlatform()
+  
+  reports {
+    html.required = true
+  }
 
   jacoco {
     destinationFile = file("${buildDir}/jacoco/test.exec")
