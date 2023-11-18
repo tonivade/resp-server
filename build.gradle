@@ -22,10 +22,9 @@ java {
 
 jar {
   manifest {
-    attributes('Automatic-Module-Name': 'org.gradle.sample')
+    attributes('Automatic-Module-Name': 'com.github.tonivade.resp')
   }
 }
-
 
 jacoco {
   toolVersion = "0.8.9"
