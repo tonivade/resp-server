@@ -6,7 +6,7 @@ junitVersion = "4.13.2"
 junitJupiterVersion = "5.10.2"
 mockitoVersion = "4.11.0"
 hamcrestVersion = "2.2"
-logbackVersion = "1.3.14"
+logbackVersion = "1.5.1"
 versionsVersion = "0.51.0"
 nexusVersion = "1.3.0"
 
