@@ -80,8 +80,9 @@ dependencies {
       extension = 'jar'
     }
   }
-  testImplementation libs.junit
-  testImplementation libs.junitJupiterEngine 
+  testImplementation platform(libs.junitBom)
+  testImplementation libs.junitJupiter
+  testRuntimeOnly libs.junitLauncher
   testImplementation libs.mockitoCore
   testImplementation libs.hamcrestLibrary
   testRuntimeOnly libs.logbackClassic
