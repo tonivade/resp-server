@@ -31,4 +31,4 @@ jobs:
       with:
         project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
         coverage-reports: build/reports/jacoco/report.xml
-      if: github.repository == 'tonivade/resp-server'
+      if: github.actor == github.repository_owner
