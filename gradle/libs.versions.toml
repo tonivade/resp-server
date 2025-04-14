@@ -2,7 +2,7 @@
 nettyVersion = "4.2.0.Final"
 rxjavaVersion = "3.1.10"
 slf4jVersion = "2.0.17"
-junitVersion = "5.12.1"
+junitVersion = "5.12.2"
 mockitoVersion = "4.11.0"
 hamcrestVersion = "3.0"
 logbackVersion = "1.3.15"
