@@ -1,5 +1,5 @@
 [versions]
-nettyVersion = "4.2.4.Final"
+nettyVersion = "4.2.5.Final"
 rxjavaVersion = "3.1.11"
 slf4jVersion = "2.0.17"
 junitVersion = "5.13.4"
