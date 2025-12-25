@@ -4,24 +4,23 @@
  */
 package com.github.tonivade.resp.protocol;
 
-import static com.github.tonivade.resp.protocol.SafeString.safeString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.when;
-
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
 import com.github.tonivade.resp.protocol.AbstractRedisToken.UnknownRedisToken;
+import com.github.tonivade.resp.util.StringRedisSource;
+import org.junit.jupiter.api.Test;
+
+import static com.github.tonivade.resp.protocol.SafeString.safeString;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 
 class RedisParserTest {
 
-  private RedisSource source = Mockito.mock(RedisSource.class);
+  private StringRedisSource source = new StringRedisSource();
 
   private RedisParser parser = new RedisParser(100000, source);
 
   private RedisToken intToken = RedisToken.integer(1);
   private RedisToken abcString = RedisToken.string("abc");
+  private RedisToken emptyString = RedisToken.string("");
   private RedisToken pongString = RedisToken.status("pong");
   private RedisToken errorString = RedisToken.error("ERR");
   private RedisToken arrayToken = RedisToken.array(intToken, abcString);
@@ -29,57 +28,76 @@ class RedisParserTest {
 
   @Test
   void testBulkString() {
-    when(source.readLine()).thenReturn(safeString("$3"));
-    when(source.readString(3)).thenReturn(safeString("abc"));
+    source.init("$3\r\nabc\r\n");
 
     RedisToken token = parser.next();
 
     assertThat(token, equalTo(abcString));
+    assertThat(source.available(), equalTo(0));
+  }
+
+  @Test
+  void testEmptyBulkString() {
+    source.init("$0\r\n\r\n");
+
+    RedisToken token = parser.next();
+
+    assertThat(token, equalTo(emptyString));
+    assertThat(source.available(), equalTo(0));
   }
 
   @Test
   void testSimpleString() {
-    when(source.readLine()).thenReturn(safeString("+pong"));
+    source.init("+pong\r\n");
 
     RedisToken token = parser.next();
 
     assertThat(token, equalTo(pongString));
+    assertThat(source.available(), equalTo(0));
   }
 
   @Test
   void testInteger() {
-    when(source.readLine()).thenReturn(safeString(":1"));
+    source.init(":1\r\n");
 
     RedisToken token = parser.next();
 
     assertThat(token, equalTo(intToken));
+    assertThat(source.available(), equalTo(0));
   }
 
   @Test
   void testErrorString() {
-    when(source.readLine()).thenReturn(safeString("-ERR"));
+    source.init("-ERR\r\n");
 
     RedisToken token = parser.next();
 
     assertThat(token, equalTo(errorString));
+    assertThat(source.available(), equalTo(0));
   }
 
   @Test
-  void testUnknownString() {
-    when(source.readLine()).thenReturn(safeString("what?"));
+  void testUnknownToken() {
+    source.init("what?\r\n");
 
     RedisToken token = parser.next();
 
     assertThat(token, equalTo(unknownString));
+    assertThat(source.available(), equalTo(0));
   }
 
   @Test
   void testArray() {
-    when(source.readLine()).thenReturn(safeString("*2"), safeString(":1"), safeString("$3"));
-    when(source.readString(3)).thenReturn(safeString("abc"));
+    source.init(
+      "*2\r\n",
+      ":1\r\n",
+      "$3\r\n",
+      "abc\r\n"
+    );
 
     RedisToken token = parser.next();
 
     assertThat(token, equalTo(arrayToken));
+    assertThat(source.available(), equalTo(0));
   }
 }

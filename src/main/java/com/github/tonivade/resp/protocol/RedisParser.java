@@ -85,7 +85,7 @@ public class RedisParser implements Iterator<RedisToken> {
   private RedisToken parseStringToken(SafeString line) {
     StringRedisToken token;
     int length = Integer.parseInt(line.substring(1));
-    if (length > 0 && length < maxLength) {
+    if (length >= 0 && length < maxLength) {
       token = new StringRedisToken(source.readString(length));
     } else {
       token = new StringRedisToken(SafeString.EMPTY_STRING);
