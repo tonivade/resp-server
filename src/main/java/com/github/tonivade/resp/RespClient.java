@@ -27,7 +27,8 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.MultiThreadIoEventLoopGroup;
+import io.netty.channel.nio.NioIoHandler;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.string.StringEncoder;
@@ -55,7 +56,7 @@ public class RespClient implements Resp {
   }
 
   public void start() {
-    workerGroup = new NioEventLoopGroup(Runtime.getRuntime().availableProcessors());
+    workerGroup = new MultiThreadIoEventLoopGroup(Runtime.getRuntime().availableProcessors(), NioIoHandler.newFactory());
 
     bootstrap = new Bootstrap().group(workerGroup)
         .channel(NioSocketChannel.class)

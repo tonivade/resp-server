@@ -13,7 +13,7 @@ ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
 java {
   toolchain {
-    languageVersion = JavaLanguageVersion.of(8)
+    languageVersion = JavaLanguageVersion.of(11)
   }
 
   withJavadocJar()
