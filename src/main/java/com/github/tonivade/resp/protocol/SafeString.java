@@ -38,7 +38,7 @@ public class SafeString implements Comparable<SafeString>, Serializable {
   }
 
   public byte[] getBytes() {
-    ByteBuffer copy = buffer.duplicate();
+    var copy = buffer.duplicate();
     byte[] bytes = new byte[copy.remaining()];
     copy.get(bytes);
     return bytes;
@@ -73,7 +73,7 @@ public class SafeString implements Comparable<SafeString>, Serializable {
   }
 
   public String toHexString() {
-    StringBuilder sb = new StringBuilder();
+    var sb = new StringBuilder();
     byte[] bytes = getBytes();
     for (int i = 0; i < bytes.length; i++) {
       int v = bytes[i] & 0xFF;
@@ -99,7 +99,7 @@ public class SafeString implements Comparable<SafeString>, Serializable {
   }
 
   public static SafeString append(SafeString stringA, SafeString stringB) {
-    ByteBuffer byteBuffer = ByteBuffer.allocate(checkNonNull(stringA).length() + checkNonNull(stringB).length());
+    var byteBuffer = ByteBuffer.allocate(checkNonNull(stringA).length() + checkNonNull(stringB).length());
     byteBuffer.put(stringA.getBytes());
     byteBuffer.put(stringB.getBytes());
     ((Buffer) byteBuffer).rewind();

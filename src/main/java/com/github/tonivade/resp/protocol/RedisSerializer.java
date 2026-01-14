@@ -18,7 +18,7 @@ import io.netty.util.Recycler;
 
 public class RedisSerializer {
 
-  private static final Recycler<ByteBufferBuilder> RECYCLER = new Recycler<ByteBufferBuilder>() {
+  private static final Recycler<ByteBufferBuilder> RECYCLER = new Recycler<>() {
     @Override
     protected ByteBufferBuilder newObject(Recycler.Handle<ByteBufferBuilder> handle) {
       return new ByteBufferBuilder(handle);

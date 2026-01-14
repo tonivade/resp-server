@@ -43,8 +43,7 @@ public class RespServerContext implements ServerContext {
     this(host, port, commands, nullListener());
   }
 
-  public RespServerContext(String host, int port, CommandSuite commands,
-                           SessionListener sessionListener) {
+  public RespServerContext(String host, int port, CommandSuite commands, SessionListener sessionListener) {
     this.host = checkNonEmpty(host);
     this.port = checkRange(port, 1024, 65535);
     this.commands = checkNonNull(commands);
@@ -106,9 +105,9 @@ public class RespServerContext implements ServerContext {
   void processCommand(Request request) {
     LOGGER.debug("received command: {}", request);
 
-    RespCommand command = getCommand(request.getCommand());
+    var command = getCommand(request.getCommand());
     try {
-      executeOn(execute(command, request))
+      enqueue(Observable.fromCallable(() -> executeCommand(command, request)))
         .subscribe(response -> processResponse(request, response),
                    ex -> LOGGER.error("error executing command: " + request, ex));
     } catch (RuntimeException ex) {
@@ -135,7 +134,7 @@ public class RespServerContext implements ServerContext {
     return command.execute(request);
   }
 
-  protected <T> Observable<T> executeOn(Observable<T> observable) {
+  protected <T> Observable<T> enqueue(Observable<T> observable) {
     return observable.subscribeOn(scheduler);
   }
 
@@ -144,13 +143,6 @@ public class RespServerContext implements ServerContext {
     if (request.isExit()) {
       request.getSession().close();
     }
-  }
-
-  private Observable<RedisToken> execute(RespCommand command, Request request) {
-    return Observable.create(observer -> {
-      observer.onNext(executeCommand(command, request));
-      observer.onComplete();
-    });
   }
 
   private void clear() {

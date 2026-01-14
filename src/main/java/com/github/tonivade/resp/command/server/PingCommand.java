@@ -21,8 +21,7 @@ public class PingCommand implements RespCommand {
   public RedisToken execute(Request request) {
     if (request.getLength() > 0) {
       return string(request.getParam(0));
-    } else {
-      return status(PONG);
     }
+    return status(PONG);
   }
 }
