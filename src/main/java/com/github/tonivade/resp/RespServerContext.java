@@ -136,7 +136,7 @@ public class RespServerContext implements ServerContext {
   }
 
   protected <T> Observable<T> executeOn(Observable<T> observable) {
-    return observable.observeOn(scheduler);
+    return observable.subscribeOn(scheduler);
   }
 
   private void processResponse(Request request, RedisToken token) {
