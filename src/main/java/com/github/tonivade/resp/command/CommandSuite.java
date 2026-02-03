@@ -54,7 +54,7 @@ public class CommandSuite {
     return commands.get(name) != null;
   }
 
-  protected void addCommand(Supplier<?> newInstance) {
+  protected void addCommand(Supplier<? extends RespCommand> newInstance) {
     try {
       processCommand(newInstance.get());
     } catch(Exception e) {
@@ -66,7 +66,7 @@ public class CommandSuite {
     commands.put(name.toLowerCase(), factory.wrap(command));
   }
 
-  private void processCommand(Object command) {
+  private void processCommand(RespCommand command) {
     Class<?> clazz = command.getClass();
     Command annotation = clazz.getAnnotation(Command.class);
     if (annotation != null) {
