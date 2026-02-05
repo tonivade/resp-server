@@ -5,5 +5,5 @@
 package com.github.tonivade.resp.command;
 
 public interface CommandWrapperFactory {
-  RespCommand wrap(Object command);
+  RespCommand wrap(RespCommand command);
 }
