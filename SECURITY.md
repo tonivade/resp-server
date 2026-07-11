@@ -5,9 +5,7 @@
 | Version | Supported |
 | ------- | --------- |
 | v1.0 | ✅ |
-| v0.25.0 | ❌ |
-| v0.24.0 | ✅ |
-| < v0.24.0 | ❌ |
+| < v1.0 | ❌ |
 
 
 ## Reporting a Vulnerability
