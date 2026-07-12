@@ -82,23 +82,23 @@ public class RedisParser implements Iterator<RedisToken> {
   }
 
   private RedisToken parseStringToken(SafeString line) {
-    StringRedisToken token;
     int length = line.parseIntAfterPrefix();
     if (length >= 0 && length < maxLength) {
-      token = new StringRedisToken(source.readString(length));
-    } else {
-      token = new StringRedisToken(SafeString.EMPTY_STRING);
+      return new StringRedisToken(source.readString(length));
     }
-    return token;
+    return new StringRedisToken(SafeString.EMPTY_STRING);
   }
 
   private RedisToken parseArray(int size) {
-    List<RedisToken> array = new ArrayList<>(size);
+    if (size >= 0 && size < maxLength) {
+      List<RedisToken> array = new ArrayList<>(size);
 
-    for (int i = 0; i < size; i++) {
-      array.add(parseToken(source.readLine()));
+      for (int i = 0; i < size; i++) {
+        array.add(parseToken(source.readLine()));
+      }
+
+      return array(array);
     }
-
-    return array(array);
+    return array();
   }
 }
