@@ -6,6 +6,7 @@ package com.github.tonivade.resp.protocol;
 
 import com.github.tonivade.resp.protocol.AbstractRedisToken.UnknownRedisToken;
 import com.github.tonivade.resp.util.StringRedisSource;
+
 import org.junit.jupiter.api.Test;
 
 import static com.github.tonivade.resp.protocol.SafeString.safeString;
@@ -44,6 +45,15 @@ class RedisParserTest {
 
     assertThat(token, equalTo(emptyString));
     assertThat(source.available(), equalTo(0));
+  }
+
+  @Test
+  void testLargeBulkString() {
+    source.init("$100000\r\n\r\n");
+
+    RedisToken token = parser.next();
+
+    assertThat(token, equalTo(emptyString));
   }
 
   @Test
@@ -99,5 +109,19 @@ class RedisParserTest {
 
     assertThat(token, equalTo(arrayToken));
     assertThat(source.available(), equalTo(0));
+  }
+
+  @Test
+  void testLargeArray() throws Exception {
+    source.init(
+      "*100000\r\n",
+      ":1\r\n",
+      "$3\r\n",
+      "abc\r\n"
+    );
+
+    RedisToken token = parser.next();
+
+    assertThat(token, equalTo(RedisToken.array()));
   }
 }
